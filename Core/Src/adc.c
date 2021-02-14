@@ -74,13 +74,33 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     __HAL_RCC_ADC1_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /**ADC1 GPIO Configuration
+    PA3     ------> ADC1_IN3
+    PA4     ------> ADC1_IN4
+    PA5     ------> ADC1_IN5
+    PA6     ------> ADC1_IN6
     PA7     ------> ADC1_IN7
+    PC4     ------> ADC1_IN14
+    PC5     ------> ADC1_IN15
+    PB1     ------> ADC1_IN9
     */
-    GPIO_InitStruct.Pin = PCB_ADC_Pin;
+    GPIO_InitStruct.Pin = SENSE_KL15_Pin|SENSE_KUEHLWASSER_Pin|SENSE_KLIMA_FLAP_Pin|SENSE_GAS_Pin
+                          |SENSE_PCB_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(PCB_ADC_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = SENSE_DRUCK_Pin|SENSE_DRUCK_TEMP_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = SENSE_INFO_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(SENSE_INFO_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
@@ -100,9 +120,21 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     __HAL_RCC_ADC1_CLK_DISABLE();
 
     /**ADC1 GPIO Configuration
+    PA3     ------> ADC1_IN3
+    PA4     ------> ADC1_IN4
+    PA5     ------> ADC1_IN5
+    PA6     ------> ADC1_IN6
     PA7     ------> ADC1_IN7
+    PC4     ------> ADC1_IN14
+    PC5     ------> ADC1_IN15
+    PB1     ------> ADC1_IN9
     */
-    HAL_GPIO_DeInit(PCB_ADC_GPIO_Port, PCB_ADC_Pin);
+    HAL_GPIO_DeInit(GPIOA, SENSE_KL15_Pin|SENSE_KUEHLWASSER_Pin|SENSE_KLIMA_FLAP_Pin|SENSE_GAS_Pin
+                          |SENSE_PCB_Pin);
+
+    HAL_GPIO_DeInit(GPIOC, SENSE_DRUCK_Pin|SENSE_DRUCK_TEMP_Pin);
+
+    HAL_GPIO_DeInit(SENSE_INFO_GPIO_Port, SENSE_INFO_Pin);
 
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
