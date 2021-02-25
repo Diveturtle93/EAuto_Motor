@@ -67,8 +67,8 @@ void MX_GPIO_Init(void)
                           |BAMOCAR_OUT1_Pin|BAMOCAR_OUT2_Pin|J317_Pin|DCDC_ENABLE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED_RED_Pin|F54_Pin|F18_Pin|KLIMA_OUT_Pin
-                          |LED_ORANGE_Pin|HEATER2_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, RED_LED_Pin|F54_Pin|F18_Pin|KLIMA_OUT_Pin
+                          |GREEN_LED_Pin|HEATER2_Pin|BLUE_LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
@@ -117,16 +117,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PF0 PFPin PFPin PFPin
-                           PFPin PF10 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|SPI5_CS_Pin|SPI5_SCK_Pin|SPI5_MISO_Pin
-                          |SPI5_MOSI_Pin|GPIO_PIN_10;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PFPin PFPin */
-  GPIO_InitStruct.Pin = ECON_Pin|RECUPERATION_Pin;
+  /*Configure GPIO pins : PFPin PFPin PFPin */
+  GPIO_InitStruct.Pin = BUTTON1_Pin|ECON_Pin|RECUPERATION_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
@@ -138,6 +130,14 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PFPin PFPin PFPin PFPin
+                           PF10 */
+  GPIO_InitStruct.Pin = SPI5_CS_Pin|SPI5_SCK_Pin|SPI5_MISO_Pin|SPI5_MOSI_Pin
+                          |GPIO_PIN_10;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
@@ -157,19 +157,11 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin
                            PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = LED_RED_Pin|F54_Pin|F18_Pin|KLIMA_OUT_Pin
-                          |LED_ORANGE_Pin|HEATER2_Pin|LED_BLUE_Pin;
+  GPIO_InitStruct.Pin = RED_LED_Pin|F54_Pin|F18_Pin|KLIMA_OUT_Pin
+                          |GREEN_LED_Pin|HEATER2_Pin|BLUE_LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin
-                           PBPin */
-  GPIO_InitStruct.Pin = SENSE_RETURN_Pin|CAN2_TX_Pin|CAN2_RX_Pin|I2C1_SCL_Pin
-                          |I2C1_SDA_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PGPin PGPin PGPin PGPin
@@ -187,7 +179,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = KL15_Pin|BAMOCAR_IN1_Pin|BAMOCAR_IN2_Pin|ASR_IN2_Pin;
+  GPIO_InitStruct.Pin = KL15_Pin|BAMOCAR_IN2_Pin|BAMOCAR_IN1_Pin|ASR_IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -228,6 +220,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
+  GPIO_InitStruct.Pin = CAN2_TX_Pin|CAN2_RX_Pin|I2C1_SCL_Pin|I2C1_SDA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 

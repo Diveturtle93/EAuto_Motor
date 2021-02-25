@@ -116,8 +116,8 @@ void Error_Handler(void);
 #define SENSE_RETURN_GPIO_Port GPIOB
 #define SENSE_INFO_Pin GPIO_PIN_1
 #define SENSE_INFO_GPIO_Port GPIOB
-#define LED_RED_Pin GPIO_PIN_2
-#define LED_RED_GPIO_Port GPIOB
+#define RED_LED_Pin GPIO_PIN_2
+#define RED_LED_GPIO_Port GPIOB
 #define RECUPERATION_Pin GPIO_PIN_11
 #define RECUPERATION_GPIO_Port GPIOF
 #define BAMOCAR_OUT1_Pin GPIO_PIN_12
@@ -158,8 +158,8 @@ void Error_Handler(void);
 #define F18_GPIO_Port GPIOB
 #define KLIMA_OUT_Pin GPIO_PIN_13
 #define KLIMA_OUT_GPIO_Port GPIOB
-#define LED_ORANGE_Pin GPIO_PIN_14
-#define LED_ORANGE_GPIO_Port GPIOB
+#define GREEN_LED_Pin GPIO_PIN_14
+#define GREEN_LED_GPIO_Port GPIOB
 #define ANLASSER_Pin GPIO_PIN_15
 #define ANLASSER_GPIO_Port GPIOB
 #define KL15_Pin GPIO_PIN_8
@@ -254,8 +254,8 @@ void Error_Handler(void);
 #define CAN2_TX_GPIO_Port GPIOB
 #define CAN2_RX_Pin GPIO_PIN_6
 #define CAN2_RX_GPIO_Port GPIOB
-#define LED_BLUE_Pin GPIO_PIN_7
-#define LED_BLUE_GPIO_Port GPIOB
+#define BLUE_LED_Pin GPIO_PIN_7
+#define BLUE_LED_GPIO_Port GPIOB
 #define I2C1_SCL_Pin GPIO_PIN_8
 #define I2C1_SCL_GPIO_Port GPIOB
 #define I2C1_SDA_Pin GPIO_PIN_9
