@@ -58,6 +58,7 @@ Nachfolgend ist eine Auflistung aller Eingangspins vom Mikrocontroller.
 | Tempomat | PG6 | GRA 3 | Komfort | No |
 | Tempomat | PG7 | GRA 2 | Komfort | No |
 | Tempomat | PG8 | GRA 1 | Komfort | No |
+| Board Computer | PG12 | Reset In | Komfort | No |
 
 ---
 
