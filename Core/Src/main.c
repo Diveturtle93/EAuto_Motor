@@ -26,7 +26,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "SystemInfo.h"
+#include "BasicUart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
