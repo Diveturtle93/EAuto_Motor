@@ -18,7 +18,12 @@ Ist der Schalter nicht gedrückt, so liegen am Eingang des Mikrocontrollers 0V a
 
 ---
 
+Alle Eingänge sind Kurzschluss fest und für Spannungen von 0V bis 12V ausgelegt. Darüber
+hinaus sind die Eingänge sicher gegen Verpolung und Überspannungen bis 24V.
+
+
 ## Liste der Eingänge
+
 Nachfolgend ist eine Auflistung aller Eingangspins vom Mikrocontroller.
 
 | Funktionsgruppe | Pin | Funktion | Relevanz | Getestet |
@@ -60,28 +65,28 @@ Nachfolgend ist eine Auflistung aller Eingangspins vom Mikrocontroller.
 | Tempomat | PG8 | GRA 1 | Komfort | No |
 | Board Computer | PG12 | Reset In | Komfort | No |
 
----
-
-## Besondere Eingänge
-Bei mehreren Eingängen gibt es noch zusätzliche Eigenschaften, weshal diese nicht als
-reine Logik IO betrachtet werden können. Dies liegt daran, dass sie entsprechend wichtig
-sind oder noch eine andere Aufgabe haben, als nur einen Logikpegel einzulesen.
-
----
 
 ## System relevante Eingänge
+
 Alle System relevanten Eingänge haben etwas mit der Auswertung der Daten zum Fahren mit
-dem Fahrzeug zu tun. Diese Eingänge werden deshalb öfter grprüft als Komforteingänge.
+dem Fahrzeug zu tun. Diese Eingänge werden deshalb öfter geprüft als Komforteingänge.
 Zudem geben die System relevanten Eingänge aufschluss auf Komponentenzustände die zum
 Fahren benötigt werden. Sie werden ebenfalls über den CAN-Bus als Nachricht versendet,
 um die Zustände für Debug-Zwecke mitloggen zu können.
 
----
+
+## Besondere Eingänge
+
+Bei mehreren Eingängen gibt es noch zusätzliche Eigenschaften, weshalb diese nicht als
+reine Logik IO betrachtet werden können. Dies liegt daran, dass sie entsprechend wichtig
+sind oder noch eine andere Aufgabe haben, als nur einen Logikpegel einzulesen.
+
 
 ## Komfort Eingänge
-Alls Komfort Eingänge sind zusätzlich vorhanden und dienen nur der Steuerung von Periferie,
-die nicht zum Fahren wichtig ist aber mit im Fahrzeug verbaut werden soll. Diese Komponenten
-werden erstmal nicht mit ihren eigentlichen Funktionen belegt und werden erst einmal für
+
+Alle Komfort Eingänge sind zusätzlich vorhanden und dienen nur der Steuerung von Periferie,
+die nicht zum Fahren wichtig ist, aber mit im Fahrzeug verbaut werden soll. Diese Komponenten
+werden erstmal nicht mit ihren eigentlichen Funktionen belegt und werden aktuell nur für
 Debug-Zwecke verwendet.
 
-Im weiteren Verlauf werden diese Eingänge mit ihrer eigentlichen Funktion belegt.
+Im weiteren Verlauf bekommen diese Eingänge ihrer eigentlichen Funktion zugewiesen.
