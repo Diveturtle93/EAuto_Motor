@@ -1,6 +1,8 @@
 "Application/Src/BasicUart.o"
 "Application/Src/SystemInfo.o"
 "Application/Src/error.o"
+"Application/Src/inputs.o"
+"Application/Src/outputs.o"
 "Core/Src/adc.o"
 "Core/Src/can.o"
 "Core/Src/gpio.o"

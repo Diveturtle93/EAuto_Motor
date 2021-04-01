@@ -71,13 +71,16 @@ mit berücksichtigt. Auch diese sollen mit aufgefürt werden.
 
 | Kanal | Funktion | Default-Wert |
 |:----- |:-------- | ------------:|
-| Channel 3 | KL15 |  |
-| Channel 4 | Kühlwasser |  |
-| Channel 5 | Klima-Flap |  |
-| Channel 6 | Gaspedal |  |
-| Channel 7 | PCB Temperatur |  |
-| Channel 8 | Return |  |
-| Channel 9 | Info |  |
-| Channel 14 | Bremsdruck |  |
-| Channel 15 | Bremsdrucktemperatur |  |
-| Channel 18 | STM32 Temperatur |  |
+| Channel 3 | KL15 | ... |
+| Channel 4 | Kühlwasser | 3470 |
+| Channel 5 | Klima-Flap | 5 |
+| Channel 6 | Gaspedal | 5 |
+| Channel 7 | PCB Temperatur | 2050 |
+| Channel 8 | Return | 2930 |
+| Channel 9 | Info | 2930 |
+| Channel 14 | Bremsdruck | 2930 |
+| Channel 15 | Bremsdrucktemperatur | 2930 |
+| Channel 18 | STM32 Temperatur | 965 |
+
+Diese Werte sind nur durch eine einzige ADC-Messung ermittelt worden. Sie schwanken bedingt
+durch Messungenauigkeiten mit einer Genauigkeit von +/- 10 um den ermittelten Wert.
