@@ -28,6 +28,8 @@
 /* USER CODE BEGIN Includes */
 #include "SystemInfo.h"
 #include "BasicUart.h"
+#include "inputs.h"
+#include "outputs.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,8 +94,29 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
+
   /* USER CODE BEGIN 2 */
 
+  	/* Schreibe Resetquelle auf die Konsole */
+#ifdef DEBUG
+	printResetSource(readResetSource());
+
+  	/* Teste serielle Schnittstelle*/
+  	#define TEST_STRING_UART  "\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
+
+  	/* Sammel Systeminformationen */
+  	collectSystemInfo();
+#endif
+
+  	/* Lese alle Eingaenge */
+  	readall_inputs();
+  	/*if (system_in != SYSTEM_INPUT)
+  		Error_Handler();
+  	if (sdc_in != SDC_INPUT)
+  		Error_Handler();
+  	if (komfort_in != KOMFORT_INPUT)
+  		Error_Handler();*/
   /* USER CODE END 2 */
 
   /* Infinite loop */

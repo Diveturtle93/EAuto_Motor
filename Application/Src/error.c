@@ -5,7 +5,7 @@
 // Datum	:	16.01.2021
 // Version	:	1.0
 // Autor	:	Diveturtle93
-// Projekt	:	STM32F767ZI
+// Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
 // Einfügen der STM Include-Dateien
@@ -15,7 +15,7 @@
 
 // Einfügen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "Error.h"
+#include "error.h"
 #include "BasicUart.h"
 //----------------------------------------------------------------------
 
