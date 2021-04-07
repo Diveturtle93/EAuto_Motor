@@ -21,7 +21,7 @@ Alle Ergbnisse werden als 12bit ausgegeben.
 | Channel 4 | PA4 | Kühlwasser | 5000ms | 3 |
 | Channel 5 | PA5 | Klima-Flap | 1000ms | 4 |
 | Channel 6 | PA6 | Gaspedal | 100ms | 2 |
-| Channel 7 | PA7 | PCB | 5000ms | 7 |
+| Channel 7 | PA7 | PCB Temperatur | 5000ms | 7 |
 | Channel 8 | PB0 | Return | 1000ms | 9 |
 | Channel 9 | PB1 | Info | 1000ms | 10 |
 | Channel 14 | PC4 | Bremsdruck | 100ms | 1 |
@@ -62,3 +62,25 @@ Eine zusätzliche Einstellung wird noch an den Sampletime Cycles vorgenommen. Di
 Zeitverzögerung, die für ein genaueres Ergebnis sorgen soll. Dabei wird der halte Konensator
 um die entsprechenden Clock-Cycles geladen. Danach werden nochmal zwölf Clock-Cycles
 für eine Konversation des AD-Wertes benötigt.
+
+## ADC-Werte
+
+Nachfolgend werden im weiten Verlauf die ADC-Werte dokumentiert, welche standardmäßig an
+den ADC-Eingängen anliegen. Zusätzlich werden noch für die Auswertung wichtige ADC-Werte
+mit berücksichtigt. Auch diese sollen mit aufgefürt werden.
+
+| Kanal | Funktion | Default-Wert |
+|:----- |:-------- | ------------:|
+| Channel 3 | KL15 | ... |
+| Channel 4 | Kühlwasser | 3470 |
+| Channel 5 | Klima-Flap | 5 |
+| Channel 6 | Gaspedal | 5 |
+| Channel 7 | PCB Temperatur | 2050 |
+| Channel 8 | Return | 2930 |
+| Channel 9 | Info | 2930 |
+| Channel 14 | Bremsdruck | 2930 |
+| Channel 15 | Bremsdrucktemperatur | 2930 |
+| Channel 18 | STM32 Temperatur | 965 |
+
+Diese Werte sind nur durch eine einzige ADC-Messung ermittelt worden. Sie schwanken bedingt
+durch Messungenauigkeiten mit einer Genauigkeit von +/- 10 um den ermittelten Wert.
