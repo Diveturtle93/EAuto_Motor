@@ -8,13 +8,18 @@ geführt.
 
 Es stehen für die Ansteuerung zwei unterschiedlicher Schaltungen zur Verfügung.
 Unterschieden werden die beiden Ausgangsschaltungen nur in ihrer Stromtragfähigkeit.
-Die beiden Ausgangsstuffen haben unterschiedliche Leistungsmosfets verbaut, welche
+Die beiden Ausgangsstufen haben unterschiedliche Leistungsmosfets verbaut, welche
 somit eine unterschiedliche Stromtragfähigkeit besitzen. Somit kann man
 unterschiedlichste Periferie ansteueren und schalten.
 
 ---
 
+Alle Ausgänge arbeiten mir der angelegten Fahrzeugspannung. Sie sind alle ausgelegt
+für 12V, können aber auch mit 24V betrieben werden.
+
+
 ## Liste der Ausgänge
+
 Nachfolgend ist eine Auflistung aller Ausgangspins vom Mikrocontroller.
 
 | Funktionsgruppe | Pin | Funktion | Relevanz | Getestet |
@@ -57,28 +62,27 @@ Nachfolgend ist eine Auflistung aller Ausgangspins vom Mikrocontroller.
 | Fahrzeug | PG14 | Lüfter 2 | System | No |
 | Fahrzeug | PG15 | Lüfter 1 | System | No |
 
----
 
-## Besondere Eingänge
-Bei mehreren Eingängen gibt es noch zusätzliche Eigenschaften, weshal diese nicht als
-reine Logik IO betrachtet werden können. Dies liegt daran, dass sie entsprechend wichtig
-sind oder noch eine andere Aufgabe haben, als nur einen Logikpegel einzulesen.
+## System relevante Ausgänge
 
----
-
-## System relevante Eingänge
-Alle System relevanten Eingänge haben etwas mit der Auswertung der Daten zum Fahren mit
-dem Fahrzeug zu tun. Diese Eingänge werden deshalb öfter grprüft als Komforteingänge.
-Zudem geben die System relevanten Eingänge aufschluss auf Komponentenzustände die zum
-Fahren benötigt werden. Sie werden ebenfalls über den CAN-Bus als Nachricht versendet,
+Alle System relevanten Ausgänge sind für die Ansteuerung von Komponenten, die etwas mit dem
+Fahren des Fahrzeug zu tun haben. Diese Ausgänge werden deshalb öfter betrachtet als
+Komfortausgänge. Zudem dürfen die System relevanten Ausgänge nicht ausfallen und müssen
+auch im Notfall funktionieren. Sie werden ebenfalls über den CAN-Bus als Nachricht versendet,
 um die Zustände für Debug-Zwecke mitloggen zu können.
 
----
 
-## Komfort Eingänge
-Alls Komfort Eingänge sind zusätzlich vorhanden und dienen nur der Steuerung von Periferie,
-die nicht zum Fahren wichtig ist aber mit im Fahrzeug verbaut werden soll. Diese Komponenten
-werden erstmal nicht mit ihren eigentlichen Funktionen belegt und werden erst einmal für
-Debug-Zwecke verwendet.
+## Besondere Ausgänge
 
-Im weiteren Verlauf werden diese Eingänge mit ihrer eigentlichen Funktion belegt.
+Bei mehreren Ausgängen gibt es noch zusätzliche Eigenschaften, weshalb diese nicht als
+reine Logik IO betrachtet werden können. Dies liegt daran, dass sie mit einer PWM ein
+Gerät ansteuern müssen.
+
+
+## Komfort Ausgänge
+Alle Komfort Ausgänge sind zusätzlich vorhanden und dienen nur der Steuerung von Periferie,
+die nicht zum Fahren wichtig ist, aber mit im Fahrzeug verbaut werden soll. Diese Komponenten
+werden erstmal nicht mit ihren eigentlichen Funktionen belegt und können aktuell für
+Debug-Zwecke verwendet werden.
+
+Im weiteren Verlauf bekommen diese Ausgänge ihrer eigentlichen Funktion zugewiesen.

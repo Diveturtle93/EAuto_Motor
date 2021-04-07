@@ -1,0 +1,41 @@
+//----------------------------------------------------------------------
+// Titel	:	Error.c
+//----------------------------------------------------------------------
+// Sprache	:	C
+// Datum	:	16.01.2021
+// Version	:	1.0
+// Autor	:	Diveturtle93
+// Projekt	:	Motorsteuergeraet
+//----------------------------------------------------------------------
+
+// Einfügen der STM Include-Dateien
+//----------------------------------------------------------------------
+#include "main.h"
+//----------------------------------------------------------------------
+
+// Einfügen der eigenen Include Dateien
+//----------------------------------------------------------------------
+#include "error.h"
+#include "BasicUart.h"
+//----------------------------------------------------------------------
+
+// Hal Error auswerten und ausgeben
+//----------------------------------------------------------------------
+void hal_error(uint8_t status)
+{
+#ifdef DEBUG
+	if (status == HAL_OK) {												// HAL OK
+		uartTransmit("HAL OK\n", 7);
+	}
+	else if (status == HAL_ERROR) {										// HAL Error
+		uartTransmit("HAL ERROR\n", 10);
+	}
+	else if (status == HAL_BUSY) {										// HAL Beschäftigt
+		uartTransmit("HAL BUSY\n", 9);
+	}
+	else if (status == HAL_TIMEOUT) {									// HAL Timeout
+		uartTransmit("HAL TIMEOUT\n", 12);
+	}
+#endif
+}
+//----------------------------------------------------------------------
