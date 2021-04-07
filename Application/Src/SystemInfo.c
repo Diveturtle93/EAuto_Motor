@@ -180,7 +180,7 @@ void collectSystemInfo(void)
 	uartTransmit(STRING_MIDDLEWARE_TITEL, sizeof(STRING_MIDDLEWARE_TITEL));
 	collectMiddlewareInfo();											// Sammelt Middleware Informationen und gibt diese über Uart aus
 
-	uartTransmit("\n", 1);
+	uartTransmit("\n\n\n", 3);
 }
 //----------------------------------------------------------------------
 
