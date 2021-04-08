@@ -56,6 +56,7 @@ void ADC_Select_CH9(void);
 #define TEMP30_CAL_VALUE                                            ((uint16_t*)((uint32_t)0x1FF0F44C))
 #define TEMP110                                                     110.0f
 #define TEMP30                                                      30.0f
+#define BUILD_TIME				__TIME__
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -109,9 +110,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_ADC1_Init();
   MX_USART2_UART_Init();
   MX_CAN3_Init();
-  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 	/* Schreibe Resetquelle auf die Konsole */
 #ifdef DEBUG
@@ -128,11 +129,13 @@ int main(void)
   	/* Lese alle Eingaenge */
   	readall_inputs();
 
+  	// Lese Temperatur
   	uartTransmit("Temperatur messen\n", 18);
 	uartTransmitNumber(*TEMP30_CAL_VALUE, 10);
 	uartTransmit("\n", 1);
 	uartTransmitNumber(*TEMP110_CAL_VALUE, 10);
 	uartTransmit("\n", 1);
+
 	ADC_Select_CH9();
 	HAL_ADC_Start(&hadc1);
 	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)
@@ -148,7 +151,9 @@ int main(void)
 	uartTransmitNumber(temperature, 10);
 	uartTransmit("\n", 1);
 
+	// Lese alle ADC-Eingaenge
 	HAL_Delay(1000);
+
 	ADC_Select_CH0();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
@@ -209,27 +214,79 @@ int main(void)
 	ADC_VAL[9] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
+	// Auswertung
+	#define ADC_OK				"\nADC Value ist in Ordnung\n"
+	#define ADC_NOK				"\nADC Value ist nicht in Ordnung\n"
+
 	uartTransmit("KL15: ", 6);
 	uartTransmitNumber(ADC_VAL[0], 10);
+	if (ADC_VAL[0] > 20)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nKühlwasser: ", 13);
 	uartTransmitNumber(ADC_VAL[1], 10);
+	if (ADC_VAL[1] > 3480 && ADC_VAL[1] < 3455)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nKlimaFlap: ", 12);
 	uartTransmitNumber(ADC_VAL[2], 10);
+	if (ADC_VAL[2] > 20)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nGas: ", 6);
 	uartTransmitNumber(ADC_VAL[3], 10);
+	if (ADC_VAL[3] > 20)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nPCB: ", 6);
 	uartTransmitNumber(ADC_VAL[4], 10);
+	if (ADC_VAL[4] > 2000 && ADC_VAL[4] < 1980)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nReturn: ", 9);
 	uartTransmitNumber(ADC_VAL[5], 10);
+	if (ADC_VAL[5] > 2955 && ADC_VAL[5] < 2940)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nInfo: ", 7);
 	uartTransmitNumber(ADC_VAL[6], 10);
+	if (ADC_VAL[6] > 2955 && ADC_VAL[6] < 2940)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nBremsdruck: ", 13);
 	uartTransmitNumber(ADC_VAL[7], 10);
+	if (ADC_VAL[7] > 2955 && ADC_VAL[7] < 2940)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nBremstemp: ", 12);
 	uartTransmitNumber(ADC_VAL[8], 10);
+	if (ADC_VAL[8] > 2955 && ADC_VAL[8] < 2940)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
+
 	uartTransmit("\nSTM Temp: ", 11);
 	uartTransmitNumber(ADC_VAL[9], 10);
-	uartTransmit("\n", 1);
+	if (ADC_VAL[9] > 955 && ADC_VAL[9] < 935)
+		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
+	else
+		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
 	HAL_Delay(4500);
@@ -314,10 +371,10 @@ void ADC_Select_CH0 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_3;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -328,10 +385,10 @@ void ADC_Select_CH1 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_4;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -342,10 +399,10 @@ void ADC_Select_CH2 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_5;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -356,10 +413,10 @@ void ADC_Select_CH3 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_6;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -370,10 +427,10 @@ void ADC_Select_CH4 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_7;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -384,10 +441,10 @@ void ADC_Select_CH5 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_8;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -398,10 +455,10 @@ void ADC_Select_CH6 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_9;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -412,10 +469,10 @@ void ADC_Select_CH7 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_14;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -426,10 +483,10 @@ void ADC_Select_CH8 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_15;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 
@@ -440,10 +497,10 @@ void ADC_Select_CH9 (void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
 }
 /* USER CODE END 4 */
