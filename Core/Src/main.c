@@ -56,7 +56,6 @@ void ADC_Select_CH9(void);
 #define TEMP30_CAL_VALUE                                            ((uint16_t*)((uint32_t)0x1FF0F44C))
 #define TEMP110                                                     110.0f
 #define TEMP30                                                      30.0f
-#define BUILD_TIME				__TIME__
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -126,6 +125,19 @@ int main(void)
   	collectSystemInfo();
 #endif
 
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
+    HAL_Delay(500);
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
+    HAL_Delay(500);
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
+    HAL_Delay(500);
+
   	/* Lese alle Eingaenge */
   	readall_inputs();
 
@@ -152,8 +164,6 @@ int main(void)
 	uartTransmit("\n", 1);
 
 	// Lese alle ADC-Eingaenge
-	HAL_Delay(1000);
-
 	ADC_Select_CH0();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
@@ -227,7 +237,7 @@ int main(void)
 
 	uartTransmit("\nKühlwasser: ", 13);
 	uartTransmitNumber(ADC_VAL[1], 10);
-	if (ADC_VAL[1] > 3480 && ADC_VAL[1] < 3455)
+	if (ADC_VAL[1] > 3480 || ADC_VAL[1] < 3455)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
@@ -248,42 +258,42 @@ int main(void)
 
 	uartTransmit("\nPCB: ", 6);
 	uartTransmitNumber(ADC_VAL[4], 10);
-	if (ADC_VAL[4] > 2000 && ADC_VAL[4] < 1980)
+	if (ADC_VAL[4] > 2000 || ADC_VAL[4] < 1980)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nReturn: ", 9);
 	uartTransmitNumber(ADC_VAL[5], 10);
-	if (ADC_VAL[5] > 2955 && ADC_VAL[5] < 2940)
+	if (ADC_VAL[5] > 2955 || ADC_VAL[5] < 2935)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nInfo: ", 7);
 	uartTransmitNumber(ADC_VAL[6], 10);
-	if (ADC_VAL[6] > 2955 && ADC_VAL[6] < 2940)
+	if (ADC_VAL[6] > 2955 || ADC_VAL[6] < 2935)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremsdruck: ", 13);
 	uartTransmitNumber(ADC_VAL[7], 10);
-	if (ADC_VAL[7] > 2955 && ADC_VAL[7] < 2940)
+	if (ADC_VAL[7] > 2955 || ADC_VAL[7] < 2935)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremstemp: ", 12);
 	uartTransmitNumber(ADC_VAL[8], 10);
-	if (ADC_VAL[8] > 2955 && ADC_VAL[8] < 2940)
+	if (ADC_VAL[8] > 2955 || ADC_VAL[8] < 2935)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nSTM Temp: ", 11);
 	uartTransmitNumber(ADC_VAL[9], 10);
-	if (ADC_VAL[9] > 955 && ADC_VAL[9] < 935)
+	if (ADC_VAL[9] > 955 || ADC_VAL[9] < 935)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
