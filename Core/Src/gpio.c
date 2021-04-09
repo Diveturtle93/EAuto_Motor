@@ -166,7 +166,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PGPin PGPin PGPin PGPin
                            PGPin PGPin PGPin PGPin */
-  GPIO_InitStruct.Pin = DCDC_INSTRUCTION_Pin|DCCDC_FAULT_Pin|ASR_IN1_Pin|GRA1_Pin
+  GPIO_InitStruct.Pin = DCDC_INSTRUCTION_Pin|DCDC_FAULT_Pin|ASR_IN1_Pin|GRA1_Pin
                           |GRA2_Pin|GRA3_Pin|GRA4_Pin|BC_RESET_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
