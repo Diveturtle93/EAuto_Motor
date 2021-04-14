@@ -34,16 +34,16 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-void ADC_Select_CH0(void);
-void ADC_Select_CH1(void);
-void ADC_Select_CH2(void);
-void ADC_Select_CH3(void);
-void ADC_Select_CH4(void);
-void ADC_Select_CH5(void);
-void ADC_Select_CH6(void);
-void ADC_Select_CH7(void);
-void ADC_Select_CH8(void);
-void ADC_Select_CH9(void);
+void ADC_KL15(void);
+void ADC_Kuhlwassertemp(void);
+void ADC_Klimaflap(void);
+void ADC_Gaspedal(void);
+void ADC_PCB(void);
+void ADC_Return(void);
+void ADC_Info(void);
+void ADC_Bremsdruck(void);
+void ADC_Bremstemp(void);
+void ADC_STMTemp(void);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -148,7 +148,7 @@ int main(void)
 	uartTransmitNumber(*TEMP110_CAL_VALUE, 10);
 	uartTransmit("\n", 1);
 
-	ADC_Select_CH9();
+	ADC_STMTemp();
 	HAL_ADC_Start(&hadc1);
 	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)
 	{
@@ -164,61 +164,61 @@ int main(void)
 	uartTransmit("\n", 1);
 
 	// Lese alle ADC-Eingaenge
-	ADC_Select_CH0();
+	ADC_KL15();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[0] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH1();
+	ADC_Kuhlwassertemp();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[1] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH2();
+	ADC_Klimaflap();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[2] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH3();
+	ADC_Gaspedal();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[3] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH4();
+	ADC_PCB();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[4] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH5();
+	ADC_Return();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[5] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH6();
+	ADC_Info();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[6] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH7();
+	ADC_Bremsdruck();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[7] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH8();
+	ADC_Bremstemp();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[8] = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
-	ADC_Select_CH9();
+	ADC_STMTemp();
 	HAL_ADC_Start(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_VAL[9] = HAL_ADC_GetValue(&hadc1);
@@ -258,35 +258,35 @@ int main(void)
 
 	uartTransmit("\nPCB: ", 6);
 	uartTransmitNumber(ADC_VAL[4], 10);
-	if (ADC_VAL[4] > 2000 || ADC_VAL[4] < 1980)
+	if (ADC_VAL[4] > 2000 || ADC_VAL[4] < 1970)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nReturn: ", 9);
 	uartTransmitNumber(ADC_VAL[5], 10);
-	if (ADC_VAL[5] > 2955 || ADC_VAL[5] < 2935)
+	if (ADC_VAL[5] > 2955 || ADC_VAL[5] < 2930)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nInfo: ", 7);
 	uartTransmitNumber(ADC_VAL[6], 10);
-	if (ADC_VAL[6] > 2955 || ADC_VAL[6] < 2935)
+	if (ADC_VAL[6] > 2955 || ADC_VAL[6] < 2930)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremsdruck: ", 13);
 	uartTransmitNumber(ADC_VAL[7], 10);
-	if (ADC_VAL[7] > 2955 || ADC_VAL[7] < 2935)
+	if (ADC_VAL[7] > 2955 || ADC_VAL[7] < 2930)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremstemp: ", 12);
 	uartTransmitNumber(ADC_VAL[8], 10);
-	if (ADC_VAL[8] > 2955 || ADC_VAL[8] < 2935)
+	if (ADC_VAL[8] > 2955 || ADC_VAL[8] < 2930)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
@@ -374,21 +374,21 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void ADC_Select_CH0 (void)
+void ADC_KL15 (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
 	*/
 	sConfig.Channel = ADC_CHANNEL_3;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
 		Error_Handler();
 	}
 }
 
-void ADC_Select_CH1 (void)
+void ADC_Kuhlwassertemp (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
@@ -402,7 +402,7 @@ void ADC_Select_CH1 (void)
 	}
 }
 
-void ADC_Select_CH2 (void)
+void ADC_Klimaflap (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
@@ -416,54 +416,26 @@ void ADC_Select_CH2 (void)
 	}
 }
 
-void ADC_Select_CH3 (void)
+void ADC_Gaspedal (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
 	*/
 	sConfig.Channel = ADC_CHANNEL_6;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
 		Error_Handler();
 	}
 }
 
-void ADC_Select_CH4 (void)
+void ADC_PCB (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
 	*/
 	sConfig.Channel = ADC_CHANNEL_7;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Select_CH5 (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_8;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Select_CH6 (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_9;
 	sConfig.Rank = 1;
 	sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
@@ -472,21 +444,49 @@ void ADC_Select_CH6 (void)
 	}
 }
 
-void ADC_Select_CH7 (void)
+void ADC_Return (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
 	*/
-	sConfig.Channel = ADC_CHANNEL_14;
+	sConfig.Channel = ADC_CHANNEL_8;
 	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
 		Error_Handler();
 	}
 }
 
-void ADC_Select_CH8 (void)
+void ADC_Info (void)
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	*/
+	sConfig.Channel = ADC_CHANNEL_9;
+	sConfig.Rank = 1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
+}
+
+void ADC_Bremsdruck (void)
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	*/
+	sConfig.Channel = ADC_CHANNEL_14;
+	sConfig.Rank = 1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
+}
+
+void ADC_Bremstemp (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
@@ -500,7 +500,7 @@ void ADC_Select_CH8 (void)
 	}
 }
 
-void ADC_Select_CH9 (void)
+void ADC_STMTemp (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
