@@ -49,7 +49,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+CAN_RxHeaderTypeDef RxMessage;
+uint8_t RxData[8], can_change = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,7 +95,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
-
   /* USER CODE BEGIN 2 */
 
   	/* Schreibe Resetquelle auf die Konsole */
@@ -111,12 +111,6 @@ int main(void)
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
-  	/*if (system_in != SYSTEM_INPUT)
-  		Error_Handler();
-  	if (sdc_in != SDC_INPUT)
-  		Error_Handler();
-  	if (komfort_in != KOMFORT_INPUT)
-  		Error_Handler();*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,7 +118,16 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  if (can_change == 1)
+	  {
+		  uartTransmitNumber(RxMessage.StdId, 10);
+		  for (uint8_t i = 0; i < RxMessage.DLC; i++)
+		  {
+			  uartTransmitNumber(RxData[i], 10);
+		  }
+		  can_change = 0;
+	  }
+	  HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -187,7 +190,11 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	HAL_CAN_GetRxMessage(&hcan3, CAN_RX_FIFO0, &RxMessage, RxData);
+	can_change = 1;
+}
 /* USER CODE END 4 */
 
 /**
