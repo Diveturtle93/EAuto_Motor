@@ -94,7 +94,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
-
   /* USER CODE BEGIN 2 */
 
   	/* Schreibe Resetquelle auf die Konsole */
