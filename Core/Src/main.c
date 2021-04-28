@@ -50,7 +50,8 @@
 
 /* USER CODE BEGIN PV */
 CAN_RxHeaderTypeDef RxMessage;
-uint8_t RxData[8], can_change = 0;
+CAN_TxHeaderTypeDef TxMessage;
+uint8_t RxData[8], can_change = 0, TxData[8], status;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,6 +112,32 @@ int main(void)
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
+
+  	if(HAL_CAN_Start(&hcan3) != HAL_OK)
+  	{
+  		/* Start Error */
+  		Error_Handler();
+  	}
+  	uartTransmit("CAN START\n", 10);
+
+  	if(HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK)
+  	{
+  		/* Notification Error */
+  		Error_Handler();
+  	}
+  	uartTransmit("Send Message\n", 13);
+
+
+  	TxMessage.StdId = 0x123;
+  	TxMessage.ExtId = 0;
+  	TxMessage.RTR = CAN_RTR_DATA;
+  	TxMessage.IDE = CAN_ID_STD;
+  	TxMessage.DLC = 8;
+  	TxMessage.TransmitGlobalTime=DISABLE;
+
+  	for (uint8_t j = 0; j < 8; j++)
+  		TxData[j] = (j + 1) << j;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -118,16 +145,31 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if (can_change == 1)
-	  {
-		  uartTransmitNumber(RxMessage.StdId, 10);
-		  for (uint8_t i = 0; i < RxMessage.DLC; i++)
-		  {
-			  uartTransmitNumber(RxData[i], 10);
-		  }
-		  can_change = 0;
-	  }
-	  HAL_Delay(1000);
+		if (can_change == 1)
+		{
+			uartTransmitNumber(RxMessage.StdId, 10);
+			for (uint8_t i = 0; i < RxMessage.DLC; i++)
+			{
+				uartTransmitNumber(RxData[i], 10);
+			}
+			can_change = 0;
+		}
+		HAL_Delay(1000);
+
+		status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
+
+		if (status == HAL_OK) {
+			uartTransmit("HAL_OK\n", 7);
+		}
+		else if (status == HAL_ERROR) {
+			uartTransmit("HAL_ERROR\n", 10);
+		}
+		else if (status == HAL_BUSY) {
+			uartTransmit("HAL_BUSY\n", 9);
+		}
+		else if (status == HAL_TIMEOUT) {
+			uartTransmit("HAL_TIMEOUT\n", 12);
+		}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -192,7 +234,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	HAL_CAN_GetRxMessage(&hcan3, CAN_RX_FIFO0, &RxMessage, RxData);
+	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
 	can_change = 1;
 }
 /* USER CODE END 4 */
