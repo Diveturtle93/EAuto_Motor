@@ -30,6 +30,7 @@
 #include "BasicUart.h"
 #include "inputs.h"
 #include "outputs.h"
+#include "error.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +53,7 @@
 CAN_RxHeaderTypeDef RxMessage;
 CAN_TxHeaderTypeDef TxMessage;
 uint8_t RxData[8], can_change = 0, TxData[8], status;
+CAN_FilterTypeDef sFilterConfig;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,20 +115,40 @@ int main(void)
   	/* Lese alle Eingaenge */
   	readall_inputs();
 
-  	if(HAL_CAN_Start(&hcan3) != HAL_OK)
+  	if((status = HAL_CAN_Start(&hcan3)) != HAL_OK)
   	{
   		/* Start Error */
+  		hal_error(status);
   		Error_Handler();
   	}
   	uartTransmit("CAN START\n", 10);
 
-  	if(HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK)
+  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY)) != HAL_OK)
   	{
   		/* Notification Error */
+  		hal_error(status);
   		Error_Handler();
   	}
   	uartTransmit("Send Message\n", 13);
 
+    sFilterConfig.FilterBank = 0;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = 0;
+    sFilterConfig.FilterActivation = ENABLE;
+
+    if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
+    {
+    	/* Filter configuration Error */
+  		hal_error(status);
+  		Error_Handler();
+    }
+
+  	//__HAL_CAN_ENABLE_IT(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING);
 
   	TxMessage.StdId = 0x123;
   	TxMessage.ExtId = 0;
@@ -136,7 +158,7 @@ int main(void)
   	TxMessage.TransmitGlobalTime=DISABLE;
 
   	for (uint8_t j = 0; j < 8; j++)
-  		TxData[j] = (j + 1) << j;
+  		TxData[j] = (j + 1);
 
   /* USER CODE END 2 */
 
@@ -145,32 +167,22 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
 		if (can_change == 1)
 		{
-			uartTransmitNumber(RxMessage.StdId, 10);
+			uartTransmitNumber(RxMessage.StdId, 16);
 			for (uint8_t i = 0; i < RxMessage.DLC; i++)
 			{
-				uartTransmitNumber(RxData[i], 10);
+				uartTransmitNumber(RxData[i], 16);
 			}
+			uartTransmit("\n", 1);
 			can_change = 0;
 		}
 		HAL_Delay(1000);
 
 		status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
-
-		if (status == HAL_OK) {
-			uartTransmit("HAL_OK\n", 7);
-		}
-		else if (status == HAL_ERROR) {
-			uartTransmit("HAL_ERROR\n", 10);
-		}
-		else if (status == HAL_BUSY) {
-			uartTransmit("HAL_BUSY\n", 9);
-		}
-		else if (status == HAL_TIMEOUT) {
-			uartTransmit("HAL_TIMEOUT\n", 12);
-		}
-    /* USER CODE BEGIN 3 */
+		hal_error(status);
   }
   /* USER CODE END 3 */
 }
