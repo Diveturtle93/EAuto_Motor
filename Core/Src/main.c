@@ -115,6 +115,7 @@ int main(void)
   	/* Lese alle Eingaenge */
   	readall_inputs();
 
+  	// Starte CAN Bus
   	if((status = HAL_CAN_Start(&hcan3)) != HAL_OK)
   	{
   		/* Start Error */
@@ -123,7 +124,8 @@ int main(void)
   	}
   	uartTransmit("CAN START\n", 10);
 
-  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY)) != HAL_OK)
+  	// Aktiviere Interrupts für CAN Bus
+  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
   	{
   		/* Notification Error */
   		hal_error(status);
@@ -131,6 +133,7 @@ int main(void)
   	}
   	uartTransmit("Send Message\n", 13);
 
+  	// Filter Bank initialisieren um Daten zu empfangen
     sFilterConfig.FilterBank = 0;
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
@@ -141,6 +144,7 @@ int main(void)
     sFilterConfig.FilterFIFOAssignment = 0;
     sFilterConfig.FilterActivation = ENABLE;
 
+    // Filter Bank schreiben
     if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
     {
     	/* Filter configuration Error */
@@ -148,8 +152,7 @@ int main(void)
   		Error_Handler();
     }
 
-  	//__HAL_CAN_ENABLE_IT(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING);
-
+    // Sendenachricht erstellen
   	TxMessage.StdId = 0x123;
   	TxMessage.ExtId = 0;
   	TxMessage.RTR = CAN_RTR_DATA;
@@ -169,9 +172,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  	// Wenn Nachricht über den CAN-Bus empfangen wurde
 		if (can_change == 1)
 		{
+			// Nachricht ID über UART ausgeben
 			uartTransmitNumber(RxMessage.StdId, 16);
+			uartTransmit("\t", 1);
 			for (uint8_t i = 0; i < RxMessage.DLC; i++)
 			{
 				uartTransmitNumber(RxData[i], 16);
@@ -181,6 +187,7 @@ int main(void)
 		}
 		HAL_Delay(1000);
 
+		// Sende CAN Nachricht auf CAN-Bus
 		status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
 		hal_error(status);
   }
