@@ -66,10 +66,10 @@ struct komfort_out_tag {
 
 // Definiere Konstanten
 //----------------------------------------------------------------------
-#define SYSTEM_OUTPUT				0b00000000								// 8 Bit, 8 Systemausgaenge
-#define HIGHCURRENT_OUT				0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
-#define LED_OUTPUT					0b0000000000000000						// 16 Bit, 14 Leuchtdioden
-#define KOMFORT_OUTPUT				0b00000000								// 8 Bit, 5 Komfortausgaenge
+#define SYSTEM_OUTPUT					0b00000000							// 8 Bit, 8 Systemausgaenge
+#define HIGHCURRENT_OUT					0b00000000							// 8 Bit, 8 Hochstromfaehige Ausgaenge
+#define LED_OUTPUT						0b0000000000000000					// 16 Bit, 14 Leuchtdioden
+#define KOMFORT_OUTPUT					0b00000000							// 8 Bit, 5 Komfortausgaenge
 //----------------------------------------------------------------------
 
 // Funktionen definieren
