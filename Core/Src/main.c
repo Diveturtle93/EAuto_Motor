@@ -31,6 +31,7 @@
 #include "inputs.h"
 #include "outputs.h"
 #include "error.h"
+#include "Bamocar.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -183,6 +184,17 @@ int main(void)
 				uartTransmitNumber(RxData[i], 16);
 			}
 			uartTransmit("\n", 1);
+
+			// Sortieren der IDs nach Geräten
+			switch (RxMessage.StdId)
+			{
+				case BAMOCAR_RX_ID:
+					BAMOCAN_ID(&RxData[0]);
+					break;
+				default:
+					uartTransmit("CAN-ID nicht verfuegbar\n", 24);
+					break;
+			}
 			can_change = 0;
 		}
 		HAL_Delay(1000);

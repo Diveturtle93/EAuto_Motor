@@ -243,6 +243,10 @@ reset_reason readResetSource(void)
 //----------------------------------------------------------------------
 void printResetSource(reset_reason reset_flags)
 {
+	// Returns für Absatz nach Neustart.
+	uartTransmit("\r\r\r\r\r\r", 6);
+
+
 	if (reset_flags == STARTUP)											// Regulärer Start
 	{
 		uartTransmit("Regular Start\r\n", 15);

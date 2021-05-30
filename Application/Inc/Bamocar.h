@@ -186,7 +186,7 @@
 #define BAMOCAR_REG_LOG_O_BLOCK					0x98
 #define BAMOCAR_REG_INFO_INTERRUPT				0x99
 #define BAMOCAR_REG_TEMP						0x9A
-#define BAMOCAR_REG_LOG_O_BLOCK					0x9B
+#define BAMOCAR_REG_LOG_I_BLOCK					0x9B
 #define BAMOCAR_REG_TEMP_PT1					0x9C
 #define BAMOCAR_REG_TEMP_PT2					0x9D
 #define BAMOCAR_REG_TEMP_PT3					0x9E
@@ -220,7 +220,7 @@
 #define BAMOCAR_REG_TEMP1_PTR_IND				0xB8
 #define BAMOCAR_REG_TEMP2_PTR					0xB9
 #define BAMOCAR_REG_TEMP2_PTR_IND				0xBA
-#define BAMOCAR_REG_MOTOR_INDUCTANCE			0xBB
+#define BAMOCAR_REG_LEAKAGE_INDUCTANCE			0xBB
 #define BAMOCAR_REG_MOTOR_STATOR				0xBC
 #define BAMOCAR_REG_MOTOR_SPECS					0xBD
 #define BAMOCAR_REG_LOGIC_DEFINE1				0xBE
@@ -273,7 +273,7 @@
 #define BAMOCAR_REG_I_BALLAST					0xEA
 #define BAMOCAR_REG_DC_BUS						0xEB
 #define BAMOCAR_REG_I_LOS						0xEC
-#define BAMOCAR_REG_SPEED_DELTA_MAX				0xED
+#define BAMOCAR_REG_TORGUE_DELTA_MAX			0xED
 #define BAMOCAR_REG_I_IST_100PC					0xEE
 #define BAMOCAR_REG_O_NOFAULT					0xEF
 
@@ -295,7 +295,7 @@
 //#define BAMOCAR_REG_reserved					0xFF
 //----------------------------------------------------------------------
 
-//
+// Aufloesung der Sollwerte
 //----------------------------------------------------------------------
 #define BAMOCAR_POSITION						12							// Aufloesung Position
 #define BAMOCAR_DREHZAHL						15							// Aufloesung Drehzahl
@@ -304,9 +304,20 @@
 #define BAMOCAR_I_SOLL							9							// Aufloesung Sollwert Strom
 //----------------------------------------------------------------------
 
+// Zeitinterval fuer Antwortnachrichten
+//----------------------------------------------------------------------
+#define INTVL_IMMEDIATE   0x00
+#define INTVL_SUSPEND     0xFF
+#define INTVL_100MS       0x64
+#define INTVL_200MS       0xC8
+#define INTVL_250MS       0xFA
+//----------------------------------------------------------------------
+
 // Funktionen definieren
 //----------------------------------------------------------------------
 void readBAMOReg(uint8_t REG);
+void readBAMORegIntvl(uint8_t REG, uint8_t interval);
+void BAMOCAN_ID(uint8_t* data);
 //----------------------------------------------------------------------
 
 #endif /* INC_BAMOCAR_H_ */

@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Application/Src/Bamocar.c \
 ../Application/Src/BasicUart.c \
 ../Application/Src/SystemInfo.c \
 ../Application/Src/error.c \
@@ -12,6 +13,7 @@ C_SRCS += \
 ../Application/Src/outputs.c 
 
 OBJS += \
+./Application/Src/Bamocar.o \
 ./Application/Src/BasicUart.o \
 ./Application/Src/SystemInfo.o \
 ./Application/Src/error.o \
@@ -19,6 +21,7 @@ OBJS += \
 ./Application/Src/outputs.o 
 
 C_DEPS += \
+./Application/Src/Bamocar.d \
 ./Application/Src/BasicUart.d \
 ./Application/Src/SystemInfo.d \
 ./Application/Src/error.d \
@@ -27,6 +30,8 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
+Application/Src/Bamocar.o: ../Application/Src/Bamocar.c Application/Src/subdir.mk
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F767xx -DDEBUG -c -I../Application/Inc -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Application/Src/Bamocar.d" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
 Application/Src/BasicUart.o: ../Application/Src/BasicUart.c Application/Src/subdir.mk
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F767xx -DDEBUG -c -I../Application/Inc -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Application/Src/BasicUart.d" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
 Application/Src/SystemInfo.o: ../Application/Src/SystemInfo.c Application/Src/subdir.mk
