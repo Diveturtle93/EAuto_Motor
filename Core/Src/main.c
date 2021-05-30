@@ -30,6 +30,8 @@
 #include "BasicUart.h"
 #include "inputs.h"
 #include "outputs.h"
+#include "error.h"
+#include "Bamocar.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,7 +51,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+CAN_RxHeaderTypeDef RxMessage;
+CAN_TxHeaderTypeDef TxMessage;
+uint8_t RxData[8], can_change = 0, TxData[8], status;
+CAN_FilterTypeDef sFilterConfig;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -110,12 +115,55 @@ int main(void)
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
-  	/*if (system_in != SYSTEM_INPUT)
+
+  	// Starte CAN Bus
+  	if((status = HAL_CAN_Start(&hcan3)) != HAL_OK)
+  	{
+  		/* Start Error */
+  		hal_error(status);
   		Error_Handler();
-  	if (sdc_in != SDC_INPUT)
+  	}
+  	uartTransmit("CAN START\n", 10);
+
+  	// Aktiviere Interrupts für CAN Bus
+  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
+  	{
+  		/* Notification Error */
+  		hal_error(status);
   		Error_Handler();
-  	if (komfort_in != KOMFORT_INPUT)
-  		Error_Handler();*/
+  	}
+  	uartTransmit("Send Message\n", 13);
+
+  	// Filter Bank initialisieren um Daten zu empfangen
+    sFilterConfig.FilterBank = 0;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = 0;
+    sFilterConfig.FilterActivation = ENABLE;
+
+    // Filter Bank schreiben
+    if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
+    {
+    	/* Filter configuration Error */
+  		hal_error(status);
+  		Error_Handler();
+    }
+
+    // Sendenachricht erstellen
+  	TxMessage.StdId = 0x123;
+  	TxMessage.ExtId = 0;
+  	TxMessage.RTR = CAN_RTR_DATA;
+  	TxMessage.IDE = CAN_ID_STD;
+  	TxMessage.DLC = 8;
+  	TxMessage.TransmitGlobalTime=DISABLE;
+
+  	for (uint8_t j = 0; j < 8; j++)
+  		TxData[j] = (j + 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,6 +173,35 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  	// Wenn Nachricht über den CAN-Bus empfangen wurde
+		if (can_change == 1)
+		{
+			// Nachricht ID über UART ausgeben
+			uartTransmitNumber(RxMessage.StdId, 16);
+			uartTransmit("\t", 1);
+			for (uint8_t i = 0; i < RxMessage.DLC; i++)
+			{
+				uartTransmitNumber(RxData[i], 16);
+			}
+			uartTransmit("\n", 1);
+
+			// Sortieren der IDs nach Geräten
+			switch (RxMessage.StdId)
+			{
+				case BAMOCAR_RX_ID:
+					BAMOCAN_ID(&RxData[0]);
+					break;
+				default:
+					uartTransmit("CAN-ID nicht verfuegbar\n", 24);
+					break;
+			}
+			can_change = 0;
+		}
+		HAL_Delay(1000);
+
+		// Sende CAN Nachricht auf CAN-Bus
+		status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
+		hal_error(status);
   }
   /* USER CODE END 3 */
 }
@@ -186,7 +263,11 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
+	can_change = 1;
+}
 /* USER CODE END 4 */
 
 /**

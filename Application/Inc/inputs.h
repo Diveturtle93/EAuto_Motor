@@ -65,9 +65,9 @@ struct komfort_in_tag {
 
 // Definiere Konstanten
 //----------------------------------------------------------------------
-#define SYSTEM_INPUT				0b0000000000000000						// 16 Bit, 16 Systemeingaenge
-#define KOMFORT_INPUT				0b0000000000000000						// 16 Bit, 16 Komforteingaenge
-#define SDC_INPUT					0b00000000								// 8 Bit, 5 SDC-Eingaenge
+#define SYSTEM_INPUT					0b0000000000000000					// 16 Bit, 16 Systemeingaenge
+#define KOMFORT_INPUT					0b0000000000000000					// 16 Bit, 16 Komforteingaenge
+#define SDC_INPUT						0b00000000							// 8 Bit, 5 SDC-Eingaenge
 //----------------------------------------------------------------------
 
 // Funktionen definieren

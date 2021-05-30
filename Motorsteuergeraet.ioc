@@ -529,6 +529,7 @@ PD13.GPIO_Label=KLIMA_PWM
 PA6.Signal=SharedAnalog_PA6
 PA7.Locked=true
 PG11.Locked=true
+NVIC.CAN3_RX0_IRQn=true\:0\:0\:false\:false\:true\:true\:true
 PD5.GPIO_Label=DEBUG_UART2TX
 ProjectManager.ToolChainLocation=
 PA2.GPIO_Label=HW_WAKE
