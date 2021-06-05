@@ -32,6 +32,8 @@
 #include "outputs.h"
 #include "error.h"
 #include "Bamocar.h"
+#include "millis.h"
+#include "Motorsteuergeraet.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +57,7 @@ CAN_RxHeaderTypeDef RxMessage;
 CAN_TxHeaderTypeDef TxMessage;
 uint8_t RxData[8], can_change = 0, TxData[8], status;
 CAN_FilterTypeDef sFilterConfig;
+uint32_t lastcan = 0, lastsendcan = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -164,6 +167,8 @@ int main(void)
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
+  	uartTransmit("\nStarte While\n\n", 15);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -173,35 +178,48 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  	// Wenn Nachricht über den CAN-Bus empfangen wurde
-		if (can_change == 1)
+		if (millis() - lastcan >= 5)
 		{
-			// Nachricht ID über UART ausgeben
-			uartTransmitNumber(RxMessage.StdId, 16);
-			uartTransmit("\t", 1);
-			for (uint8_t i = 0; i < RxMessage.DLC; i++)
+			// Wenn Nachricht über den CAN-Bus empfangen wurde
+			if (can_change == 1)
 			{
-				uartTransmitNumber(RxData[i], 16);
-			}
-			uartTransmit("\n", 1);
+				// Nachricht ID über UART ausgeben
+				uartTransmitNumber(RxMessage.StdId, 16);
+				uartTransmit("\t", 1);
+				for (uint8_t i = 0; i < RxMessage.DLC; i++)
+				{
+					uartTransmitNumber(RxData[i], 16);
+				}
+				uartTransmit("\n", 1);
 
-			// Sortieren der IDs nach Geräten
-			switch (RxMessage.StdId)
-			{
-				case BAMOCAR_RX_ID:
-					BAMOCAN_ID(&RxData[0]);
-					break;
-				default:
-					uartTransmit("CAN-ID nicht verfuegbar\n", 24);
-					break;
+				// Sortieren der IDs nach Geräten
+				switch (RxMessage.StdId)
+				{
+					case BAMOCAR_RX_ID:
+						BAMOCAN_ID(&RxData[0]);
+						break;
+					case 0x111:
+						uartTransmit("CAN-ID Computer config\n", 23);
+						break;
+					default:
+						uartTransmit("CAN-ID nicht verfuegbar\n", 24);
+						break;
+				}
+
+				TxData[2] = motor1.output[2];
+				TxData[3] = motor1.output[3];
+				lastcan = millis();
+				can_change = 0;
 			}
-			can_change = 0;
 		}
-		HAL_Delay(1000);
 
 		// Sende CAN Nachricht auf CAN-Bus
-		status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
-		hal_error(status);
+		if (millis() - lastsendcan >= 993)
+		{
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+			lastsendcan = millis();
+		}
   }
   /* USER CODE END 3 */
 }
