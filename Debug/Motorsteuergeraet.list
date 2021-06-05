@@ -3096,8 +3096,8 @@ int main(void)
  8001822:	4882      	ldr	r0, [pc, #520]	; (8001a2c <main+0x564>)
  8001824:	f7fe fe8c 	bl	8000540 <uartTransmit>
 
-	uartTransmit("\nKühlwasser: ", 13);
- 8001828:	210d      	movs	r1, #13
+	uartTransmit("\nKühlwasser: ", 14);
+ 8001828:	210e      	movs	r1, #14
  800182a:	4881      	ldr	r0, [pc, #516]	; (8001a30 <main+0x568>)
  800182c:	f7fe fe88 	bl	8000540 <uartTransmit>
 	uartTransmitNumber(ADC_VAL[1], 10);
@@ -3182,12 +3182,12 @@ int main(void)
  80018be:	210a      	movs	r1, #10
  80018c0:	4618      	mov	r0, r3
  80018c2:	f7fe fe51 	bl	8000568 <uartTransmitNumber>
-	if (ADC_VAL[4] > 2000 || ADC_VAL[4] < 1980)
+	if (ADC_VAL[4] > 2000 || ADC_VAL[4] < 1970)
  80018c6:	89bb      	ldrh	r3, [r7, #12]
  80018c8:	f5b3 6ffa 	cmp.w	r3, #2000	; 0x7d0
  80018cc:	d804      	bhi.n	80018d8 <main+0x410>
  80018ce:	89bb      	ldrh	r3, [r7, #12]
- 80018d0:	f240 72bb 	movw	r2, #1979	; 0x7bb
+ 80018d0:	f240 72b1 	movw	r2, #1969	; 0x7b1
  80018d4:	4293      	cmp	r3, r2
  80018d6:	d804      	bhi.n	80018e2 <main+0x41a>
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
@@ -3210,13 +3210,13 @@ int main(void)
  80018f4:	210a      	movs	r1, #10
  80018f6:	4618      	mov	r0, r3
  80018f8:	f7fe fe36 	bl	8000568 <uartTransmitNumber>
-	if (ADC_VAL[5] > 2955 || ADC_VAL[5] < 2935)
+	if (ADC_VAL[5] > 2955 || ADC_VAL[5] < 2930)
  80018fc:	89fb      	ldrh	r3, [r7, #14]
  80018fe:	f640 328b 	movw	r2, #2955	; 0xb8b
  8001902:	4293      	cmp	r3, r2
  8001904:	d804      	bhi.n	8001910 <main+0x448>
  8001906:	89fb      	ldrh	r3, [r7, #14]
- 8001908:	f640 3276 	movw	r2, #2934	; 0xb76
+ 8001908:	f640 3271 	movw	r2, #2929	; 0xb71
  800190c:	4293      	cmp	r3, r2
  800190e:	d804      	bhi.n	800191a <main+0x452>
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
@@ -3239,13 +3239,13 @@ int main(void)
  800192c:	210a      	movs	r1, #10
  800192e:	4618      	mov	r0, r3
  8001930:	f7fe fe1a 	bl	8000568 <uartTransmitNumber>
-	if (ADC_VAL[6] > 2955 || ADC_VAL[6] < 2935)
+	if (ADC_VAL[6] > 2955 || ADC_VAL[6] < 2930)
  8001934:	8a3b      	ldrh	r3, [r7, #16]
  8001936:	f640 328b 	movw	r2, #2955	; 0xb8b
  800193a:	4293      	cmp	r3, r2
  800193c:	d804      	bhi.n	8001948 <main+0x480>
  800193e:	8a3b      	ldrh	r3, [r7, #16]
- 8001940:	f640 3276 	movw	r2, #2934	; 0xb76
+ 8001940:	f640 3271 	movw	r2, #2929	; 0xb71
  8001944:	4293      	cmp	r3, r2
  8001946:	d804      	bhi.n	8001952 <main+0x48a>
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
@@ -3268,13 +3268,13 @@ int main(void)
  8001964:	210a      	movs	r1, #10
  8001966:	4618      	mov	r0, r3
  8001968:	f7fe fdfe 	bl	8000568 <uartTransmitNumber>
-	if (ADC_VAL[7] > 2955 || ADC_VAL[7] < 2935)
+	if (ADC_VAL[7] > 2955 || ADC_VAL[7] < 2930)
  800196c:	8a7b      	ldrh	r3, [r7, #18]
  800196e:	f640 328b 	movw	r2, #2955	; 0xb8b
  8001972:	4293      	cmp	r3, r2
  8001974:	d804      	bhi.n	8001980 <main+0x4b8>
  8001976:	8a7b      	ldrh	r3, [r7, #18]
- 8001978:	f640 3276 	movw	r2, #2934	; 0xb76
+ 8001978:	f640 3271 	movw	r2, #2929	; 0xb71
  800197c:	4293      	cmp	r3, r2
  800197e:	d804      	bhi.n	800198a <main+0x4c2>
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
@@ -3297,13 +3297,13 @@ int main(void)
  800199c:	210a      	movs	r1, #10
  800199e:	4618      	mov	r0, r3
  80019a0:	f7fe fde2 	bl	8000568 <uartTransmitNumber>
-	if (ADC_VAL[8] > 2955 || ADC_VAL[8] < 2935)
+	if (ADC_VAL[8] > 2955 || ADC_VAL[8] < 2930)
  80019a4:	8abb      	ldrh	r3, [r7, #20]
  80019a6:	f640 328b 	movw	r2, #2955	; 0xb8b
  80019aa:	4293      	cmp	r3, r2
  80019ac:	d804      	bhi.n	80019b8 <main+0x4f0>
  80019ae:	8abb      	ldrh	r3, [r7, #20]
- 80019b0:	f640 3276 	movw	r2, #2934	; 0xb76
+ 80019b0:	f640 3271 	movw	r2, #2929	; 0xb71
  80019b4:	4293      	cmp	r3, r2
  80019b6:	d804      	bhi.n	80019c2 <main+0x4fa>
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));

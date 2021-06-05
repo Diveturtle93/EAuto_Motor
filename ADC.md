@@ -69,18 +69,52 @@ Nachfolgend werden im weiten Verlauf die ADC-Werte dokumentiert, welche standard
 den ADC-Eingängen anliegen. Zusätzlich werden noch für die Auswertung wichtige ADC-Werte
 mit berücksichtigt. Auch diese sollen mit aufgefürt werden.
 
-| Kanal | Funktion | Default-Wert |
-|:----- |:-------- | ------------:|
-| Channel 3 | KL15 | ... |
-| Channel 4 | Kühlwasser | 3470 |
-| Channel 5 | Klima-Flap | 5 |
-| Channel 6 | Gaspedal | 5 |
-| Channel 7 | PCB Temperatur | 2050 |
-| Channel 8 | Return | 2930 |
-| Channel 9 | Info | 2930 |
-| Channel 14 | Bremsdruck | 2930 |
-| Channel 15 | Bremsdrucktemperatur | 2930 |
-| Channel 18 | STM32 Temperatur | 965 |
+| Kanal | Funktion | Default-Wert @ 5V | Mit Sensor |
+|:----- |:-------- | -----------------:| ----------:|
+| Channel 3 | KL15 | < 10 | ... |
+| Channel 4 | Kühlwasser | 3470 | ... |
+| Channel 5 | Klima-Flap | < 10 | ... |
+| Channel 6 | Gaspedal | < 10 | ... |
+| Channel 7 | PCB Temperatur | 2050 | ... |
+| Channel 8 | Return | 2930 | ... |
+| Channel 9 | Info | 2930 | ... |
+| Channel 14 | Bremsdruck | 4095 | 2930 |
+| Channel 15 | Bremsdrucktemperatur | 4095 | 2050 |
+| Channel 18 | STM32 Temperatur | 965 | ... |
 
 Diese Werte sind nur durch eine einzige ADC-Messung ermittelt worden. Sie schwanken bedingt
-durch Messungenauigkeiten mit einer Genauigkeit von +/- 10 um den ermittelten Wert.
+durch Messungenauigkeiten mit einer Genauigkeit von +/- 10 um den ermittelten Wert. Dabei
+wurde der 12V Anschluss offen gelassen. Die Platine wurde direkt mit 5V versorgt.
+Bei den Messungen für Kühlwasser, Klima-Flap, Gaspedal Bremsdruck und Bremsdrucktemperatur
+war jeweils kein Sensor angeschlossen. Diese werden im Verlauf ergänzt.
+
+---
+
+Nachfolgend noch weitere Messungen mit der Platine bei unterschiedlichen Versorgungs-
+spannungen.
+
+| Kanal | Funktion | Wert @ 9V | Werte @ 12V (036906051)| Werte @ 12V (038906051) |
+|:----- |:-------- | ---------:| ----------------------:| -----------------------:|
+| Channel 3 | KL15 | 2235 | 2990 |3003 |
+| Channel 4 | Kühlwasser | 3525 | 3530 | 3460 |
+| Channel 5 | Klima-Flap | < 10 | < 10 | <10 |
+| Channel 6 | Gaspedal | < 10 | < 10 | <10 |
+| Channel 7 | PCB Temperatur | 1900 | 1915 | 1980 |
+| Channel 8 | Return | 3060 | 3065 | 3060 |
+| Channel 9 | Info | 3060 | 3065 | 3060 |
+| Channel 14 | Bremsdruck | 3125 | 3135 | 1470 |
+| Channel 15 | Bremsdrucktemperatur | 2275 | 2270 | 2280 |
+| Channel 18 | STM32 Temperatur | 950 | 945 | 945 |
+
+---
+
+Der Drucksensor gibt an seinen beiden Maximalwerten ADC-Werte mit 679 und 3080 aus.
+Das entspricht ca. 0,45 bar und 2 bar. Diese Werte müssen entsprechend noch validiert
+werden. Ggf. ist auch eine Anpassung im Schaltplan notwendig.
+
+Nach einer erneuten Messung mit einem ausgebauten Sensor sind die Werte für den Druck, wie
+erwartet. Des Sensor gibt bei Umgebungsdruck (ca. 1 Bar) entsprechend eine Wert von um die
+96 kPa zurück. Dies entspricht einem Druck von 0,96 Bar. Ebenfalls ist aufgefallen, dass
+der erster gemessene Sensor, eine andere Teilenummer hat. Die Recherche ergab, der Sensor
+hat einen geringeren maximal Druck. Dafür aber eine bessere Auflösung über den Wertebereich.
+Der Wertebereich liegt für den Sensor 036906051 bei 15 kPa bis 120 kPa.

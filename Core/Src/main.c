@@ -230,12 +230,12 @@ int main(void)
 
 	uartTransmit("KL15: ", 6);
 	uartTransmitNumber(ADC_VAL[0], 10);
-	if (ADC_VAL[0] > 20)
+	if (ADC_VAL[0] > 3030 || ADC_VAL[1] < 2980)						// @12V Versorgungsspannung
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
-	uartTransmit("\nKühlwasser: ", 13);
+	uartTransmit("\nKühlwasser: ", 14);
 	uartTransmitNumber(ADC_VAL[1], 10);
 	if (ADC_VAL[1] > 3480 || ADC_VAL[1] < 3455)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
@@ -265,35 +265,35 @@ int main(void)
 
 	uartTransmit("\nReturn: ", 9);
 	uartTransmitNumber(ADC_VAL[5], 10);
-	if (ADC_VAL[5] > 2955 || ADC_VAL[5] < 2930)
+	if (ADC_VAL[5] > 3070 || ADC_VAL[5] < 3000)					// Mit Konsolenelement
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nInfo: ", 7);
 	uartTransmitNumber(ADC_VAL[6], 10);
-	if (ADC_VAL[6] > 2955 || ADC_VAL[6] < 2930)
+	if (ADC_VAL[6] > 3070 || ADC_VAL[6] < 3000)					// Mit Konsolenelement
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremsdruck: ", 13);
 	uartTransmitNumber(ADC_VAL[7], 10);
-	if (ADC_VAL[7] > 2955 || ADC_VAL[7] < 2930)
+	if (ADC_VAL[7] > 1500 || ADC_VAL[7] < 1450)					// @Umgebungsdruck
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremstemp: ", 12);
 	uartTransmitNumber(ADC_VAL[8], 10);
-	if (ADC_VAL[8] > 2955 || ADC_VAL[8] < 2930)
+	if (ADC_VAL[8] > 2300 || ADC_VAL[8] < 2250)					// @Zimmertemperatur
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nSTM Temp: ", 11);
 	uartTransmitNumber(ADC_VAL[9], 10);
-	if (ADC_VAL[9] > 955 || ADC_VAL[9] < 935)
+	if (ADC_VAL[9] > 955 || ADC_VAL[9] < 935)					// Nach 2h Betrieb
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
