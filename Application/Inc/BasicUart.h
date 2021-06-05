@@ -14,7 +14,7 @@
 #define INC_BASICUART_H_
 //----------------------------------------------------------------------
 
-// Einfügen der standard Include-Dateien
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
 #include <stdint.h>
 #include <stdio.h>

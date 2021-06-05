@@ -8,12 +8,12 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "main.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
 //----------------------------------------------------------------------
@@ -22,6 +22,11 @@
 //----------------------------------------------------------------------
 void init_outputs(void)
 {
+	// Schreibe alle Variablen auf Null
+	system_out.systemoutput = 0;																	// Alle System Ausgaenge auf null setzen
+	highcurrent_out.high_out = 0;																	// Alle Hochstrom Ausgaenge auf null setzen
+	leuchten_out.ledoutput = 0;																		// Alle Leuchten Ausgaenge auf null setzen
+	komfort_out.komfortoutput = 0;																	// Alle Komfort Ausgaenge auf null setzen
 }
 //----------------------------------------------------------------------
 
@@ -29,11 +34,6 @@ void init_outputs(void)
 //----------------------------------------------------------------------
 void writeall_outputs(void)
 {
-	/*system_out = SYSTEM_OUTPUT;
-	highcurrent_out = HIGHCURRENT_OUT;
-	leuchten_out = LED_OUTPUT;
-	komfort_out = KOMFORT_OUTPUT;*/
-
 	// Schreibe System Ausgaenge
 	HAL_GPIO_WritePin(J317_GPIO_Port, J317_Pin, system_out.J317);									// Hauptrelais KL15
 	HAL_GPIO_WritePin(F54_GPIO_Port, F54_Pin, system_out.F54);										// Thermoschalter Kuehlmittel, Luefter

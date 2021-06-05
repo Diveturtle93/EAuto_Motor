@@ -131,113 +131,113 @@ int main(void)
   	#define SYSTEMIN			"\n\nSystem Eingaenge\n\n"
   	uartTransmit(SYSTEMIN, sizeof(SYSTEMIN));
 
-	#define TESTKICKDOWN		"Test Kickdown, default = 0\n"
-  	uartTransmit(TESTKICKDOWN, sizeof(TESTKICKDOWN));
+	#define STRINGKICKDOWN		"Test Kickdown, default = 0\n"
+  	uartTransmit(STRINGKICKDOWN, sizeof(STRINGKICKDOWN));
   	if(system_in.Kickdown == 1)
   		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTLEERLAUF		"Test Leerlauf, default = 0\n"
-	uartTransmit(TESTLEERLAUF, sizeof(TESTLEERLAUF));
+	#define STRINGLEERLAUF		"Test Leerlauf, default = 0\n"
+	uartTransmit(STRINGLEERLAUF, sizeof(STRINGLEERLAUF));
 	if(system_in.Leerlauf == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 	uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBREMSENO		"Test Bremse normally open, default = 1\n"
-	uartTransmit(TESTBREMSENO, sizeof(TESTBREMSENO));
+	#define STRINGBREMSENO		"Test Bremse normally open, default = 1\n"
+	uartTransmit(STRINGBREMSENO, sizeof(STRINGBREMSENO));
 	if(system_in.BremseNO != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBREMSENC		"Test Bremse normally connect, default = 0\n"
-	uartTransmit(TESTBREMSENC, sizeof(TESTBREMSENC));
+	#define STRINGBREMSENC		"Test Bremse normally connect, default = 0\n"
+	uartTransmit(STRINGBREMSENC, sizeof(STRINGBREMSENC));
 	if(system_in.BremseNC == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTKUPPLUNG		"Test Kupplung, default = 1\n"
-	uartTransmit(TESTKUPPLUNG, sizeof(TESTKUPPLUNG));
+	#define STRINGKUPPLUNG		"Test Kupplung, default = 1\n"
+	uartTransmit(STRINGKUPPLUNG, sizeof(STRINGKUPPLUNG));
 	if(system_in.Kupplung != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTRECUPERATION	"Test Recuperation, default = 1\n"
-	uartTransmit(TESTRECUPERATION, sizeof(TESTRECUPERATION));
+	#define STRINGRECUPERATION	"Test Recuperation, default = 1\n"
+	uartTransmit(STRINGRECUPERATION, sizeof(STRINGRECUPERATION));
 	if(system_in.Recuperation != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTECON			"Test ECON, default = 0\n"
-	uartTransmit(TESTECON, sizeof(TESTECON));
+	#define STRINGECON			"Test ECON, default = 0\n"
+	uartTransmit(STRINGECON, sizeof(STRINGECON));
 	if(system_in.ECON != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTANLASSER		"Test Anlasser, default = 1\n"
-	uartTransmit(TESTANLASSER, sizeof(TESTANLASSER));
+	#define STRINGANLASSER		"Test Anlasser, default = 1\n"
+	uartTransmit(STRINGANLASSER, sizeof(STRINGANLASSER));
 	if(system_in.Anlasser != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTKL15			"Test KL15, default = 1\n"
-	uartTransmit(TESTKL15, sizeof(TESTKL15));
+	#define STRINGKL15			"Test KL15, default = 1\n"
+	uartTransmit(STRINGKL15, sizeof(STRINGKL15));
 	if(system_in.KL15 != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTDCDCINST		"Test DCDC_Inst, default = 0\n"
-	uartTransmit(TESTDCDCINST, sizeof(TESTDCDCINST));
+	#define STRINGDCDCINST		"Test DCDC_Inst, default = 0\n"
+	uartTransmit(STRINGDCDCINST, sizeof(STRINGDCDCINST));
 	if(system_in.DCDC_Inst == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBUTTON1			"Test Button1, default = 1\n"
-	uartTransmit(TESTBUTTON1, sizeof(TESTBUTTON1));
+	#define STRINGBUTTON1		"Test Button1, default = 1\n"
+	uartTransmit(STRINGBUTTON1, sizeof(STRINGBUTTON1));
 	if(system_in.Button1 != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBUTTON2			"Test Button2, default = 1\n"
-	uartTransmit(TESTBUTTON2, sizeof(TESTBUTTON2));
+	#define STRINGBUTTON2		"Test Button2, default = 1\n"
+	uartTransmit(STRINGBUTTON2, sizeof(STRINGBUTTON2));
 	if(system_in.Button2 != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTCRASH			"Test Crash, default = 0\n"
-	uartTransmit(TESTCRASH, sizeof(TESTCRASH));
+	#define STRINGCRASH			"Test Crash, default = 0\n"
+	uartTransmit(STRINGCRASH, sizeof(STRINGCRASH));
 	if(system_in.Crash == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTWAKEUP			"Test Wakeup, default = 0\n"
-	uartTransmit(TESTWAKEUP, sizeof(TESTWAKEUP));
+	#define STRINGWAKEUP		"Test Wakeup, default = 0\n"
+	uartTransmit(STRINGWAKEUP, sizeof(STRINGWAKEUP));
 	if(system_in.Wakeup == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBREMSDRUCKNO	"Test Bremsdruck normally open, default = 0\n"
-	uartTransmit(TESTBREMSDRUCKNO, sizeof(TESTBREMSDRUCKNO));
+	#define STRINGBREMSDRUCKNO	"Test Bremsdruck normally open, default = 0\n"
+	uartTransmit(STRINGBREMSDRUCKNO, sizeof(STRINGBREMSDRUCKNO));
 	if(system_in.Bremsdruck_NO == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBREMSDRUCKNC	"Test Bremsdruck normally connect, default = 0\n"
-	uartTransmit(TESTBREMSDRUCKNC, sizeof(TESTBREMSDRUCKNC));
+	#define STRINGBREMSDRUCKNC	"Test Bremsdruck normally connect, default = 0\n"
+	uartTransmit(STRINGBREMSDRUCKNC, sizeof(STRINGBREMSDRUCKNC));
 	if(system_in.Bremsdruck_NC == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
@@ -246,113 +246,113 @@ int main(void)
 	#define KOMFORTIN			"\n\nKomfort Eingaenge\n\n"
   	uartTransmit(KOMFORTIN, sizeof(KOMFORTIN));
 
-	#define TESTASR1			"Test ASR1, default = 0\n"
-  	uartTransmit(TESTASR1, sizeof(TESTASR1));
+	#define STRINGASR1			"Test ASR1, default = 0\n"
+  	uartTransmit(STRINGASR1, sizeof(STRINGASR1));
   	if(komfort_in.ASR1 == 1)
   		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTASR2			"Test ASR2, default = 0\n"
-	uartTransmit(TESTASR1, sizeof(TESTASR1));
+	#define STRINGASR2			"Test ASR2, default = 0\n"
+	uartTransmit(STRINGASR1, sizeof(STRINGASR1));
 	if(komfort_in.ASR2 == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 	uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTECO				"Test ECO, default = 0\n"
-	uartTransmit(TESTECO, sizeof(TESTECO));
+	#define STRINGECO			"Test ECO, default = 0\n"
+	uartTransmit(STRINGECO, sizeof(STRINGECO));
 	if(komfort_in.ECO == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBCRSTIN			"Test BC_Rst_In, default = 0\n"
-	uartTransmit(TESTBCRSTIN, sizeof(TESTBCRSTIN));
+	#define STRINGBCRSTIN		"Test BC_Rst_In, default = 0\n"
+	uartTransmit(STRINGBCRSTIN, sizeof(STRINGBCRSTIN));
 	if(komfort_in.BC_Rst_In == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBCUPIN			"Test BC_Up_In, default = 0\n"
-	uartTransmit(TESTBCUPIN, sizeof(TESTBCUPIN));
+	#define STRINGBCUPIN		"Test BC_Up_In, default = 0\n"
+	uartTransmit(STRINGBCUPIN, sizeof(STRINGBCUPIN));
 	if(komfort_in.BC_Up_In == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBCDOWNIN		"Test BC_Down_In, default = 0\n"
-	uartTransmit(TESTBCDOWNIN, sizeof(TESTBCDOWNIN));
+	#define STRINGBCDOWNIN		"Test BC_Down_In, default = 0\n"
+	uartTransmit(STRINGBCDOWNIN, sizeof(STRINGBCDOWNIN));
 	if(komfort_in.BC_Down_In == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBAMOIN1			"Test BamoIn1, default = 1\n"
-	uartTransmit(TESTBAMOIN1, sizeof(TESTBAMOIN1));
+	#define STRINGBAMOIN1		"Test BamoIn1, default = 1\n"
+	uartTransmit(STRINGBAMOIN1, sizeof(STRINGBAMOIN1));
 	if(komfort_in.BamoIn1 != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBAMOIN2			"Test BamoIn2, default = 1\n"
-	uartTransmit(TESTBAMOIN2, sizeof(TESTBAMOIN2));
+	#define STRINGBAMOIN2		"Test BamoIn2, default = 1\n"
+	uartTransmit(STRINGBAMOIN2, sizeof(STRINGBAMOIN2));
 	if(komfort_in.BamoIn2 != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTENTER			"Test Enter, default = 0\n"
-	uartTransmit(TESTENTER, sizeof(TESTENTER));
+	#define STRINGENTER			"Test Enter, default = 0\n"
+	uartTransmit(STRINGENTER, sizeof(STRINGENTER));
 	if(komfort_in.Enter == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTOUTA			"Test OutB, default = 0\n"
-	uartTransmit(TESTOUTA, sizeof(TESTOUTA));
+	#define STRINGOUTA			"Test OutB, default = 0\n"
+	uartTransmit(STRINGOUTA, sizeof(STRINGOUTA));
 	if(komfort_in.OutA == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTOUTB			"Test OutB, default = 0\n"
-	uartTransmit(TESTOUTB, sizeof(TESTOUTB));
+	#define STRINGOUTB			"Test OutB, default = 0\n"
+	uartTransmit(STRINGOUTB, sizeof(STRINGOUTB));
 	if(komfort_in.OutB == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTGRA1			"Test GRA1, default = 0\n"
-	uartTransmit(TESTGRA1, sizeof(TESTGRA1));
+	#define STRINGGRA1			"Test GRA1, default = 0\n"
+	uartTransmit(STRINGGRA1, sizeof(STRINGGRA1));
 	if(komfort_in.GRA1 == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTGRA2			"Test GRA2, default = 0\n"
-	uartTransmit(TESTGRA2, sizeof(TESTGRA2));
+	#define STRINGGRA2			"Test GRA2, default = 0\n"
+	uartTransmit(STRINGGRA2, sizeof(STRINGGRA2));
 	if(komfort_in.GRA2 == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTGRA3			"Test GRA3, default = 0\n"
-	uartTransmit(TESTGRA3, sizeof(TESTGRA3));
+	#define STRINGGRA3			"Test GRA3, default = 0\n"
+	uartTransmit(STRINGGRA3, sizeof(STRINGGRA3));
 	if(komfort_in.GRA3 == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTGRA4			"Test GRA4, default = 0\n"
-	uartTransmit(TESTGRA4, sizeof(TESTGRA4));
+	#define STRINGGRA4			"Test GRA4, default = 0\n"
+	uartTransmit(STRINGGRA4, sizeof(STRINGGRA4));
 	if(komfort_in.GRA4 == 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTDURCHFLUSS		"Test Durchfluss, default = 1\n"
-	uartTransmit(TESTDURCHFLUSS, sizeof(TESTDURCHFLUSS));
+	#define STRINGDURCHFLUSS	"Test Durchfluss, default = 1\n"
+	uartTransmit(STRINGDURCHFLUSS, sizeof(STRINGDURCHFLUSS));
 	if(komfort_in.Durchfluss != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
@@ -361,36 +361,36 @@ int main(void)
 	#define PEDALIN				"\n\nPedal Eingaenge\n\n"
 	uartTransmit(PEDALIN, sizeof(PEDALIN));
 
-	#define TESTEMERGENCY		"Test Emergency Run, default = 1\n"
-	uartTransmit(TESTEMERGENCY, sizeof(TESTEMERGENCY));
+	#define STRINGEMERGENCY		"Test Emergency Run, default = 1\n"
+	uartTransmit(STRINGEMERGENCY, sizeof(STRINGEMERGENCY));
 	if(sdc_in.EmergencyRun != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTSDC0			"Test SDC0, default = 1\n"
-	uartTransmit(TESTSDC0, sizeof(TESTSDC0));
+	#define STRINGSDC0			"Test SDC0, default = 1\n"
+	uartTransmit(STRINGSDC0, sizeof(STRINGSDC0));
 	if(sdc_in.SDC0 != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 	uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTAKKUSDC			"Test Akku SDC, default = 1\n"
-	uartTransmit(TESTAKKUSDC, sizeof(TESTAKKUSDC));
+	#define STRINGAKKUSDC		"Test Akku SDC, default = 1\n"
+	uartTransmit(STRINGAKKUSDC, sizeof(STRINGAKKUSDC));
 	if(sdc_in.AkkuSDC != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTBTBSDC			"Test BTB SDC, default = 1\n"
-	uartTransmit(TESTBTBSDC, sizeof(TESTBTBSDC));
+	#define STRINGBTBSDC		"Test BTB SDC, default = 1\n"
+	uartTransmit(STRINGBTBSDC, sizeof(STRINGBTBSDC));
 	if(sdc_in.BTB_SDC != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else
 		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
 
-	#define TESTDCDCFAULT		"Test DCDC Fault, default = 1\n"
-	uartTransmit(TESTDCDCFAULT, sizeof(TESTDCDCFAULT));
+	#define STRINGDCDCFAULT		"Test DCDC Fault, default = 1\n"
+	uartTransmit(STRINGDCDCFAULT, sizeof(STRINGDCDCFAULT));
 	if(sdc_in.DCDC_Fault != 1)
 		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
 	else

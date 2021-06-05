@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 0000002e  00000000  00000000  0002000c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000f122  00000000  00000000  0002003a  2**0
+ 12 .debug_info   0000f230  00000000  00000000  0002003a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00002666  00000000  00000000  0002f15c  2**0
+ 13 .debug_abbrev 000026a3  00000000  00000000  0002f26a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000a70  00000000  00000000  000317c8  2**3
+ 14 .debug_aranges 00000a70  00000000  00000000  00031910  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00000958  00000000  00000000  00032238  2**3
+ 15 .debug_ranges 00000958  00000000  00000000  00032380  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000299cd  00000000  00000000  00032b90  2**0
+ 16 .debug_macro  000299cd  00000000  00000000  00032cd8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000e8aa  00000000  00000000  0005c55d  2**0
+ 17 .debug_line   0000e8aa  00000000  00000000  0005c6a5  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000fbbf9  00000000  00000000  0006ae07  2**0
+ 18 .debug_str    000fbc96  00000000  00000000  0006af4f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  00166a00  2**0
+ 19 .comment      00000053  00000000  00000000  00166be5  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000288c  00000000  00000000  00166a54  2**2
+ 20 .debug_frame  0000288c  00000000  00000000  00166c38  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2771,8 +2771,8 @@ int main(void)
  8001572:	4897      	ldr	r0, [pc, #604]	; (80017d0 <main+0x308>)
  8001574:	f7fe ffe4 	bl	8000540 <uartTransmit>
 
-	#define TESTKICKDOWN		"Test Kickdown, default = 0\n"
-  	uartTransmit(TESTKICKDOWN, sizeof(TESTKICKDOWN));
+	#define STRINGKICKDOWN		"Test Kickdown, default = 0\n"
+  	uartTransmit(STRINGKICKDOWN, sizeof(STRINGKICKDOWN));
  8001578:	211c      	movs	r1, #28
  800157a:	4896      	ldr	r0, [pc, #600]	; (80017d4 <main+0x30c>)
  800157c:	f7fe ffe0 	bl	8000540 <uartTransmit>
@@ -2794,8 +2794,8 @@ int main(void)
  800159a:	4891      	ldr	r0, [pc, #580]	; (80017e0 <main+0x318>)
  800159c:	f7fe ffd0 	bl	8000540 <uartTransmit>
 
-	#define TESTLEERLAUF		"Test Leerlauf, default = 0\n"
-	uartTransmit(TESTLEERLAUF, sizeof(TESTLEERLAUF));
+	#define STRINGLEERLAUF		"Test Leerlauf, default = 0\n"
+	uartTransmit(STRINGLEERLAUF, sizeof(STRINGLEERLAUF));
  80015a0:	211c      	movs	r1, #28
  80015a2:	4890      	ldr	r0, [pc, #576]	; (80017e4 <main+0x31c>)
  80015a4:	f7fe ffcc 	bl	8000540 <uartTransmit>
@@ -2817,8 +2817,8 @@ int main(void)
  80015c2:	4887      	ldr	r0, [pc, #540]	; (80017e0 <main+0x318>)
  80015c4:	f7fe ffbc 	bl	8000540 <uartTransmit>
 
-	#define TESTBREMSENO		"Test Bremse normally open, default = 1\n"
-	uartTransmit(TESTBREMSENO, sizeof(TESTBREMSENO));
+	#define STRINGBREMSENO		"Test Bremse normally open, default = 1\n"
+	uartTransmit(STRINGBREMSENO, sizeof(STRINGBREMSENO));
  80015c8:	2128      	movs	r1, #40	; 0x28
  80015ca:	4887      	ldr	r0, [pc, #540]	; (80017e8 <main+0x320>)
  80015cc:	f7fe ffb8 	bl	8000540 <uartTransmit>
@@ -2840,8 +2840,8 @@ int main(void)
  80015ea:	487d      	ldr	r0, [pc, #500]	; (80017e0 <main+0x318>)
  80015ec:	f7fe ffa8 	bl	8000540 <uartTransmit>
 
-	#define TESTBREMSENC		"Test Bremse normally connect, default = 0\n"
-	uartTransmit(TESTBREMSENC, sizeof(TESTBREMSENC));
+	#define STRINGBREMSENC		"Test Bremse normally connect, default = 0\n"
+	uartTransmit(STRINGBREMSENC, sizeof(STRINGBREMSENC));
  80015f0:	212b      	movs	r1, #43	; 0x2b
  80015f2:	487e      	ldr	r0, [pc, #504]	; (80017ec <main+0x324>)
  80015f4:	f7fe ffa4 	bl	8000540 <uartTransmit>
@@ -2863,8 +2863,8 @@ int main(void)
  8001612:	4873      	ldr	r0, [pc, #460]	; (80017e0 <main+0x318>)
  8001614:	f7fe ff94 	bl	8000540 <uartTransmit>
 
-	#define TESTKUPPLUNG		"Test Kupplung, default = 1\n"
-	uartTransmit(TESTKUPPLUNG, sizeof(TESTKUPPLUNG));
+	#define STRINGKUPPLUNG		"Test Kupplung, default = 1\n"
+	uartTransmit(STRINGKUPPLUNG, sizeof(STRINGKUPPLUNG));
  8001618:	211c      	movs	r1, #28
  800161a:	4875      	ldr	r0, [pc, #468]	; (80017f0 <main+0x328>)
  800161c:	f7fe ff90 	bl	8000540 <uartTransmit>
@@ -2886,8 +2886,8 @@ int main(void)
  800163a:	4869      	ldr	r0, [pc, #420]	; (80017e0 <main+0x318>)
  800163c:	f7fe ff80 	bl	8000540 <uartTransmit>
 
-	#define TESTRECUPERATION	"Test Recuperation, default = 1\n"
-	uartTransmit(TESTRECUPERATION, sizeof(TESTRECUPERATION));
+	#define STRINGRECUPERATION	"Test Recuperation, default = 1\n"
+	uartTransmit(STRINGRECUPERATION, sizeof(STRINGRECUPERATION));
  8001640:	2120      	movs	r1, #32
  8001642:	486c      	ldr	r0, [pc, #432]	; (80017f4 <main+0x32c>)
  8001644:	f7fe ff7c 	bl	8000540 <uartTransmit>
@@ -2909,8 +2909,8 @@ int main(void)
  8001662:	485f      	ldr	r0, [pc, #380]	; (80017e0 <main+0x318>)
  8001664:	f7fe ff6c 	bl	8000540 <uartTransmit>
 
-	#define TESTECON			"Test ECON, default = 0\n"
-	uartTransmit(TESTECON, sizeof(TESTECON));
+	#define STRINGECON			"Test ECON, default = 0\n"
+	uartTransmit(STRINGECON, sizeof(STRINGECON));
  8001668:	2118      	movs	r1, #24
  800166a:	4863      	ldr	r0, [pc, #396]	; (80017f8 <main+0x330>)
  800166c:	f7fe ff68 	bl	8000540 <uartTransmit>
@@ -2932,8 +2932,8 @@ int main(void)
  800168a:	4855      	ldr	r0, [pc, #340]	; (80017e0 <main+0x318>)
  800168c:	f7fe ff58 	bl	8000540 <uartTransmit>
 
-	#define TESTANLASSER		"Test Anlasser, default = 1\n"
-	uartTransmit(TESTANLASSER, sizeof(TESTANLASSER));
+	#define STRINGANLASSER		"Test Anlasser, default = 1\n"
+	uartTransmit(STRINGANLASSER, sizeof(STRINGANLASSER));
  8001690:	211c      	movs	r1, #28
  8001692:	485a      	ldr	r0, [pc, #360]	; (80017fc <main+0x334>)
  8001694:	f7fe ff54 	bl	8000540 <uartTransmit>
@@ -2955,8 +2955,8 @@ int main(void)
  80016b2:	484b      	ldr	r0, [pc, #300]	; (80017e0 <main+0x318>)
  80016b4:	f7fe ff44 	bl	8000540 <uartTransmit>
 
-	#define TESTKL15			"Test KL15, default = 1\n"
-	uartTransmit(TESTKL15, sizeof(TESTKL15));
+	#define STRINGKL15			"Test KL15, default = 1\n"
+	uartTransmit(STRINGKL15, sizeof(STRINGKL15));
  80016b8:	2118      	movs	r1, #24
  80016ba:	4851      	ldr	r0, [pc, #324]	; (8001800 <main+0x338>)
  80016bc:	f7fe ff40 	bl	8000540 <uartTransmit>
@@ -2978,8 +2978,8 @@ int main(void)
  80016da:	4841      	ldr	r0, [pc, #260]	; (80017e0 <main+0x318>)
  80016dc:	f7fe ff30 	bl	8000540 <uartTransmit>
 
-	#define TESTDCDCINST		"Test DCDC_Inst, default = 0\n"
-	uartTransmit(TESTDCDCINST, sizeof(TESTDCDCINST));
+	#define STRINGDCDCINST		"Test DCDC_Inst, default = 0\n"
+	uartTransmit(STRINGDCDCINST, sizeof(STRINGDCDCINST));
  80016e0:	211d      	movs	r1, #29
  80016e2:	4848      	ldr	r0, [pc, #288]	; (8001804 <main+0x33c>)
  80016e4:	f7fe ff2c 	bl	8000540 <uartTransmit>
@@ -3001,8 +3001,8 @@ int main(void)
  8001702:	4837      	ldr	r0, [pc, #220]	; (80017e0 <main+0x318>)
  8001704:	f7fe ff1c 	bl	8000540 <uartTransmit>
 
-	#define TESTBUTTON1			"Test Button1, default = 1\n"
-	uartTransmit(TESTBUTTON1, sizeof(TESTBUTTON1));
+	#define STRINGBUTTON1		"Test Button1, default = 1\n"
+	uartTransmit(STRINGBUTTON1, sizeof(STRINGBUTTON1));
  8001708:	211b      	movs	r1, #27
  800170a:	483f      	ldr	r0, [pc, #252]	; (8001808 <main+0x340>)
  800170c:	f7fe ff18 	bl	8000540 <uartTransmit>
@@ -3024,8 +3024,8 @@ int main(void)
  800172a:	482d      	ldr	r0, [pc, #180]	; (80017e0 <main+0x318>)
  800172c:	f7fe ff08 	bl	8000540 <uartTransmit>
 
-	#define TESTBUTTON2			"Test Button2, default = 1\n"
-	uartTransmit(TESTBUTTON2, sizeof(TESTBUTTON2));
+	#define STRINGBUTTON2		"Test Button2, default = 1\n"
+	uartTransmit(STRINGBUTTON2, sizeof(STRINGBUTTON2));
  8001730:	211b      	movs	r1, #27
  8001732:	4836      	ldr	r0, [pc, #216]	; (800180c <main+0x344>)
  8001734:	f7fe ff04 	bl	8000540 <uartTransmit>
@@ -3047,8 +3047,8 @@ int main(void)
  8001752:	4823      	ldr	r0, [pc, #140]	; (80017e0 <main+0x318>)
  8001754:	f7fe fef4 	bl	8000540 <uartTransmit>
 
-	#define TESTCRASH			"Test Crash, default = 0\n"
-	uartTransmit(TESTCRASH, sizeof(TESTCRASH));
+	#define STRINGCRASH			"Test Crash, default = 0\n"
+	uartTransmit(STRINGCRASH, sizeof(STRINGCRASH));
  8001758:	2119      	movs	r1, #25
  800175a:	482d      	ldr	r0, [pc, #180]	; (8001810 <main+0x348>)
  800175c:	f7fe fef0 	bl	8000540 <uartTransmit>
@@ -3070,8 +3070,8 @@ int main(void)
  800177a:	4819      	ldr	r0, [pc, #100]	; (80017e0 <main+0x318>)
  800177c:	f7fe fee0 	bl	8000540 <uartTransmit>
 
-	#define TESTWAKEUP			"Test Wakeup, default = 0\n"
-	uartTransmit(TESTWAKEUP, sizeof(TESTWAKEUP));
+	#define STRINGWAKEUP		"Test Wakeup, default = 0\n"
+	uartTransmit(STRINGWAKEUP, sizeof(STRINGWAKEUP));
  8001780:	211a      	movs	r1, #26
  8001782:	4824      	ldr	r0, [pc, #144]	; (8001814 <main+0x34c>)
  8001784:	f7fe fedc 	bl	8000540 <uartTransmit>
@@ -3093,8 +3093,8 @@ int main(void)
  80017a2:	480f      	ldr	r0, [pc, #60]	; (80017e0 <main+0x318>)
  80017a4:	f7fe fecc 	bl	8000540 <uartTransmit>
 
-	#define TESTBREMSDRUCKNO	"Test Bremsdruck normally open, default = 0\n"
-	uartTransmit(TESTBREMSDRUCKNO, sizeof(TESTBREMSDRUCKNO));
+	#define STRINGBREMSDRUCKNO	"Test Bremsdruck normally open, default = 0\n"
+	uartTransmit(STRINGBREMSDRUCKNO, sizeof(STRINGBREMSDRUCKNO));
  80017a8:	212c      	movs	r1, #44	; 0x2c
  80017aa:	481b      	ldr	r0, [pc, #108]	; (8001818 <main+0x350>)
  80017ac:	f7fe fec8 	bl	8000540 <uartTransmit>
@@ -3137,8 +3137,8 @@ int main(void)
  800181e:	48ab      	ldr	r0, [pc, #684]	; (8001acc <main+0x604>)
  8001820:	f7fe fe8e 	bl	8000540 <uartTransmit>
 
-	#define TESTBREMSDRUCKNC	"Test Bremsdruck normally connect, default = 0\n"
-	uartTransmit(TESTBREMSDRUCKNC, sizeof(TESTBREMSDRUCKNC));
+	#define STRINGBREMSDRUCKNC	"Test Bremsdruck normally connect, default = 0\n"
+	uartTransmit(STRINGBREMSDRUCKNC, sizeof(STRINGBREMSDRUCKNC));
  8001824:	212f      	movs	r1, #47	; 0x2f
  8001826:	48aa      	ldr	r0, [pc, #680]	; (8001ad0 <main+0x608>)
  8001828:	f7fe fe8a 	bl	8000540 <uartTransmit>
@@ -3166,8 +3166,8 @@ int main(void)
  800184e:	48a3      	ldr	r0, [pc, #652]	; (8001adc <main+0x614>)
  8001850:	f7fe fe76 	bl	8000540 <uartTransmit>
 
-	#define TESTASR1			"Test ASR1, default = 0\n"
-  	uartTransmit(TESTASR1, sizeof(TESTASR1));
+	#define STRINGASR1			"Test ASR1, default = 0\n"
+  	uartTransmit(STRINGASR1, sizeof(STRINGASR1));
  8001854:	2118      	movs	r1, #24
  8001856:	48a2      	ldr	r0, [pc, #648]	; (8001ae0 <main+0x618>)
  8001858:	f7fe fe72 	bl	8000540 <uartTransmit>
@@ -3189,8 +3189,8 @@ int main(void)
  8001876:	4895      	ldr	r0, [pc, #596]	; (8001acc <main+0x604>)
  8001878:	f7fe fe62 	bl	8000540 <uartTransmit>
 
-	#define TESTASR2			"Test ASR2, default = 0\n"
-	uartTransmit(TESTASR1, sizeof(TESTASR1));
+	#define STRINGASR2			"Test ASR2, default = 0\n"
+	uartTransmit(STRINGASR1, sizeof(STRINGASR1));
  800187c:	2118      	movs	r1, #24
  800187e:	4898      	ldr	r0, [pc, #608]	; (8001ae0 <main+0x618>)
  8001880:	f7fe fe5e 	bl	8000540 <uartTransmit>
@@ -3212,8 +3212,8 @@ int main(void)
  800189e:	488b      	ldr	r0, [pc, #556]	; (8001acc <main+0x604>)
  80018a0:	f7fe fe4e 	bl	8000540 <uartTransmit>
 
-	#define TESTECO				"Test ECO, default = 0\n"
-	uartTransmit(TESTECO, sizeof(TESTECO));
+	#define STRINGECO			"Test ECO, default = 0\n"
+	uartTransmit(STRINGECO, sizeof(STRINGECO));
  80018a4:	2117      	movs	r1, #23
  80018a6:	4890      	ldr	r0, [pc, #576]	; (8001ae8 <main+0x620>)
  80018a8:	f7fe fe4a 	bl	8000540 <uartTransmit>
@@ -3235,8 +3235,8 @@ int main(void)
  80018c6:	4881      	ldr	r0, [pc, #516]	; (8001acc <main+0x604>)
  80018c8:	f7fe fe3a 	bl	8000540 <uartTransmit>
 
-	#define TESTBCRSTIN			"Test BC_Rst_In, default = 0\n"
-	uartTransmit(TESTBCRSTIN, sizeof(TESTBCRSTIN));
+	#define STRINGBCRSTIN		"Test BC_Rst_In, default = 0\n"
+	uartTransmit(STRINGBCRSTIN, sizeof(STRINGBCRSTIN));
  80018cc:	211d      	movs	r1, #29
  80018ce:	4887      	ldr	r0, [pc, #540]	; (8001aec <main+0x624>)
  80018d0:	f7fe fe36 	bl	8000540 <uartTransmit>
@@ -3258,8 +3258,8 @@ int main(void)
  80018ee:	4877      	ldr	r0, [pc, #476]	; (8001acc <main+0x604>)
  80018f0:	f7fe fe26 	bl	8000540 <uartTransmit>
 
-	#define TESTBCUPIN			"Test BC_Up_In, default = 0\n"
-	uartTransmit(TESTBCUPIN, sizeof(TESTBCUPIN));
+	#define STRINGBCUPIN		"Test BC_Up_In, default = 0\n"
+	uartTransmit(STRINGBCUPIN, sizeof(STRINGBCUPIN));
  80018f4:	211c      	movs	r1, #28
  80018f6:	487e      	ldr	r0, [pc, #504]	; (8001af0 <main+0x628>)
  80018f8:	f7fe fe22 	bl	8000540 <uartTransmit>
@@ -3281,8 +3281,8 @@ int main(void)
  8001916:	486d      	ldr	r0, [pc, #436]	; (8001acc <main+0x604>)
  8001918:	f7fe fe12 	bl	8000540 <uartTransmit>
 
-	#define TESTBCDOWNIN		"Test BC_Down_In, default = 0\n"
-	uartTransmit(TESTBCDOWNIN, sizeof(TESTBCDOWNIN));
+	#define STRINGBCDOWNIN		"Test BC_Down_In, default = 0\n"
+	uartTransmit(STRINGBCDOWNIN, sizeof(STRINGBCDOWNIN));
  800191c:	211e      	movs	r1, #30
  800191e:	4875      	ldr	r0, [pc, #468]	; (8001af4 <main+0x62c>)
  8001920:	f7fe fe0e 	bl	8000540 <uartTransmit>
@@ -3304,8 +3304,8 @@ int main(void)
  800193e:	4863      	ldr	r0, [pc, #396]	; (8001acc <main+0x604>)
  8001940:	f7fe fdfe 	bl	8000540 <uartTransmit>
 
-	#define TESTBAMOIN1			"Test BamoIn1, default = 1\n"
-	uartTransmit(TESTBAMOIN1, sizeof(TESTBAMOIN1));
+	#define STRINGBAMOIN1		"Test BamoIn1, default = 1\n"
+	uartTransmit(STRINGBAMOIN1, sizeof(STRINGBAMOIN1));
  8001944:	211b      	movs	r1, #27
  8001946:	486c      	ldr	r0, [pc, #432]	; (8001af8 <main+0x630>)
  8001948:	f7fe fdfa 	bl	8000540 <uartTransmit>
@@ -3327,8 +3327,8 @@ int main(void)
  8001966:	4859      	ldr	r0, [pc, #356]	; (8001acc <main+0x604>)
  8001968:	f7fe fdea 	bl	8000540 <uartTransmit>
 
-	#define TESTBAMOIN2			"Test BamoIn2, default = 1\n"
-	uartTransmit(TESTBAMOIN2, sizeof(TESTBAMOIN2));
+	#define STRINGBAMOIN2		"Test BamoIn2, default = 1\n"
+	uartTransmit(STRINGBAMOIN2, sizeof(STRINGBAMOIN2));
  800196c:	211b      	movs	r1, #27
  800196e:	4863      	ldr	r0, [pc, #396]	; (8001afc <main+0x634>)
  8001970:	f7fe fde6 	bl	8000540 <uartTransmit>
@@ -3350,8 +3350,8 @@ int main(void)
  800198e:	484f      	ldr	r0, [pc, #316]	; (8001acc <main+0x604>)
  8001990:	f7fe fdd6 	bl	8000540 <uartTransmit>
 
-	#define TESTENTER			"Test Enter, default = 0\n"
-	uartTransmit(TESTENTER, sizeof(TESTENTER));
+	#define STRINGENTER			"Test Enter, default = 0\n"
+	uartTransmit(STRINGENTER, sizeof(STRINGENTER));
  8001994:	2119      	movs	r1, #25
  8001996:	485a      	ldr	r0, [pc, #360]	; (8001b00 <main+0x638>)
  8001998:	f7fe fdd2 	bl	8000540 <uartTransmit>
@@ -3373,8 +3373,8 @@ int main(void)
  80019b6:	4845      	ldr	r0, [pc, #276]	; (8001acc <main+0x604>)
  80019b8:	f7fe fdc2 	bl	8000540 <uartTransmit>
 
-	#define TESTOUTA			"Test OutB, default = 0\n"
-	uartTransmit(TESTOUTA, sizeof(TESTOUTA));
+	#define STRINGOUTA			"Test OutB, default = 0\n"
+	uartTransmit(STRINGOUTA, sizeof(STRINGOUTA));
  80019bc:	2118      	movs	r1, #24
  80019be:	4851      	ldr	r0, [pc, #324]	; (8001b04 <main+0x63c>)
  80019c0:	f7fe fdbe 	bl	8000540 <uartTransmit>
@@ -3396,8 +3396,8 @@ int main(void)
  80019de:	483b      	ldr	r0, [pc, #236]	; (8001acc <main+0x604>)
  80019e0:	f7fe fdae 	bl	8000540 <uartTransmit>
 
-	#define TESTOUTB			"Test OutB, default = 0\n"
-	uartTransmit(TESTOUTB, sizeof(TESTOUTB));
+	#define STRINGOUTB			"Test OutB, default = 0\n"
+	uartTransmit(STRINGOUTB, sizeof(STRINGOUTB));
  80019e4:	2118      	movs	r1, #24
  80019e6:	4847      	ldr	r0, [pc, #284]	; (8001b04 <main+0x63c>)
  80019e8:	f7fe fdaa 	bl	8000540 <uartTransmit>
@@ -3419,8 +3419,8 @@ int main(void)
  8001a06:	4831      	ldr	r0, [pc, #196]	; (8001acc <main+0x604>)
  8001a08:	f7fe fd9a 	bl	8000540 <uartTransmit>
 
-	#define TESTGRA1			"Test GRA1, default = 0\n"
-	uartTransmit(TESTGRA1, sizeof(TESTGRA1));
+	#define STRINGGRA1			"Test GRA1, default = 0\n"
+	uartTransmit(STRINGGRA1, sizeof(STRINGGRA1));
  8001a0c:	2118      	movs	r1, #24
  8001a0e:	483e      	ldr	r0, [pc, #248]	; (8001b08 <main+0x640>)
  8001a10:	f7fe fd96 	bl	8000540 <uartTransmit>
@@ -3442,8 +3442,8 @@ int main(void)
  8001a2e:	4827      	ldr	r0, [pc, #156]	; (8001acc <main+0x604>)
  8001a30:	f7fe fd86 	bl	8000540 <uartTransmit>
 
-	#define TESTGRA2			"Test GRA2, default = 0\n"
-	uartTransmit(TESTGRA2, sizeof(TESTGRA2));
+	#define STRINGGRA2			"Test GRA2, default = 0\n"
+	uartTransmit(STRINGGRA2, sizeof(STRINGGRA2));
  8001a34:	2118      	movs	r1, #24
  8001a36:	4835      	ldr	r0, [pc, #212]	; (8001b0c <main+0x644>)
  8001a38:	f7fe fd82 	bl	8000540 <uartTransmit>
@@ -3465,8 +3465,8 @@ int main(void)
  8001a56:	481d      	ldr	r0, [pc, #116]	; (8001acc <main+0x604>)
  8001a58:	f7fe fd72 	bl	8000540 <uartTransmit>
 
-	#define TESTGRA3			"Test GRA3, default = 0\n"
-	uartTransmit(TESTGRA3, sizeof(TESTGRA3));
+	#define STRINGGRA3			"Test GRA3, default = 0\n"
+	uartTransmit(STRINGGRA3, sizeof(STRINGGRA3));
  8001a5c:	2118      	movs	r1, #24
  8001a5e:	482c      	ldr	r0, [pc, #176]	; (8001b10 <main+0x648>)
  8001a60:	f7fe fd6e 	bl	8000540 <uartTransmit>
@@ -3488,8 +3488,8 @@ int main(void)
  8001a7e:	4813      	ldr	r0, [pc, #76]	; (8001acc <main+0x604>)
  8001a80:	f7fe fd5e 	bl	8000540 <uartTransmit>
 
-	#define TESTGRA4			"Test GRA4, default = 0\n"
-	uartTransmit(TESTGRA4, sizeof(TESTGRA4));
+	#define STRINGGRA4			"Test GRA4, default = 0\n"
+	uartTransmit(STRINGGRA4, sizeof(STRINGGRA4));
  8001a84:	2118      	movs	r1, #24
  8001a86:	4823      	ldr	r0, [pc, #140]	; (8001b14 <main+0x64c>)
  8001a88:	f7fe fd5a 	bl	8000540 <uartTransmit>
@@ -3511,8 +3511,8 @@ int main(void)
  8001aa6:	4809      	ldr	r0, [pc, #36]	; (8001acc <main+0x604>)
  8001aa8:	f7fe fd4a 	bl	8000540 <uartTransmit>
 
-	#define TESTDURCHFLUSS		"Test Durchfluss, default = 1\n"
-	uartTransmit(TESTDURCHFLUSS, sizeof(TESTDURCHFLUSS));
+	#define STRINGDURCHFLUSS	"Test Durchfluss, default = 1\n"
+	uartTransmit(STRINGDURCHFLUSS, sizeof(STRINGDURCHFLUSS));
  8001aac:	211e      	movs	r1, #30
  8001aae:	481a      	ldr	r0, [pc, #104]	; (8001b18 <main+0x650>)
  8001ab0:	f7fe fd46 	bl	8000540 <uartTransmit>
@@ -3560,8 +3560,8 @@ int main(void)
  8001b26:	4835      	ldr	r0, [pc, #212]	; (8001bfc <main+0x734>)
  8001b28:	f7fe fd0a 	bl	8000540 <uartTransmit>
 
-	#define TESTEMERGENCY		"Test Emergency Run, default = 1\n"
-	uartTransmit(TESTEMERGENCY, sizeof(TESTEMERGENCY));
+	#define STRINGEMERGENCY		"Test Emergency Run, default = 1\n"
+	uartTransmit(STRINGEMERGENCY, sizeof(STRINGEMERGENCY));
  8001b2c:	2121      	movs	r1, #33	; 0x21
  8001b2e:	4834      	ldr	r0, [pc, #208]	; (8001c00 <main+0x738>)
  8001b30:	f7fe fd06 	bl	8000540 <uartTransmit>
@@ -3583,8 +3583,8 @@ int main(void)
  8001b4e:	482a      	ldr	r0, [pc, #168]	; (8001bf8 <main+0x730>)
  8001b50:	f7fe fcf6 	bl	8000540 <uartTransmit>
 
-	#define TESTSDC0			"Test SDC0, default = 1\n"
-	uartTransmit(TESTSDC0, sizeof(TESTSDC0));
+	#define STRINGSDC0			"Test SDC0, default = 1\n"
+	uartTransmit(STRINGSDC0, sizeof(STRINGSDC0));
  8001b54:	2118      	movs	r1, #24
  8001b56:	482d      	ldr	r0, [pc, #180]	; (8001c0c <main+0x744>)
  8001b58:	f7fe fcf2 	bl	8000540 <uartTransmit>
@@ -3606,8 +3606,8 @@ int main(void)
  8001b76:	4820      	ldr	r0, [pc, #128]	; (8001bf8 <main+0x730>)
  8001b78:	f7fe fce2 	bl	8000540 <uartTransmit>
 
-	#define TESTAKKUSDC			"Test Akku SDC, default = 1\n"
-	uartTransmit(TESTAKKUSDC, sizeof(TESTAKKUSDC));
+	#define STRINGAKKUSDC		"Test Akku SDC, default = 1\n"
+	uartTransmit(STRINGAKKUSDC, sizeof(STRINGAKKUSDC));
  8001b7c:	211c      	movs	r1, #28
  8001b7e:	4824      	ldr	r0, [pc, #144]	; (8001c10 <main+0x748>)
  8001b80:	f7fe fcde 	bl	8000540 <uartTransmit>
@@ -3629,8 +3629,8 @@ int main(void)
  8001b9e:	4816      	ldr	r0, [pc, #88]	; (8001bf8 <main+0x730>)
  8001ba0:	f7fe fcce 	bl	8000540 <uartTransmit>
 
-	#define TESTBTBSDC			"Test BTB SDC, default = 1\n"
-	uartTransmit(TESTBTBSDC, sizeof(TESTBTBSDC));
+	#define STRINGBTBSDC		"Test BTB SDC, default = 1\n"
+	uartTransmit(STRINGBTBSDC, sizeof(STRINGBTBSDC));
  8001ba4:	211b      	movs	r1, #27
  8001ba6:	481b      	ldr	r0, [pc, #108]	; (8001c14 <main+0x74c>)
  8001ba8:	f7fe fcca 	bl	8000540 <uartTransmit>
@@ -3652,8 +3652,8 @@ int main(void)
  8001bc6:	480c      	ldr	r0, [pc, #48]	; (8001bf8 <main+0x730>)
  8001bc8:	f7fe fcba 	bl	8000540 <uartTransmit>
 
-	#define TESTDCDCFAULT		"Test DCDC Fault, default = 1\n"
-	uartTransmit(TESTDCDCFAULT, sizeof(TESTDCDCFAULT));
+	#define STRINGDCDCFAULT		"Test DCDC Fault, default = 1\n"
+	uartTransmit(STRINGDCDCFAULT, sizeof(STRINGDCDCFAULT));
  8001bcc:	211e      	movs	r1, #30
  8001bce:	4812      	ldr	r0, [pc, #72]	; (8001c18 <main+0x750>)
  8001bd0:	f7fe fcb6 	bl	8000540 <uartTransmit>
