@@ -21,6 +21,8 @@
 #include "can.h"
 
 /* USER CODE BEGIN 0 */
+// Definiere Variable
+CAN_FilterTypeDef sFilterConfig;
 
 /* USER CODE END 0 */
 
@@ -54,6 +56,38 @@ void MX_CAN3_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN3_Init 2 */
+	// Starte CAN Bus
+	if((HAL_CAN_Start(&hcan3)) != HAL_OK)
+	{
+		// Fehler beim Starten des CAN-Busses
+		Error_Handler();
+	}
+
+	// Aktiviere Interrupts fuer CAN Bus
+	if((HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
+	{
+		// Fehler in der Initialisierung des CAN Interrupts
+		Error_Handler();
+	}
+
+	// Filter Bank initialisieren um Daten zu empfangen
+	// Akzeptiere alle CAN-Pakete
+	sFilterConfig.FilterBank = 0;
+	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	sFilterConfig.FilterIdHigh = 0x0000;
+	sFilterConfig.FilterIdLow = 0x0000;
+	sFilterConfig.FilterMaskIdHigh = 0x0000;
+	sFilterConfig.FilterMaskIdLow = 0x0000;
+	sFilterConfig.FilterFIFOAssignment = 0;
+	sFilterConfig.FilterActivation = ENABLE;
+
+	// Filter Bank schreiben
+	if((HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
+	{
+		// Fehler beim konfigurieren der Filterbank fuer den CAN-Bus
+		Error_Handler();
+	}
 
   /* USER CODE END CAN3_Init 2 */
 

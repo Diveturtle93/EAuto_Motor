@@ -54,7 +54,6 @@
 CAN_RxHeaderTypeDef RxMessage;
 CAN_TxHeaderTypeDef TxMessage;
 uint8_t RxData[8], can_change = 0, TxData[8], status;
-CAN_FilterTypeDef sFilterConfig;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,57 +100,20 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
-  	/* Schreibe Resetquelle auf die Konsole */
+  	// Schreibe Resetquelle auf die Konsole
 #ifdef DEBUG
 	printResetSource(readResetSource());
 
-  	/* Teste serielle Schnittstelle*/
-  	#define TEST_STRING_UART  "\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	// Teste serielle Schnittstelle
+  	#define TEST_STRING_UART  			"\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
 
-  	/* Sammel Systeminformationen */
+  	// Sammel Systeminformationen
   	collectSystemInfo();
 #endif
 
-  	/* Lese alle Eingaenge */
+  	// Lese alle Eingaenge
   	readall_inputs();
-
-  	// Starte CAN Bus
-  	if((status = HAL_CAN_Start(&hcan3)) != HAL_OK)
-  	{
-  		/* Start Error */
-  		hal_error(status);
-  		Error_Handler();
-  	}
-  	uartTransmit("CAN START\n", 10);
-
-  	// Aktiviere Interrupts für CAN Bus
-  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
-  	{
-  		/* Notification Error */
-  		hal_error(status);
-  		Error_Handler();
-  	}
-  	uartTransmit("Send Message\n", 13);
-
-  	// Filter Bank initialisieren um Daten zu empfangen
-    sFilterConfig.FilterBank = 0;
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = 0;
-    sFilterConfig.FilterActivation = ENABLE;
-
-    // Filter Bank schreiben
-    if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
-    {
-    	/* Filter configuration Error */
-  		hal_error(status);
-  		Error_Handler();
-    }
 
     // Sendenachricht erstellen
   	TxMessage.StdId = 0x123;
@@ -189,7 +151,7 @@ int main(void)
 			switch (RxMessage.StdId)
 			{
 				case BAMOCAR_RX_ID:
-					BAMOCAN_ID(&RxData[0]);
+					BAMOCAN_ID(&RxData[0], RxMessage.DLC);
 					break;
 				default:
 					uartTransmit("CAN-ID nicht verfuegbar\n", 24);
@@ -263,8 +225,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// CAN Interrupt Nachricht angekommen
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
+	// Nachricht aus Speicher auslesen
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
 	can_change = 1;
 }
@@ -279,8 +243,20 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+
+  // Schalte Fehler LED ein
+  leuchten_out.RedLed = 1;
+  HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);
+
+  // Sende Nachricht auf Uart-Interface
+#ifdef DEBUG
+  #define STRING_ERROR_HANDLER			"Error Handler wird ausgefuehrt!!!"
+  uartTransmit(STRING_ERROR_HANDLER, sizeof(STRING_ERROR_HANDLER));
+#endif
+  // Beginne Endlosschleife nachdem Fehler aufgetreten ist
   while (1)
   {
+
   }
   /* USER CODE END Error_Handler_Debug */
 }

@@ -58,8 +58,8 @@ void collectMiddlewareInfo(void)
 	uartTransmit(".", 1);												// Hal Version anzeigen
 	uartTransmitNumber((uint32_t)(HAL_GetHalVersion() & 0xFF), 10);
 
-
-	/*uartTransmit(STRING_RTOS_CMSIS_VERSION, sizeof(STRING_RTOS_CMSIS_VERSION));
+#ifdef CMSIS_OS_H_
+	uartTransmit(STRING_RTOS_CMSIS_VERSION, sizeof(STRING_RTOS_CMSIS_VERSION));
 	uartTransmitNumber((osCMSIS >> 16), 10);							// FreeRTOS CMSIS Version anzeigen
 
 	uartTransmit(".", 1);
@@ -75,7 +75,8 @@ void collectMiddlewareInfo(void)
 	uartTransmit(".", 1);
 	uartTransmitNumber(tskKERNEL_VERSION_BUILD, 10);					// FreeRTOS Kernel Version anzeigen
 
-	uartTransmit("\n", 1);*/
+	uartTransmit("\n", 1);
+#endif
 }
 //----------------------------------------------------------------------
 
