@@ -8,12 +8,12 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "main.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "error.h"
 #include "BasicUart.h"
@@ -30,7 +30,7 @@ void hal_error(uint8_t status)
 	else if (status == HAL_ERROR) {										// HAL Error
 		uartTransmit("HAL ERROR\n", 10);
 	}
-	else if (status == HAL_BUSY) {										// HAL Beschäftigt
+	else if (status == HAL_BUSY) {										// HAL Beschaeftigt
 		uartTransmit("HAL BUSY\n", 9);
 	}
 	else if (status == HAL_TIMEOUT) {									// HAL Timeout

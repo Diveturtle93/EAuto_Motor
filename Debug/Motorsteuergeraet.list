@@ -2524,12 +2524,20 @@ void MX_GPIO_Init(void)
                           |GPIO_PIN_2|SD_SW_Pin|SD_D0_Pin|SD_D1_Pin
                           |SD_D2_Pin|SD_D3_Pin|SD_SCK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+ 80012e6:	2303      	movs	r3, #3
+ 80012e8:	62bb      	str	r3, [r7, #40]	; 0x28
  80013d2:	2303      	movs	r3, #3
  80013d4:	62bb      	str	r3, [r7, #40]	; 0x28
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 80012ea:	2300      	movs	r3, #0
+ 80012ec:	62fb      	str	r3, [r7, #44]	; 0x2c
  80013d6:	2300      	movs	r3, #0
  80013d8:	62fb      	str	r3, [r7, #44]	; 0x2c
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+ 80012ee:	f107 0324 	add.w	r3, r7, #36	; 0x24
+ 80012f2:	4619      	mov	r1, r3
+ 80012f4:	4858      	ldr	r0, [pc, #352]	; (8001458 <MX_GPIO_Init+0x2f8>)
+ 80012f6:	f001 fb67 	bl	80029c8 <HAL_GPIO_Init>
  80013da:	f107 0324 	add.w	r3, r7, #36	; 0x24
  80013de:	4619      	mov	r1, r3
  80013e0:	4858      	ldr	r0, [pc, #352]	; (8001544 <MX_GPIO_Init+0x2f8>)
@@ -2697,6 +2705,13 @@ void MX_GPIO_Init(void)
  80014d2:	4619      	mov	r1, r3
  80014d4:	481e      	ldr	r0, [pc, #120]	; (8001550 <MX_GPIO_Init+0x304>)
  80014d6:	f001 fe8f 	bl	80031f8 <HAL_GPIO_Init>
+
+  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
+                           PDPin PDPin PDPin */
+  GPIO_InitStruct.Pin = BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
+ 80014da:	f64e 2388 	movw	r3, #60040	; 0xea88
+ 80014de:	627b      	str	r3, [r7, #36]	; 0x24
+                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|OELSTAND_TEMP_Pin;
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin */
@@ -2886,7 +2901,7 @@ int main(void)
  80015ec:	f7ff f9a6 	bl	800093c <printResetSource>
 
   	/* Teste serielle Schnittstelle*/
-  	#define TEST_STRING_UART  "\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	#define TEST_STRING_UART	"\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
  80015f0:	213a      	movs	r1, #58	; 0x3a
  80015f2:	4881      	ldr	r0, [pc, #516]	; (80017f8 <main+0x244>)
@@ -2896,6 +2911,56 @@ int main(void)
   	collectSystemInfo();
  80015f8:	f7ff f92c 	bl	8000854 <collectSystemInfo>
 #endif
+
+  	// Leds Testen
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
+ 80014fc:	2201      	movs	r2, #1
+ 80014fe:	2180      	movs	r1, #128	; 0x80
+ 8001500:	48b2      	ldr	r0, [pc, #712]	; (80017cc <main+0x304>)
+ 8001502:	f001 fc25 	bl	8002d50 <HAL_GPIO_WritePin>
+    HAL_Delay(1000);
+ 8001506:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
+ 800150a:	f000 fd87 	bl	800201c <HAL_Delay>
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
+ 800150e:	2200      	movs	r2, #0
+ 8001510:	2180      	movs	r1, #128	; 0x80
+ 8001512:	48ae      	ldr	r0, [pc, #696]	; (80017cc <main+0x304>)
+ 8001514:	f001 fc1c 	bl	8002d50 <HAL_GPIO_WritePin>
+    HAL_Delay(500);
+ 8001518:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
+ 800151c:	f000 fd7e 	bl	800201c <HAL_Delay>
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
+ 8001520:	2201      	movs	r2, #1
+ 8001522:	f44f 4180 	mov.w	r1, #16384	; 0x4000
+ 8001526:	48a9      	ldr	r0, [pc, #676]	; (80017cc <main+0x304>)
+ 8001528:	f001 fc12 	bl	8002d50 <HAL_GPIO_WritePin>
+    HAL_Delay(1000);
+ 800152c:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
+ 8001530:	f000 fd74 	bl	800201c <HAL_Delay>
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
+ 8001534:	2200      	movs	r2, #0
+ 8001536:	f44f 4180 	mov.w	r1, #16384	; 0x4000
+ 800153a:	48a4      	ldr	r0, [pc, #656]	; (80017cc <main+0x304>)
+ 800153c:	f001 fc08 	bl	8002d50 <HAL_GPIO_WritePin>
+    HAL_Delay(500);
+ 8001540:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
+ 8001544:	f000 fd6a 	bl	800201c <HAL_Delay>
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+ 8001548:	2201      	movs	r2, #1
+ 800154a:	2104      	movs	r1, #4
+ 800154c:	489f      	ldr	r0, [pc, #636]	; (80017cc <main+0x304>)
+ 800154e:	f001 fbff 	bl	8002d50 <HAL_GPIO_WritePin>
+    HAL_Delay(1000);
+ 8001552:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
+ 8001556:	f000 fd61 	bl	800201c <HAL_Delay>
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
+ 800155a:	2200      	movs	r2, #0
+ 800155c:	2104      	movs	r1, #4
+ 800155e:	489b      	ldr	r0, [pc, #620]	; (80017cc <main+0x304>)
+ 8001560:	f001 fbf6 	bl	8002d50 <HAL_GPIO_WritePin>
+    HAL_Delay(500);
+ 8001564:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
+ 8001568:	f000 fd58 	bl	800201c <HAL_Delay>
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
@@ -3460,6 +3525,18 @@ __STATIC_FORCEINLINE void __disable_irq(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+  HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+ 8001d44:	2201      	movs	r2, #1
+ 8001d46:	2104      	movs	r1, #4
+ 8001d48:	4803      	ldr	r0, [pc, #12]	; (8001d58 <Error_Handler+0x1c>)
+ 8001d4a:	f001 f801 	bl	8002d50 <HAL_GPIO_WritePin>
+#ifdef DEBUG
+#define ERRORMESSAGE			"\nError Handler ausgeloest\n"
+  uartTransmit(ERRORMESSAGE,sizeof(ERRORMESSAGE));
+ 8001d4e:	211b      	movs	r1, #27
+ 8001d50:	4802      	ldr	r0, [pc, #8]	; (8001d5c <Error_Handler+0x20>)
+ 8001d52:	f7fe fbf5 	bl	8000540 <uartTransmit>
+#endif
   while (1)
  80019b8:	e7fe      	b.n	80019b8 <Error_Handler+0x8>
 	...
@@ -4069,36 +4146,50 @@ Reset_Handler:
 
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
+ 8001f14:	2100      	movs	r1, #0
  8001c50:	2100      	movs	r1, #0
   b  LoopCopyDataInit
+ 8001f16:	e003      	b.n	8001f20 <LoopCopyDataInit>
  8001c52:	e003      	b.n	8001c5c <LoopCopyDataInit>
 
+08001f18 <CopyDataInit>:
 08001c54 <CopyDataInit>:
 
 CopyDataInit:
   ldr  r3, =_sidata
+ 8001f18:	4b0c      	ldr	r3, [pc, #48]	; (8001f4c <LoopFillZerobss+0x18>)
  8001c54:	4b0c      	ldr	r3, [pc, #48]	; (8001c88 <LoopFillZerobss+0x18>)
   ldr  r3, [r3, r1]
+ 8001f1a:	585b      	ldr	r3, [r3, r1]
  8001c56:	585b      	ldr	r3, [r3, r1]
   str  r3, [r0, r1]
+ 8001f1c:	5043      	str	r3, [r0, r1]
  8001c58:	5043      	str	r3, [r0, r1]
   adds  r1, r1, #4
+ 8001f1e:	3104      	adds	r1, #4
  8001c5a:	3104      	adds	r1, #4
 
+08001f20 <LoopCopyDataInit>:
 08001c5c <LoopCopyDataInit>:
     
 LoopCopyDataInit:
   ldr  r0, =_sdata
+ 8001f20:	480b      	ldr	r0, [pc, #44]	; (8001f50 <LoopFillZerobss+0x1c>)
  8001c5c:	480b      	ldr	r0, [pc, #44]	; (8001c8c <LoopFillZerobss+0x1c>)
   ldr  r3, =_edata
+ 8001f22:	4b0c      	ldr	r3, [pc, #48]	; (8001f54 <LoopFillZerobss+0x20>)
  8001c5e:	4b0c      	ldr	r3, [pc, #48]	; (8001c90 <LoopFillZerobss+0x20>)
   adds  r2, r0, r1
+ 8001f24:	1842      	adds	r2, r0, r1
  8001c60:	1842      	adds	r2, r0, r1
   cmp  r2, r3
+ 8001f26:	429a      	cmp	r2, r3
  8001c62:	429a      	cmp	r2, r3
   bcc  CopyDataInit
+ 8001f28:	d3f6      	bcc.n	8001f18 <CopyDataInit>
  8001c64:	d3f6      	bcc.n	8001c54 <CopyDataInit>
   ldr  r2, =_sbss
+ 8001f2a:	4a0b      	ldr	r2, [pc, #44]	; (8001f58 <LoopFillZerobss+0x24>)
  8001c66:	4a0b      	ldr	r2, [pc, #44]	; (8001c94 <LoopFillZerobss+0x24>)
   b  LoopFillZerobss
  8001c68:	e002      	b.n	8001c70 <LoopFillZerobss>
@@ -4302,6 +4393,9 @@ __weak uint32_t HAL_GetTick(void)
  8001d54:	200001ac 	.word	0x200001ac
 
 08001d58 <HAL_GetHalVersion>:
+/**
+  * @brief  Returns the HAL revision
+  * @retval version : 0xXYZR (8bits for each decimal, R for RC)
 /**
   * @brief  Returns the HAL revision
   * @retval version : 0xXYZR (8bits for each decimal, R for RC)
@@ -9785,6 +9879,8 @@ HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef  *RCC_OscInitStruct)
           (READ_BIT(pll_config, RCC_PLLCFGR_PLLP) != ((((RCC_OscInitStruct->PLL.PLLP) >> 1U) - 1U) << RCC_PLLCFGR_PLLP_Pos)) ||
  8003b88:	429a      	cmp	r2, r3
  8003b8a:	d107      	bne.n	8003b9c <HAL_RCC_OscConfig+0x548>
+ 8003b88:	429a      	cmp	r2, r3
+ 8003b8a:	d107      	bne.n	8003b9c <HAL_RCC_OscConfig+0x548>
           (READ_BIT(pll_config, RCC_PLLCFGR_PLLR) != (RCC_OscInitStruct->PLL.PLLR << RCC_PLLCFGR_PLLR_Pos)))
  8003b8c:	68fb      	ldr	r3, [r7, #12]
  8003b8e:	f003 42e0 	and.w	r2, r3, #1879048192	; 0x70000000
@@ -10709,6 +10805,8 @@ HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef  *PeriphClk
  80040dc:	f7fd fe30 	bl	8001d40 <HAL_GetTick>
  80040e0:	6178      	str	r0, [r7, #20]
 
+    /* Reset the Backup domain only if the RTC Clock source selection is modified */
+    tmpreg0 = (RCC->BDCR & RCC_BDCR_RTCSEL);
         /* Wait till LSE is ready */
         while(__HAL_RCC_GET_FLAG(RCC_FLAG_LSERDY) == RESET)
  80040e2:	e00a      	b.n	80040fa <HAL_RCCEx_PeriphCLKConfig+0x19e>
