@@ -122,7 +122,7 @@
 #define BAMOCAR_REG_ROTOR						0x5C						// Rotor Signal
 #define BAMOCAR_REG_SPEED_CMD_INT				0x5D						// Command Geschwindigkeit intern
 #define BAMOCAR_REG_SPEED_FILTER				0x5E						// Filter aktuelle Geschwindigkeitswerte
-#define BAMOCAR_REG_I_IST_FILTER				0x5F						// Aktuelle Stromwerte gefiltert (Zum Anzeigen / Monitoring)
+#define BAMOCAR_REG_I_ACT_FILTER				0x5F						// Aktuelle Stromwerte gefiltert (Zum Anzeigen / Monitoring)
 
 #define BAMOCAR_REG_AIN_FILTER					0x60						//
 #define BAMOCAR_REG_IT_MONITOR					0x61						// I_t Monitor

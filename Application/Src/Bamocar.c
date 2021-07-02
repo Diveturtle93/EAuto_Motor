@@ -82,6 +82,7 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 	switch (Reg)
 	{
+		// Drehzahl vom Bamocar bekommen
 		case BAMOCAR_REG_N_ACT_FILTER:
 			speed = ((data[2]<<8) + data[1]);
 
@@ -94,7 +95,8 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 			break;
 
-		case BAMOCAR_REG_I_IST_FILTER:
+		// Stromwert von Bamocar bekommen
+		case BAMOCAR_REG_I_ACT_FILTER:
 			strom = ((data[2]<<8) + data[1]);
 
 // Uart Ausgabe
@@ -106,15 +108,16 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 			break;
 
+		// Statusregister von Bamocar bekommen
 		case BAMOCAR_REG_STATUS:
 			bamocar_stat.status1 = ((data[4] << 24) + (data[3] << 16) + (data[2] << 8) + data[1]);
 
 // Uart Ausgabe
 #ifdef DEBUG
 			uartTransmit("Bamocar Status\n", 15);
-			for (uint8_t i = 0; i < 4; i++)
+			for (uint8_t i = 4; i > 0; i--)
 			{
-				uartTransmitNumber(bamocar_stat.status[i+1], 10);
+				uartTransmitNumber(bamocar_stat.status[i-1], 16);
 				uartTransmit(" ", 1);
 			}
 			uartTransmit("\n", 1);
@@ -122,6 +125,7 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 			break;
 
+		// Errorregister von Bamocar bekommen
 		case BAMOCAR_REG_ERROR:
 			bamocar_error.error1 = ((data[2] << 8) + data[1]);
 			bamocar_warnung.warnung1 = ((data[4] << 8) + data[3]);
@@ -131,7 +135,7 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 			uartTransmit("Bamocar Error\n", 14);
 			for (uint8_t i = 0; i < 4; i++)
 			{
-				uartTransmitNumber(data[1+i], 10);
+				uartTransmitNumber(data[1+i], 16);
 				uartTransmit(" ", 1);
 			}
 			uartTransmit("\n", 1);
@@ -139,15 +143,16 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 			break;
 
+		// Status IO Register von Bamocar bekommen
 		case BAMOCAR_REG_STATUS_IO:
 			bamocar_statIO.status1 = ((data[2] << 8) + data[1]);
 
 // Uart Ausgabe
 #ifdef DEBUG
 			uartTransmit("Bamocar IO Status\n", 18);
-			for (uint8_t i = 0; i < 4; i++)
+			for (uint8_t i = 0; i < 2; i++)
 			{
-				uartTransmitNumber(bamocar_stat.status[i+1], 10);
+				uartTransmitNumber(bamocar_statIO.status[i], 16);
 				uartTransmit(" ", 1);
 			}
 			uartTransmit("\n", 1);
@@ -155,6 +160,7 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 			break;
 
+		// Firmware von Bamocar ausgelesen
 		case BAMOCAR_REG_FIRMWARE:
 			bamocar_data.data = ((data[2]<<8) + data[1]);
 
@@ -167,6 +173,7 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 			break;
 
+		// Register fuer Bamocar nicht definiert, Fehler
 		default:
 			uartTransmit("Bamocar Register nicht definiert\n", 33);
 			break;

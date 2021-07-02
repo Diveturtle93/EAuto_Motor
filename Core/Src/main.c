@@ -153,12 +153,17 @@ int main(void)
 				case BAMOCAR_RX_ID:
 					BAMOCAN_ID(&RxData[0], RxMessage.DLC);
 					break;
+				case 0x111:
+					uartTransmit("CAN-ID Computer config\n", 23);
+					readBAMOReg(BAMOCAR_REG_FIRMWARE);
+					break;
 				default:
 					uartTransmit("CAN-ID nicht verfuegbar\n", 24);
 					break;
 			}
 			can_change = 0;
 		}
+
 		HAL_Delay(1000);
 
 		// Sende CAN Nachricht auf CAN-Bus
