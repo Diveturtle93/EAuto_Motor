@@ -21,6 +21,7 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -54,10 +55,8 @@
 
 /* USER CODE BEGIN PV */
 CAN_RxHeaderTypeDef RxMessage;
-CAN_TxHeaderTypeDef TxMessage;
-uint8_t RxData[8], can_change = 0, TxData[8], status;
-CAN_FilterTypeDef sFilterConfig;
-uint32_t lastcan = 0, lastsendcan = 0;
+uint8_t RxData[8], can_change = 0;
+volatile uint8_t millisekunden_flag_1 = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,6 +87,16 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+	// Definiere Variablen fuer Main-Funktion
+	uint8_t TxData[8], status;
+	uint16_t count = 0;
+  	uint32_t lastcan = 0, lastsendcan = 0;
+  	CAN_FilterTypeDef sFilterConfig;
+  	CAN_TxHeaderTypeDef TxMessage;
+  	CAN_TxHeaderTypeDef TxMotor1;
+  	CAN_TxHeaderTypeDef TxMotor2;
+  	CAN_TxHeaderTypeDef TxMotor3;
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -102,6 +111,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   	/* Schreibe Resetquelle auf die Konsole */
@@ -164,8 +174,35 @@ int main(void)
   	TxMessage.DLC = 8;
   	TxMessage.TransmitGlobalTime=DISABLE;
 
+	// Sendenachricht Motorsteuergeraet 1 erstellen
+	TxMotor1.StdId = MOTOR_CAN_DREHZAHL;
+	TxMotor1.ExtId = 0;
+	TxMotor1.RTR = CAN_RTR_DATA;
+	TxMotor1.IDE = CAN_ID_STD;
+	TxMotor1.DLC = 8;
+	TxMotor1.TransmitGlobalTime=DISABLE;
+
+	// Sendenachricht Motorsteuergeraet 1 erstellen
+	TxMotor2.StdId = MOTOR_CAN_MOTOR2;
+	TxMotor2.ExtId = 0;
+	TxMotor2.RTR = CAN_RTR_DATA;
+	TxMotor2.IDE = CAN_ID_STD;
+	TxMotor2.DLC = 8;
+	TxMotor2.TransmitGlobalTime=DISABLE;
+
+	// Sendenachricht Motorsteuergeraet 1 erstellen
+	TxMotor3.StdId = MOTOR_CAN_GASPEDAL;
+	TxMotor3.ExtId = 0;
+	TxMotor3.RTR = CAN_RTR_DATA;
+	TxMotor3.IDE = CAN_ID_STD;
+	TxMotor3.DLC = 8;
+	TxMotor3.TransmitGlobalTime=DISABLE;
+
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
+
+  	// Start timer
+  	HAL_TIM_Base_Start(&htim6);
 
   	uartTransmit("\nStarte While\n\n", 15);
 
@@ -178,7 +215,23 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		if (millis() - lastcan >= 5)
+	  	// Task wird jede Millisekunde ausgefuehrt
+		if (millisekunden_flag_1 == 1)
+		{
+			count++;													// Zähle count hoch
+			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurück
+		}
+
+		// Task wird alle 20 Millisekunden ausgefueht
+		if (count == 20)
+		{
+			// Sende Nachricht Motorsteuergeraet 1
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+		}
+
+	  	// Task wird alle 5 Millisekunden ausgefuehrt
+	  	if (millis() - lastcan >= 5)
 		{
 			// Wenn Nachricht über den CAN-Bus empfangen wurde
 			if (can_change == 1)
@@ -281,10 +334,22 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// Interrupts
+// Can-Interrupt: Nachricht wartet
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
 	can_change = 1;
+}
+
+// Timer-Interrupt: Timer ist uebergelaufen
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
+	if (htim == &htim6)
+	{
+		millisekunden_flag_1 = 1;
+	}
 }
 /* USER CODE END 4 */
 
