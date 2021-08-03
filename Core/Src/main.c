@@ -36,6 +36,7 @@
 #include "millis.h"
 #include "Motorsteuergeraet.h"
 #include "adc_inputs.h"
+#include "pedale.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,7 +91,7 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[5], InData[5], status;
-	uint16_t count = 0, ADC_Gas, ADC_Bremse;
+	uint16_t count = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
   	CAN_FilterTypeDef sFilterConfig;
 
@@ -243,44 +244,10 @@ int main(void)
 			readall_inputs();
 
 			// Bremse pruefen
-			if ((system_in.BremseNO == 1) && (system_in.BremseNC != 1))
-			{
-
-			}
-			else if ((system_in.BremseNO != 1) && (system_in.BremseNC == 1))
-			{
-
-			}
-			else if ((system_in.BremseNO != 1) && (system_in.BremseNC != 1))
-			{
-				// Bremsdruck einlesen
-				ADC_Bremse = ADC_Bremsdruck();
-			}
-			else
-			{
-				// Bremse invalide
-				Error_Handler();
-			}
+			readBrake();
 
 			// Gaspedal pruefen
-			if ((system_in.Kickdown == 1) && (system_in.Leerlauf != 1))
-			{
-
-			}
-			else if ((system_in.Kickdown != 1) && (system_in.Leerlauf == 1))
-			{
-
-			}
-			else if ((system_in.Kickdown != 1) && (system_in.Leerlauf != 1))
-			{
-				// Gaspedal einlesen
-				ADC_Gas = ADC_Gaspedal();
-			}
-			else
-			{
-				// Gaspedal invalide
-				Error_Handler();
-			}
+			readTrottle();
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt

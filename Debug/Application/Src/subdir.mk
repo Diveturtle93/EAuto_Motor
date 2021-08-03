@@ -12,7 +12,8 @@ C_SRCS += \
 ../Application/Src/error.c \
 ../Application/Src/inputs.c \
 ../Application/Src/millis.c \
-../Application/Src/outputs.c 
+../Application/Src/outputs.c \
+../Application/Src/pedale.c 
 
 OBJS += \
 ./Application/Src/Bamocar.o \
@@ -22,7 +23,8 @@ OBJS += \
 ./Application/Src/error.o \
 ./Application/Src/inputs.o \
 ./Application/Src/millis.o \
-./Application/Src/outputs.o 
+./Application/Src/outputs.o \
+./Application/Src/pedale.o 
 
 C_DEPS += \
 ./Application/Src/Bamocar.d \
@@ -32,7 +34,8 @@ C_DEPS += \
 ./Application/Src/error.d \
 ./Application/Src/inputs.d \
 ./Application/Src/millis.d \
-./Application/Src/outputs.d 
+./Application/Src/outputs.d \
+./Application/Src/pedale.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
