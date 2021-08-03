@@ -35,6 +35,7 @@
 #include "Bamocar.h"
 #include "millis.h"
 #include "Motorsteuergeraet.h"
+#include "adc_inputs.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,7 +90,7 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[5], InData[5], status;
-	uint16_t count = 0;
+	uint16_t count = 0, ADC_Gas, ADC_Bremse;
   	uint32_t lastcan = 0, lastsendcan = 0;
   	CAN_FilterTypeDef sFilterConfig;
 
@@ -121,26 +122,15 @@ int main(void)
 	printResetSource(readResetSource());
 
   	/* Teste serielle Schnittstelle*/
-  	#define TEST_STRING_UART	"\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
 
   	/* Sammel Systeminformationen */
   	collectSystemInfo();
 #endif
 
-  	// Leds Testen
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
+	// Leds Testen
+  	testPCB_Leds();
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
@@ -234,11 +224,11 @@ int main(void)
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
 		{
-			count++;													// Zähle count hoch
-			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurück
+			count++;													// Zaehler count hochzaehlen
+			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
 		}
 
-		// Task wird alle 20 Millisekunden ausgefueht
+		// Task wird alle 20 Millisekunden ausgefuehrt
 		if (count == 20)
 		{
 			// Sende Nachricht Motor1
@@ -246,7 +236,54 @@ int main(void)
 			hal_error(status);
 		}
 
-		// Task wird alle 200 Millisekunden ausgefueht
+		// Task wird alle 50 Millisekunden ausgefuehrt
+		if (count == 50)
+		{
+			// alle Inputs einlesen
+			readall_inputs();
+
+			// Bremse pruefen
+			if ((system_in.BremseNO == 1) && (system_in.BremseNC != 1))
+			{
+
+			}
+			else if ((system_in.BremseNO != 1) && (system_in.BremseNC == 1))
+			{
+
+			}
+			else if ((system_in.BremseNO != 1) && (system_in.BremseNC != 1))
+			{
+				// Bremsdruck einlesen
+				ADC_Bremse = ADC_Bremsdruck();
+			}
+			else
+			{
+				// Bremse invalide
+				Error_Handler();
+			}
+
+			// Gaspedal pruefen
+			if ((system_in.Kickdown == 1) && (system_in.Leerlauf != 1))
+			{
+
+			}
+			else if ((system_in.Kickdown != 1) && (system_in.Leerlauf == 1))
+			{
+
+			}
+			else if ((system_in.Kickdown != 1) && (system_in.Leerlauf != 1))
+			{
+				// Gaspedal einlesen
+				ADC_Gas = ADC_Gaspedal();
+			}
+			else
+			{
+				// Gaspedal invalide
+				Error_Handler();
+			}
+		}
+
+		// Task wird alle 200 Millisekunden ausgefuehrt
 		if (count == 200)
 		{
 			// Daten fuer Ausgaenge zusammenfuehren
@@ -275,7 +312,7 @@ int main(void)
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
 	  	if (millis() - lastcan >= 5)
 		{
-			// Wenn Nachricht über den CAN-Bus empfangen wurde
+			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
 			if (can_change == 1)
 			{
 				// Nachricht ID über UART ausgeben
@@ -344,6 +381,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLN = 432;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
