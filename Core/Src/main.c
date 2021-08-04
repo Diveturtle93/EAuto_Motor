@@ -21,6 +21,7 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -32,6 +33,10 @@
 #include "outputs.h"
 #include "error.h"
 #include "Bamocar.h"
+#include "millis.h"
+#include "Motorsteuergeraet.h"
+#include "adc_inputs.h"
+#include "pedale.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,6 +59,7 @@
 CAN_RxHeaderTypeDef RxMessage;
 CAN_TxHeaderTypeDef TxMessage;
 uint8_t RxData[8], can_change = 0, TxData[8], status;
+volatile uint8_t millisekunden_flag_1 = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -84,6 +90,18 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+	// Definiere Variablen fuer Main-Funktion
+	uint8_t TxData[8], OutData[5], InData[5], status;
+	uint16_t count = 0;
+  	uint32_t lastcan = 0, lastsendcan = 0;
+  	CAN_FilterTypeDef sFilterConfig;
+
+  	// Erstelle Can-Nachrichten
+  	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -98,33 +116,66 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   	// Schreibe Resetquelle auf die Konsole
 #ifdef DEBUG
 	printResetSource(readResetSource());
 
-  	// Teste serielle Schnittstelle
-  	#define TEST_STRING_UART  			"\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	/* Teste serielle Schnittstelle*/
+  	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
 
   	// Sammel Systeminformationen
   	collectSystemInfo();
 #endif
 
-  	// Lese alle Eingaenge
+	// Leds Testen
+  	testPCB_Leds();
+
+  	/* Lese alle Eingaenge */
   	readall_inputs();
 
     // Sendenachricht erstellen
-  	TxMessage.StdId = 0x123;
+  	/*TxMessage.StdId = 0x123;
   	TxMessage.ExtId = 0;
   	TxMessage.RTR = CAN_RTR_DATA;
   	TxMessage.IDE = CAN_ID_STD;
   	TxMessage.DLC = 8;
-  	TxMessage.TransmitGlobalTime=DISABLE;
+  	TxMessage.TransmitGlobalTime=DISABLE;*/
+
+	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
+  	/*TxOutput.StdId = MOTOR_CAN_DIGITAL_OUT;
+  	TxOutput.ExtId = 0;
+  	TxOutput.RTR = CAN_RTR_DATA;
+  	TxOutput.IDE = CAN_ID_STD;
+  	TxOutput.DLC = 8;
+  	TxOutput.TransmitGlobalTime=DISABLE;*/
+
+	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
+  	/*TxInput.StdId = MOTOR_CAN_DIGITAL_IN;
+  	TxInput.ExtId = 0;
+  	TxInput.RTR = CAN_RTR_DATA;
+  	TxInput.IDE = CAN_ID_STD;
+  	TxInput.DLC = 8;
+  	TxInput.TransmitGlobalTime=DISABLE;*/
+
+	// Sendenachricht Motorsteuergeraet Motor1 erstellen
+	/*TxMotor1.StdId = MOTOR_CAN_DREHZAHL;
+	TxMotor1.ExtId = 0;
+	TxMotor1.RTR = CAN_RTR_DATA;
+	TxMotor1.IDE = CAN_ID_STD;
+	TxMotor1.DLC = 8;
+	TxMotor1.TransmitGlobalTime=DISABLE;*/
 
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
+
+  	// Start timer
+  	HAL_TIM_Base_Start(&htim6);
+
+  	uartTransmit("\nStarte While\n\n", 15);
 
   /* USER CODE END 2 */
 
@@ -135,40 +186,103 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  	// Wenn Nachricht über den CAN-Bus empfangen wurde
-		if (can_change == 1)
+	  	// Task wird jede Millisekunde ausgefuehrt
+		if (millisekunden_flag_1 == 1)
 		{
-			// Nachricht ID über UART ausgeben
-			uartTransmitNumber(RxMessage.StdId, 16);
-			uartTransmit("\t", 1);
-			for (uint8_t i = 0; i < RxMessage.DLC; i++)
-			{
-				uartTransmitNumber(RxData[i], 16);
-			}
-			uartTransmit("\n", 1);
-
-			// Sortieren der IDs nach Geräten
-			switch (RxMessage.StdId)
-			{
-				case BAMOCAR_RX_ID:
-					BAMOCAN_ID(&RxData[0], RxMessage.DLC);
-					break;
-				case 0x111:
-					uartTransmit("CAN-ID Computer config\n", 23);
-					readBAMOReg(BAMOCAR_REG_FIRMWARE);
-					break;
-				default:
-					uartTransmit("CAN-ID nicht verfuegbar\n", 24);
-					break;
-			}
-			can_change = 0;
+			count++;													// Zaehler count hochzaehlen
+			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
 		}
 
-		HAL_Delay(1000);
+		// Task wird alle 20 Millisekunden ausgefuehrt
+		if (count == 20)
+		{
+			// Sende Nachricht Motor1
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+		}
+
+		// Task wird alle 50 Millisekunden ausgefuehrt
+		if (count == 50)
+		{
+			// alle Inputs einlesen
+			readall_inputs();
+
+			// Bremse pruefen
+			readBrake();
+
+			// Gaspedal pruefen
+			readTrottle();
+		}
+
+		// Task wird alle 200 Millisekunden ausgefuehrt
+		if (count == 200)
+		{
+			// Daten fuer Ausgaenge zusammenfuehren
+			OutData[0] = system_out.systemoutput;
+			OutData[1] = highcurrent_out.high_out;
+			OutData[2] = (leuchten_out.ledoutput >> 8);
+			OutData[3] = leuchten_out.ledoutput;
+			OutData[4] = komfort_out.komfortoutput;
+
+			// Sende Nachricht digitale Ausgaenge
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+
+			// Daten fuer Eingaenge zusammenfuehren
+			InData[0] = (system_in.systeminput >> 8);
+			InData[1] = system_in.systeminput;
+			InData[2] = sdc_in.sdcinput;
+			InData[3] = (komfort_in.komfortinput >> 8);
+			InData[4] = komfort_in.komfortinput;
+
+			// Sende Nachricht digitale Eingaenge
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+		}
+
+	  	// Task wird alle 5 Millisekunden ausgefuehrt
+	  	if (millis() - lastcan >= 5)
+		{
+			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
+			if (can_change == 1)
+			{
+				// Nachricht ID über UART ausgeben
+				uartTransmitNumber(RxMessage.StdId, 16);
+				uartTransmit("\t", 1);
+				for (uint8_t i = 0; i < RxMessage.DLC; i++)
+				{
+					uartTransmitNumber(RxData[i], 16);
+				}
+				uartTransmit("\n", 1);
+
+				// Sortieren der IDs nach Geräten
+				switch (RxMessage.StdId)
+				{
+					case BAMOCAR_RX_ID:
+						BAMOCAN_ID(&RxData[0]);
+						break;
+					case 0x111:
+						uartTransmit("CAN-ID Computer config\n", 23);
+						break;
+					default:
+						uartTransmit("CAN-ID nicht verfuegbar\n", 24);
+						break;
+				}
+
+				TxData[2] = motor1.output[2];
+				TxData[3] = motor1.output[3];
+				lastcan = millis();
+				can_change = 0;
+			}
+		}
 
 		// Sende CAN Nachricht auf CAN-Bus
-		status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
-		hal_error(status);
+		if (millis() - lastsendcan >= 993)
+		{
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+			lastsendcan = millis();
+		}
   }
   /* USER CODE END 3 */
 }
@@ -198,6 +312,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLN = 432;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -230,12 +345,23 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-// CAN Interrupt Nachricht angekommen
+// Interrupts
+// Can-Interrupt: Nachricht wartet
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	// Nachricht aus Speicher auslesen
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
 	can_change = 1;
+}
+
+// Timer-Interrupt: Timer ist uebergelaufen
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
+	if (htim == &htim6)
+	{
+		millisekunden_flag_1 = 1;
+	}
 }
 /* USER CODE END 4 */
 
