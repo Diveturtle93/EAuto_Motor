@@ -28,34 +28,42 @@
 
 // Gaspedal auswerten
 //----------------------------------------------------------------------
-void readTrottle(void)
+uint16_t readTrottle(void)
 {
 	// Variablen anlegen
 	uint16_t ADC_Gas = 0;
 
 	// Gaspedal auf Plausibilitaet pruefen
-	if ((system_in.Leerlauf == 1) && (system_in.Kickdown != 1))				// Gaspedal nicht getreten
-	{
-
-	}
-	else if ((system_in.Leerlauf != 1) && (system_in.Kickdown == 1))		// Gaspedal voll getreten
-	{
-
-	}
-	else if ((system_in.Leerlauf != 1) && (system_in.Kickdown != 1))		// Gaspedal teilweise betreten
-	{
-		// Gaspedal einlesen
+//	if ((system_in.Kickdown != 1) && (system_in.Leerlauf == 1))				// Gaspedal voll getreten
+//	{
+//
+//	}
+//	else if ((system_in.Kickdown == 1))										// Gaspedal nicht oder teilweise getreten
+//	{
+//		// Gaspedal einlesen
 		ADC_Gas = ADC_Gaspedal();
-	}
-	else																	// Falls beide Schalter betaetigt sind
+//	}
+//	else																	// Falls beide Schalter betaetigt sind
+//	{
+//		// Gaspedal invalide
+//		software_error(ERROR_GASPEDAL);
+//	}
+
+	if (ADC_Gas <= 300)
 	{
-		// Gaspedal invalide
-		software_error(ERROR_GASPEDAL);
+		ADC_Gas = 0;
 	}
+
+	if (ADC_Gas >= 3900)
+	{
+
+	}
+
+	return ADC_Gas;
 }
 //----------------------------------------------------------------------
 
-// Bremse auswerten
+/* // Bremse auswerten
 //----------------------------------------------------------------------
 void readBrake(void)
 {
@@ -82,4 +90,4 @@ void readBrake(void)
 		software_error(ERROR_BREMSPEDAL);
 	}
 }
-//----------------------------------------------------------------------
+//----------------------------------------------------------------------*/

@@ -57,8 +57,7 @@
 
 /* USER CODE BEGIN PV */
 CAN_RxHeaderTypeDef RxMessage;
-CAN_TxHeaderTypeDef TxMessage;
-uint8_t RxData[8], can_change = 0, TxData[8], status;
+uint8_t RxData[8], can_change = 0;
 volatile uint8_t millisekunden_flag_1 = 0;
 /* USER CODE END PV */
 
@@ -91,16 +90,17 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5], InData[5], status;
-	uint16_t count = 0;
+	uint8_t TxData[8], OutData[5], InData[5], status, tmp[4];
+	uint16_t count = 0, gas_adc;
   	uint32_t lastcan = 0, lastsendcan = 0;
-  	CAN_FilterTypeDef sFilterConfig;
 
   	// Erstelle Can-Nachrichten
   	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
   	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
+
 
   /* USER CODE END Init */
 
@@ -175,7 +175,29 @@ int main(void)
   	// Start timer
   	HAL_TIM_Base_Start(&htim6);
 
-  	uartTransmit("\nStarte While\n\n", 15);
+  	// Schreibe BamoCar CAN-Timeout
+  	tmp[0] = 0xd0;
+  	tmp[1] = 0x4f;
+  	tmp[2] = 0x01;
+
+#define BAMOCANTIMEOUT			"\nSetze BamoCar CAN-Timeout Zeit auf 500ms\n"
+  	uartTransmit(BAMOCANTIMEOUT, sizeof(BAMOCANTIMEOUT));
+  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+	hal_error(status);
+
+  	// Loesche BamoCar Fehler
+  	tmp[0] = 0x8e;
+  	tmp[1] = 0x00;
+  	tmp[2] = 0x00;
+
+#define BAMOCANERROR			"\nSetze Bamocar Fehler zurueck\n"
+  	uartTransmit(BAMOCANERROR, sizeof(BAMOCANERROR));
+  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+	hal_error(status);
+
+  	// Starte While-Schleife
+#define MAINWHILE				"\nStarte While Schleife\n"
+  	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 
   /* USER CODE END 2 */
 
@@ -194,7 +216,7 @@ int main(void)
 		}
 
 		// Task wird alle 20 Millisekunden ausgefuehrt
-		if (count == 20)
+		if ((count % 20) == 0)
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
@@ -202,20 +224,32 @@ int main(void)
 		}
 
 		// Task wird alle 50 Millisekunden ausgefuehrt
-		if (count == 50)
+		if ((count % 50) == 0)
+		{
+		}
+
+		// Task wird alle 100 Millisekunden ausgefuehrt
+		if ((count % 100) == 0)
 		{
 			// alle Inputs einlesen
 			readall_inputs();
 
 			// Bremse pruefen
-			readBrake();
+//			readBrake();
 
 			// Gaspedal pruefen
-			readTrottle();
+			gas_adc = readTrottle();
+			tmp[0] = 0x90;
+			tmp[1] = (gas_adc-300)/10;
+			tmp[2] = 0;
+
+			// Drehmoment an Bamocar senden
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
-		if (count == 200)
+		if ((count % 200) == 0)
 		{
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
@@ -238,6 +272,9 @@ int main(void)
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
+
+			// Variable count auf 0 zuruecksetzen
+			count = 0;
 		}
 
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
@@ -259,7 +296,7 @@ int main(void)
 				switch (RxMessage.StdId)
 				{
 					case BAMOCAR_RX_ID:
-						BAMOCAN_ID(&RxData[0]);
+						BAMOCAN_ID(&RxData[0], RxMessage.DLC);
 						break;
 					case 0x111:
 						uartTransmit("CAN-ID Computer config\n", 23);
