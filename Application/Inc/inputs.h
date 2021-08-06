@@ -39,6 +39,8 @@ union system_input_tag {
 	uint16_t systeminput;						// 2 Byte
 } system_in;
 //----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
 union sdc_in_tag {
 	struct {
 		uint8_t EmergencyRun : 1;				// 0
@@ -50,6 +52,8 @@ union sdc_in_tag {
 
 	uint8_t sdcinput;							// 1 Byte
 } sdc_in;
+//----------------------------------------------------------------------
+
 //----------------------------------------------------------------------
 union komfort_in_tag {
 	struct {
@@ -77,9 +81,9 @@ union komfort_in_tag {
 
 // Definiere Konstanten
 //----------------------------------------------------------------------
-#define SYSTEM_INPUT				0b0000000000000000						// 16 Bit, 16 Systemeingaenge
-#define KOMFORT_INPUT				0b0000000000000000						// 16 Bit, 16 Komforteingaenge
-#define SDC_INPUT					0b00000000								// 8 Bit, 5 SDC-Eingaenge
+#define SYSTEM_INPUT					0b0000000000000000					// 16 Bit, 16 Systemeingaenge
+#define KOMFORT_INPUT					0b0000000000000000					// 16 Bit, 16 Komforteingaenge
+#define SDC_INPUT						0b00000000							// 8 Bit, 5 SDC-Eingaenge
 //----------------------------------------------------------------------
 
 // Funktionen definieren

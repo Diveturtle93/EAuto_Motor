@@ -37,8 +37,8 @@ void readall_inputs(void)
 	system_in.Button2 = HAL_GPIO_ReadPin(BUTTON2_GPIO_Port, BUTTON2_Pin);						// Zusatzeingang Taster 2
 	system_in.Crash = HAL_GPIO_ReadPin(CRASH_GPIO_Port, CRASH_Pin);								// Crash Eingang
 	system_in.Wakeup = HAL_GPIO_ReadPin(HW_WAKE_GPIO_Port, HW_WAKE_Pin);						// Eingang Hardware Wakeup
-	//system_in.Bremsdruck_NO = HAL_GPIO_ReadPin(Bremsdruck_NO_GPIO_Port, Bremsdruck_NO_Pin);	// Bremsdruck nicht zu hoch
-	//system_in.Bremsdruck_NC = HAL_GPIO_ReadPin(Bremsdruck_NC_GPIO_Port, Bremsdruck_NC_Pin);	// Bremsdruck zu hoch
+//	system_in.Bremsdruck_NO = HAL_GPIO_ReadPin(Bremsdruck_NO_GPIO_Port, Bremsdruck_NO_Pin);		// Bremsdruck nicht zu hoch
+//	system_in.Bremsdruck_NC = HAL_GPIO_ReadPin(Bremsdruck_NC_GPIO_Port, Bremsdruck_NC_Pin);		// Bremsdruck zu hoch
 
 	// SDC-Eingaenge einlesen
 	sdc_in.EmergencyRun = HAL_GPIO_ReadPin(EMERGENCY_RUN_GPIO_Port, EMERGENCY_RUN_Pin);			// Emergency Run, Akku

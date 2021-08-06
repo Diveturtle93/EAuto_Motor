@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
-// Titel	:	Error.h
+// Titel	:	millis.h
 //----------------------------------------------------------------------
 // Sprache	:	C
-// Datum	:	16.01.2021
+// Datum	:	01.06.2021
 // Version	:	1.0
 // Autor	:	Diveturtle93
 // Projekt	:	Motorsteuergeraet
@@ -10,22 +10,19 @@
 
 // Dateiheader definieren
 //----------------------------------------------------------------------
-#ifndef ERROR_H_
-#define ERROR_H_
+#ifndef INC_MILLIS_H_
+#define INC_MILLIS_H_
 //----------------------------------------------------------------------
 
-// Festlegen der Fehlercodes
+// Include-Dateien einfügen
 //----------------------------------------------------------------------
-#define ERROR_NONE						0
-#define ERROR_GASPEDAL					1
-#define ERROR_BREMSPEDAL				2
+#include <stdint.h>
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-void hal_error(uint8_t status);
-void software_error(uint8_t errorcode);
+uint32_t millis(void);
 //----------------------------------------------------------------------
 
-#endif /* INC_ERROR_H_ */
+#endif /* INC_MILLIS_H_ */
 //----------------------------------------------------------------------

@@ -21,6 +21,7 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -30,6 +31,12 @@
 #include "BasicUart.h"
 #include "inputs.h"
 #include "outputs.h"
+#include "error.h"
+#include "Bamocar.h"
+#include "millis.h"
+#include "Motorsteuergeraet.h"
+#include "adc_inputs.h"
+#include "pedale.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,7 +56,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+CAN_RxHeaderTypeDef RxMessage;
+uint8_t RxData[8], can_change = 0;
+volatile uint8_t millisekunden_flag_1 = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,6 +89,18 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+	// Definiere Variablen fuer Main-Funktion
+	uint8_t TxData[8], OutData[5], InData[5], status;
+	uint16_t count = 0;
+  	uint32_t lastcan = 0, lastsendcan = 0;
+  	CAN_FilterTypeDef sFilterConfig;
+
+  	// Erstelle Can-Nachrichten
+  	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -94,6 +115,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
   	/* Schreibe Resetquelle auf die Konsole */
@@ -101,313 +123,96 @@ int main(void)
 	printResetSource(readResetSource());
 
   	/* Teste serielle Schnittstelle*/
-  	#define TEST_STRING_UART	"\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
 
   	/* Sammel Systeminformationen */
   	collectSystemInfo();
 #endif
 
-  	// Leds Testen
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
+	// Leds Testen
+  	testPCB_Leds();
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
 
-	#define TASTERPRESSED		"Taster betaetigt, Not OK\n"
-	#define TASTERNOTPRESSED	"Taster nicht betaetigt, OK\n"
-
-  	#define SYSTEMIN			"\n\nSystem Eingaenge\n\n"
-  	uartTransmit(SYSTEMIN, sizeof(SYSTEMIN));
-
-	#define STRINGKICKDOWN		"Test Kickdown, default = 0\n"
-  	uartTransmit(STRINGKICKDOWN, sizeof(STRINGKICKDOWN));
-  	if(system_in.Kickdown == 1)
-  		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGLEERLAUF		"Test Leerlauf, default = 0\n"
-	uartTransmit(STRINGLEERLAUF, sizeof(STRINGLEERLAUF));
-	if(system_in.Leerlauf == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-	uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBREMSENO		"Test Bremse normally open, default = 1\n"
-	uartTransmit(STRINGBREMSENO, sizeof(STRINGBREMSENO));
-	if(system_in.BremseNO != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBREMSENC		"Test Bremse normally connect, default = 0\n"
-	uartTransmit(STRINGBREMSENC, sizeof(STRINGBREMSENC));
-	if(system_in.BremseNC == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGKUPPLUNG		"Test Kupplung, default = 1\n"
-	uartTransmit(STRINGKUPPLUNG, sizeof(STRINGKUPPLUNG));
-	if(system_in.Kupplung != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGRECUPERATION	"Test Recuperation, default = 1\n"
-	uartTransmit(STRINGRECUPERATION, sizeof(STRINGRECUPERATION));
-	if(system_in.Recuperation != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGECON			"Test ECON, default = 0\n"
-	uartTransmit(STRINGECON, sizeof(STRINGECON));
-	if(system_in.ECON != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGANLASSER		"Test Anlasser, default = 1\n"
-	uartTransmit(STRINGANLASSER, sizeof(STRINGANLASSER));
-	if(system_in.Anlasser != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGKL15			"Test KL15, default = 1\n"
-	uartTransmit(STRINGKL15, sizeof(STRINGKL15));
-	if(system_in.KL15 != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGDCDCINST		"Test DCDC_Inst, default = 0\n"
-	uartTransmit(STRINGDCDCINST, sizeof(STRINGDCDCINST));
-	if(system_in.DCDC_Inst == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBUTTON1		"Test Button1, default = 1\n"
-	uartTransmit(STRINGBUTTON1, sizeof(STRINGBUTTON1));
-	if(system_in.Button1 != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBUTTON2		"Test Button2, default = 1\n"
-	uartTransmit(STRINGBUTTON2, sizeof(STRINGBUTTON2));
-	if(system_in.Button2 != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGCRASH			"Test Crash, default = 0\n"
-	uartTransmit(STRINGCRASH, sizeof(STRINGCRASH));
-	if(system_in.Crash == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGWAKEUP		"Test Wakeup, default = 0\n"
-	uartTransmit(STRINGWAKEUP, sizeof(STRINGWAKEUP));
-	if(system_in.Wakeup == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBREMSDRUCKNO	"Test Bremsdruck normally open, default = 0\n"
-	uartTransmit(STRINGBREMSDRUCKNO, sizeof(STRINGBREMSDRUCKNO));
-	if(system_in.Bremsdruck_NO == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBREMSDRUCKNC	"Test Bremsdruck normally connect, default = 0\n"
-	uartTransmit(STRINGBREMSDRUCKNC, sizeof(STRINGBREMSDRUCKNC));
-	if(system_in.Bremsdruck_NC == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define KOMFORTIN			"\n\nKomfort Eingaenge\n\n"
-  	uartTransmit(KOMFORTIN, sizeof(KOMFORTIN));
-
-	#define STRINGASR1			"Test ASR1, default = 0\n"
-  	uartTransmit(STRINGASR1, sizeof(STRINGASR1));
-  	if(komfort_in.ASR1 == 1)
-  		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGASR2			"Test ASR2, default = 0\n"
-	uartTransmit(STRINGASR1, sizeof(STRINGASR1));
-	if(komfort_in.ASR2 == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-	uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGECO			"Test ECO, default = 0\n"
-	uartTransmit(STRINGECO, sizeof(STRINGECO));
-	if(komfort_in.ECO == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBCRSTIN		"Test BC_Rst_In, default = 0\n"
-	uartTransmit(STRINGBCRSTIN, sizeof(STRINGBCRSTIN));
-	if(komfort_in.BC_Rst_In == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBCUPIN		"Test BC_Up_In, default = 0\n"
-	uartTransmit(STRINGBCUPIN, sizeof(STRINGBCUPIN));
-	if(komfort_in.BC_Up_In == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBCDOWNIN		"Test BC_Down_In, default = 0\n"
-	uartTransmit(STRINGBCDOWNIN, sizeof(STRINGBCDOWNIN));
-	if(komfort_in.BC_Down_In == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBAMOIN1		"Test BamoIn1, default = 1\n"
-	uartTransmit(STRINGBAMOIN1, sizeof(STRINGBAMOIN1));
-	if(komfort_in.BamoIn1 != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBAMOIN2		"Test BamoIn2, default = 1\n"
-	uartTransmit(STRINGBAMOIN2, sizeof(STRINGBAMOIN2));
-	if(komfort_in.BamoIn2 != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGENTER			"Test Enter, default = 0\n"
-	uartTransmit(STRINGENTER, sizeof(STRINGENTER));
-	if(komfort_in.Enter == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGOUTA			"Test OutB, default = 0\n"
-	uartTransmit(STRINGOUTA, sizeof(STRINGOUTA));
-	if(komfort_in.OutA == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGOUTB			"Test OutB, default = 0\n"
-	uartTransmit(STRINGOUTB, sizeof(STRINGOUTB));
-	if(komfort_in.OutB == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGGRA1			"Test GRA1, default = 0\n"
-	uartTransmit(STRINGGRA1, sizeof(STRINGGRA1));
-	if(komfort_in.GRA1 == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGGRA2			"Test GRA2, default = 0\n"
-	uartTransmit(STRINGGRA2, sizeof(STRINGGRA2));
-	if(komfort_in.GRA2 == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGGRA3			"Test GRA3, default = 0\n"
-	uartTransmit(STRINGGRA3, sizeof(STRINGGRA3));
-	if(komfort_in.GRA3 == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGGRA4			"Test GRA4, default = 0\n"
-	uartTransmit(STRINGGRA4, sizeof(STRINGGRA4));
-	if(komfort_in.GRA4 == 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGDURCHFLUSS	"Test Durchfluss, default = 1\n"
-	uartTransmit(STRINGDURCHFLUSS, sizeof(STRINGDURCHFLUSS));
-	if(komfort_in.Durchfluss != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define PEDALIN				"\n\nPedal Eingaenge\n\n"
-	uartTransmit(PEDALIN, sizeof(PEDALIN));
-
-	#define STRINGEMERGENCY		"Test Emergency Run, default = 1\n"
-	uartTransmit(STRINGEMERGENCY, sizeof(STRINGEMERGENCY));
-	if(sdc_in.EmergencyRun != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGSDC0			"Test SDC0, default = 1\n"
-	uartTransmit(STRINGSDC0, sizeof(STRINGSDC0));
-	if(sdc_in.SDC0 != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-	uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGAKKUSDC		"Test Akku SDC, default = 1\n"
-	uartTransmit(STRINGAKKUSDC, sizeof(STRINGAKKUSDC));
-	if(sdc_in.AkkuSDC != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGBTBSDC		"Test BTB SDC, default = 1\n"
-	uartTransmit(STRINGBTBSDC, sizeof(STRINGBTBSDC));
-	if(sdc_in.BTB_SDC != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-	#define STRINGDCDCFAULT		"Test DCDC Fault, default = 1\n"
-	uartTransmit(STRINGDCDCFAULT, sizeof(STRINGDCDCFAULT));
-	if(sdc_in.DCDC_Fault != 1)
-		uartTransmit(TASTERPRESSED, sizeof(TASTERPRESSED));
-	else
-		uartTransmit(TASTERNOTPRESSED, sizeof(TASTERNOTPRESSED));
-
-
-
-
-
-
-
-  	/*if (system_in != SYSTEM_INPUT)
+  	// Starte CAN Bus
+  	if((status = HAL_CAN_Start(&hcan3)) != HAL_OK)
+  	{
+  		/* Start Error */
+  		hal_error(status);
   		Error_Handler();
-  	if (sdc_in != SDC_INPUT)
+  	}
+  	uartTransmit("CAN START\n", 10);
+
+  	// Aktiviere Interrupts für CAN Bus
+  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
+  	{
+  		/* Notification Error */
+  		hal_error(status);
   		Error_Handler();
-  	if (komfort_in != KOMFORT_INPUT)
-  		Error_Handler();*/
+  	}
+  	uartTransmit("Send Message\n", 13);
+
+  	// Filter Bank initialisieren um Daten zu empfangen
+    sFilterConfig.FilterBank = 0;
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = 0;
+    sFilterConfig.FilterActivation = ENABLE;
+
+    // Filter Bank schreiben
+    if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
+    {
+    	/* Filter configuration Error */
+  		hal_error(status);
+  		Error_Handler();
+    }
+
+    // Sendenachricht erstellen
+  	/*TxMessage.StdId = 0x123;
+  	TxMessage.ExtId = 0;
+  	TxMessage.RTR = CAN_RTR_DATA;
+  	TxMessage.IDE = CAN_ID_STD;
+  	TxMessage.DLC = 8;
+  	TxMessage.TransmitGlobalTime=DISABLE;*/
+
+	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
+  	/*TxOutput.StdId = MOTOR_CAN_DIGITAL_OUT;
+  	TxOutput.ExtId = 0;
+  	TxOutput.RTR = CAN_RTR_DATA;
+  	TxOutput.IDE = CAN_ID_STD;
+  	TxOutput.DLC = 8;
+  	TxOutput.TransmitGlobalTime=DISABLE;*/
+
+	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
+  	/*TxInput.StdId = MOTOR_CAN_DIGITAL_IN;
+  	TxInput.ExtId = 0;
+  	TxInput.RTR = CAN_RTR_DATA;
+  	TxInput.IDE = CAN_ID_STD;
+  	TxInput.DLC = 8;
+  	TxInput.TransmitGlobalTime=DISABLE;*/
+
+	// Sendenachricht Motorsteuergeraet Motor1 erstellen
+	/*TxMotor1.StdId = MOTOR_CAN_DREHZAHL;
+	TxMotor1.ExtId = 0;
+	TxMotor1.RTR = CAN_RTR_DATA;
+	TxMotor1.IDE = CAN_ID_STD;
+	TxMotor1.DLC = 8;
+	TxMotor1.TransmitGlobalTime=DISABLE;*/
+
+  	for (uint8_t j = 0; j < 8; j++)
+  		TxData[j] = (j + 1);
+
+  	// Start timer
+  	HAL_TIM_Base_Start(&htim6);
+
+  	uartTransmit("\nStarte While\n\n", 15);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -417,6 +222,103 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  	// Task wird jede Millisekunde ausgefuehrt
+		if (millisekunden_flag_1 == 1)
+		{
+			count++;													// Zaehler count hochzaehlen
+			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
+		}
+
+		// Task wird alle 20 Millisekunden ausgefuehrt
+		if (count == 20)
+		{
+			// Sende Nachricht Motor1
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+		}
+
+		// Task wird alle 50 Millisekunden ausgefuehrt
+		if (count == 50)
+		{
+			// alle Inputs einlesen
+			readall_inputs();
+
+			// Bremse pruefen
+			readBrake();
+
+			// Gaspedal pruefen
+			readTrottle();
+		}
+
+		// Task wird alle 200 Millisekunden ausgefuehrt
+		if (count == 200)
+		{
+			// Daten fuer Ausgaenge zusammenfuehren
+			OutData[0] = system_out.systemoutput;
+			OutData[1] = highcurrent_out.high_out;
+			OutData[2] = (leuchten_out.ledoutput >> 8);
+			OutData[3] = leuchten_out.ledoutput;
+			OutData[4] = komfort_out.komfortoutput;
+
+			// Sende Nachricht digitale Ausgaenge
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+
+			// Daten fuer Eingaenge zusammenfuehren
+			InData[0] = (system_in.systeminput >> 8);
+			InData[1] = system_in.systeminput;
+			InData[2] = sdc_in.sdcinput;
+			InData[3] = (komfort_in.komfortinput >> 8);
+			InData[4] = komfort_in.komfortinput;
+
+			// Sende Nachricht digitale Eingaenge
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+		}
+
+	  	// Task wird alle 5 Millisekunden ausgefuehrt
+	  	if (millis() - lastcan >= 5)
+		{
+			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
+			if (can_change == 1)
+			{
+				// Nachricht ID über UART ausgeben
+				uartTransmitNumber(RxMessage.StdId, 16);
+				uartTransmit("\t", 1);
+				for (uint8_t i = 0; i < RxMessage.DLC; i++)
+				{
+					uartTransmitNumber(RxData[i], 16);
+				}
+				uartTransmit("\n", 1);
+
+				// Sortieren der IDs nach Geräten
+				switch (RxMessage.StdId)
+				{
+					case BAMOCAR_RX_ID:
+						BAMOCAN_ID(&RxData[0]);
+						break;
+					case 0x111:
+						uartTransmit("CAN-ID Computer config\n", 23);
+						break;
+					default:
+						uartTransmit("CAN-ID nicht verfuegbar\n", 24);
+						break;
+				}
+
+				TxData[2] = motor1.output[2];
+				TxData[3] = motor1.output[3];
+				lastcan = millis();
+				can_change = 0;
+			}
+		}
+
+		// Sende CAN Nachricht auf CAN-Bus
+		if (millis() - lastsendcan >= 993)
+		{
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+			lastsendcan = millis();
+		}
   }
   /* USER CODE END 3 */
 }
@@ -446,6 +348,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLN = 432;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -478,7 +381,23 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// Interrupts
+// Can-Interrupt: Nachricht wartet
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
+	can_change = 1;
+}
 
+// Timer-Interrupt: Timer ist uebergelaufen
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
+	if (htim == &htim6)
+	{
+		millisekunden_flag_1 = 1;
+	}
+}
 /* USER CODE END 4 */
 
 /**

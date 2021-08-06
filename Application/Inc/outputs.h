@@ -31,6 +31,8 @@ union system_out_tag {
 	uint8_t systemoutput;						// Byte
 } system_out;
 //----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
 union highcurrent_out_tag {
 	struct {
 		uint8_t Digital1 : 1;					// 0
@@ -45,6 +47,8 @@ union highcurrent_out_tag {
 
 	uint8_t high_out;							// Byte
 } highcurrent_out;
+//----------------------------------------------------------------------
+
 //----------------------------------------------------------------------
 union leuchten_out_tag {
 	struct {
@@ -66,6 +70,8 @@ union leuchten_out_tag {
 
 	uint16_t ledoutput;							// 2 Byte
 } leuchten_out;
+//----------------------------------------------------------------------
+
 //----------------------------------------------------------------------
 union komfort_out_tag {
 	struct {
@@ -93,6 +99,7 @@ union komfort_out_tag {
 void init_outputs(void);													// Initialisiere Ausgaenge
 void writeall_outputs(void);												// Schreibe alle Ausgaenge
 void writeled_outputs(void);												// Schreibe alle LED-Ausgaenge
+void testPCB_Leds(void);													// Teste PCB LEDs fuer je 1s
 //----------------------------------------------------------------------
 
 #endif /* INC_OUTPUTS_H_ */

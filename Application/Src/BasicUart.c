@@ -40,7 +40,7 @@ void uartTransmitNumber(const uint32_t number, const uint32_t base)
 {
 	char str[11];
 
-	itoa(number, str, base);
+	utoa(number, str, base);
 	HAL_UART_Transmit(&huart2, (uint8_t *)str, strlen(str), 1000);
 }
 //----------------------------------------------------------------------
