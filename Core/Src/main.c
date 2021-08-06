@@ -91,7 +91,7 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[5], InData[5], status;
-	uint16_t count = 0;
+	uint16_t count = 0, adc_gas;
   	uint32_t lastcan = 0, lastsendcan = 0;
   	CAN_FilterTypeDef sFilterConfig;
 
@@ -243,11 +243,8 @@ int main(void)
 			// alle Inputs einlesen
 			readall_inputs();
 
-			// Bremse pruefen
-			readBrake();
-
-			// Gaspedal pruefen
-			readTrottle();
+			// Pedale pruefen, ADC-Gaspedal ausgeben
+			adc_gas = readPedals();
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
