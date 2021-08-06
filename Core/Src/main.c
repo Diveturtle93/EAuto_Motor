@@ -91,7 +91,7 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[5], InData[5], status, tmp[4];
-	uint16_t count = 0, gas_adc;
+	uint16_t count = 0, gas_adc, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
 
   	// Erstelle Can-Nachrichten
@@ -118,6 +118,9 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+
+  	// Start Timer 6 Interrupt
+  	HAL_TIM_Base_Start_IT(&htim6);
 
   	// Schreibe Resetquelle auf die Konsole
 #ifdef DEBUG
@@ -175,25 +178,25 @@ int main(void)
   	// Start timer
   	HAL_TIM_Base_Start(&htim6);
 
-  	// Schreibe BamoCar CAN-Timeout
-  	tmp[0] = 0xd0;
-  	tmp[1] = 0x4f;
-  	tmp[2] = 0x01;
+//  	// Schreibe BamoCar CAN-Timeout
+//  	tmp[0] = 0xd0;
+//  	tmp[1] = 0x4f;
+//  	tmp[2] = 0x01;
+//
+//#define BAMOCANTIMEOUT			"\nSetze BamoCar CAN-Timeout Zeit auf 500ms\n"
+//  	uartTransmit(BAMOCANTIMEOUT, sizeof(BAMOCANTIMEOUT));
+//  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+//	hal_error(status);
 
-#define BAMOCANTIMEOUT			"\nSetze BamoCar CAN-Timeout Zeit auf 500ms\n"
-  	uartTransmit(BAMOCANTIMEOUT, sizeof(BAMOCANTIMEOUT));
-  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-	hal_error(status);
-
-  	// Loesche BamoCar Fehler
-  	tmp[0] = 0x8e;
-  	tmp[1] = 0x00;
-  	tmp[2] = 0x00;
-
-#define BAMOCANERROR			"\nSetze Bamocar Fehler zurueck\n"
-  	uartTransmit(BAMOCANERROR, sizeof(BAMOCANERROR));
-  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-	hal_error(status);
+//  	// Loesche BamoCar Fehler
+//  	tmp[0] = 0x8e;
+//  	tmp[1] = 0x00;
+//  	tmp[2] = 0x00;
+//
+//#define BAMOCANERROR			"\nSetze Bamocar Fehler zurueck\n"
+//  	uartTransmit(BAMOCANERROR, sizeof(BAMOCANERROR));
+//  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+//	hal_error(status);
 
   	// Starte While-Schleife
 #define MAINWHILE				"\nStarte While Schleife\n"
@@ -239,9 +242,15 @@ int main(void)
 
 			// Gaspedal pruefen
 			gas_adc = readTrottle();
+
+			// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+			// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergrößern)
+			gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+
+			// Daten in Bamocarformat umwandeln
 			tmp[0] = 0x90;
-			tmp[1] = (gas_adc-300)/10;
-			tmp[2] = 0;
+			tmp[1] = (gas_mean);
+			tmp[2] = ((gas_mean) >> 8);
 
 			// Drehmoment an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
@@ -271,6 +280,15 @@ int main(void)
 
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
+			hal_error(status);
+
+			// Bamocar Fehler auslesen
+			tmp[0] = 0x3D;
+			tmp[1] = 0x8F;
+			tmp[2] = 0x00;
+
+			// Befehl Fehler auslesen an Bamocar senden
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
 
 			// Variable count auf 0 zuruecksetzen

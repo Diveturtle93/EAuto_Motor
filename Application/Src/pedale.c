@@ -54,6 +54,11 @@ uint16_t readTrottle(void)
 		ADC_Gas = 0;
 	}
 
+	if (ADC_Gas > 300)
+	{
+		ADC_Gas -= 300;
+	}
+
 	if (ADC_Gas >= 3900)
 	{
 
