@@ -90,14 +90,14 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5], InData[5], status, tmp[4];
+	uint8_t TxData[8], OutData[5] = {0}, InData[5] = {0}, status, tmp[4];
 	uint16_t count = 0, gas_adc, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
 
   	// Erstelle Can-Nachrichten
   	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-  	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
-  	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
+  	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 
@@ -137,41 +137,10 @@ int main(void)
 	// Leds Testen
   	testPCB_Leds();
 
-  	/* Lese alle Eingaenge */
+  	// Lese alle Eingaenge
   	readall_inputs();
 
-    // Sendenachricht erstellen
-  	/*TxMessage.StdId = 0x123;
-  	TxMessage.ExtId = 0;
-  	TxMessage.RTR = CAN_RTR_DATA;
-  	TxMessage.IDE = CAN_ID_STD;
-  	TxMessage.DLC = 8;
-  	TxMessage.TransmitGlobalTime=DISABLE;*/
-
-	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
-  	/*TxOutput.StdId = MOTOR_CAN_DIGITAL_OUT;
-  	TxOutput.ExtId = 0;
-  	TxOutput.RTR = CAN_RTR_DATA;
-  	TxOutput.IDE = CAN_ID_STD;
-  	TxOutput.DLC = 8;
-  	TxOutput.TransmitGlobalTime=DISABLE;*/
-
-	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
-  	/*TxInput.StdId = MOTOR_CAN_DIGITAL_IN;
-  	TxInput.ExtId = 0;
-  	TxInput.RTR = CAN_RTR_DATA;
-  	TxInput.IDE = CAN_ID_STD;
-  	TxInput.DLC = 8;
-  	TxInput.TransmitGlobalTime=DISABLE;*/
-
-	// Sendenachricht Motorsteuergeraet Motor1 erstellen
-	/*TxMotor1.StdId = MOTOR_CAN_DREHZAHL;
-	TxMotor1.ExtId = 0;
-	TxMotor1.RTR = CAN_RTR_DATA;
-	TxMotor1.IDE = CAN_ID_STD;
-	TxMotor1.DLC = 8;
-	TxMotor1.TransmitGlobalTime=DISABLE;*/
-
+  	// Daten fuer TxMassage erstellen
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
@@ -226,11 +195,6 @@ int main(void)
 			hal_error(status);
 		}
 
-		// Task wird alle 50 Millisekunden ausgefuehrt
-		if ((count % 50) == 0)
-		{
-		}
-
 		// Task wird alle 100 Millisekunden ausgefuehrt
 		if ((count % 100) == 0)
 		{
@@ -266,20 +230,22 @@ int main(void)
 			OutData[2] = (leuchten_out.ledoutput >> 8);
 			OutData[3] = leuchten_out.ledoutput;
 			OutData[4] = komfort_out.komfortoutput;
+			OutData[5] ++;
 
 			// Sende Nachricht digitale Ausgaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX2);
 			hal_error(status);
 
 			// Daten fuer Eingaenge zusammenfuehren
-			InData[0] = (system_in.systeminput >> 8);
-			InData[1] = system_in.systeminput;
-			InData[2] = sdc_in.sdcinput;
-			InData[3] = (komfort_in.komfortinput >> 8);
-			InData[4] = komfort_in.komfortinput;
+			InData[0] ++;
+			InData[1] = (system_in.systeminput >> 8);
+			InData[2] = system_in.systeminput;
+			InData[3] = sdc_in.sdcinput;
+			InData[4] = (komfort_in.komfortinput >> 8);
+			InData[5] = komfort_in.komfortinput;
 
 			// Sende Nachricht digitale Eingaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
 			hal_error(status);
 
 			// Bamocar Fehler auslesen
@@ -331,13 +297,15 @@ int main(void)
 			}
 		}
 
-		// Sende CAN Nachricht auf CAN-Bus
+#ifdef DEBUG
+		// Sende CAN Nachricht auf CAN-Bus / Teste CAN-BUS
 		if (millis() - lastsendcan >= 993)
 		{
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
 			lastsendcan = millis();
 		}
+#endif
   }
   /* USER CODE END 3 */
 }
