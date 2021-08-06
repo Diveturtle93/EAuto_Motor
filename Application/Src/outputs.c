@@ -113,16 +113,16 @@ void pwm_oelstand(uint16_t count)
 	switch (count)
 	{
 		case 0: // 0ms
-			HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
 			break;
 		case 15: // 1x15 ms = 15 ms
-			HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);
 			break;
 		case 45: // 3x15 ms = 45 ms
-			HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
 			break;
 		case 75: // 5x15 ms = 75 ms
-			HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);
 			break;
 		default:
 			break;
