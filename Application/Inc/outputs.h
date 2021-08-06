@@ -100,6 +100,7 @@ void init_outputs(void);													// Initialisiere Ausgaenge
 void writeall_outputs(void);												// Schreibe alle Ausgaenge
 void writeled_outputs(void);												// Schreibe alle LED-Ausgaenge
 void testPCB_Leds(void);													// Teste PCB LEDs fuer je 1s
+void pwm_oelstand(uint16_t count);
 //----------------------------------------------------------------------
 
 #endif /* INC_OUTPUTS_H_ */

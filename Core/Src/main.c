@@ -229,8 +229,11 @@ int main(void)
 			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
 		}
 
+		// PWM Oelstandsensor Kombiinstrument ausgeben
+		pwm_oelstand(count);
+
 		// Task wird alle 20 Millisekunden ausgefuehrt
-		if (count == 20)
+		if ((count % 20) == 1)
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
@@ -238,7 +241,7 @@ int main(void)
 		}
 
 		// Task wird alle 50 Millisekunden ausgefuehrt
-		if (count == 50)
+		if ((count % 100) == 1)
 		{
 			// alle Inputs einlesen
 			readall_inputs();
@@ -248,7 +251,7 @@ int main(void)
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
-		if (count == 200)
+		if ((count % 200) == 1)
 		{
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
@@ -271,6 +274,11 @@ int main(void)
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
+		}
+
+		if ((count % 405) == 1)
+		{
+			count = 0;
 		}
 
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
