@@ -16,14 +16,14 @@
 
 // CAN-IDs definieren
 //----------------------------------------------------------------------
-// Motorsteuergerät neu
+// Motorsteuergeraet neu
 #define MOTOR_CAN_SAFETY							0x139					// Shutdown Circuit Motorsteuergeraet, Sicherheitsrelevante Daten
 #define MOTOR_CAN_DIGITAL_OUT						0x240					// Digitale Ausgaenge Motorsteuergeraet, Alle digitalen Ausgaenge
 #define MOTOR_CAN_DIGITAL_IN						0x241					// Digitale Eingaenge Motorsteuergeraet, Alle digitalen Eingaenge
 #define MOTOR_CAN_ANALOG_IN							0x242					// Analogwerte Motorsteuergerat, Gaspedal, Bremsdruck, Info, Return, KlimaFlap, KL15
 #define MOTOR_CAN_TEMPERATUR						0x539					// Temperatur Motorsteuergeraet, PCB, Bremsdrucktemperatur, Kuehlwassertemperatur
 //----------------------------------------------------------------------
-// Motorsteuergerät alt
+// Motorsteuergeraet alt
 //----------------------------------------------------------------------
 #define MOTOR_CAN_DREHZAHL							0x280					// Motorsteuergerät ID MotorSTG1
 #define MOTOR_CAN_MOTOR2							0x288					// Motorsteuergerät ID MotorSTG2
@@ -33,7 +33,7 @@
 #define MOTOR_CAN_GAS								0x488					// Motorsteuergerät ID MotorSTG6
 #define MOTOR_CAN_FLEXIA							0x580					// Motorsteuergerät ID MotorFlexia
 //----------------------------------------------------------------------
-// CAN-IDs auf dem BUS
+// CAN-IDs auf dem BUS Fahrzeug intern
 //----------------------------------------------------------------------
 #define LENKWINKEL_CAN								0x0C2					// CAN ID Lenkwinkelsensor
 #define BEMSE1_CAN									0x1A0

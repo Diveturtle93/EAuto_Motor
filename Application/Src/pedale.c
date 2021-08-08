@@ -49,19 +49,19 @@ uint16_t readTrottle(void)
 //		software_error(ERROR_GASPEDAL);
 //	}
 
-	if (ADC_Gas <= 300)
+	if (ADC_Gas < 300)
 	{
 		ADC_Gas = 0;
 	}
 
-	if (ADC_Gas > 300)
+	if (ADC_Gas >= 300)
 	{
 		ADC_Gas -= 300;
 	}
 
-	if (ADC_Gas >= 3900)
+	if (ADC_Gas >= 1000)
 	{
-
+		ADC_Gas = 1000;
 	}
 
 	return ADC_Gas;

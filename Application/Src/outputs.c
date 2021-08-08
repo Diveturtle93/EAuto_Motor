@@ -87,6 +87,7 @@ void writeled_outputs(void)
 //----------------------------------------------------------------------
 
 // Teste Platinen LEDs
+//----------------------------------------------------------------------
 void testPCB_Leds(void)
 {
 	// Leds Testen
@@ -103,3 +104,4 @@ void testPCB_Leds(void)
     HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
     HAL_Delay(500);
 }
+//----------------------------------------------------------------------

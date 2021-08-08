@@ -394,25 +394,26 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();														// Interrupts deaktivieren
 
-  // Schalte Fehler LED ein
-  leuchten_out.RedLed = 1;
-  HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);
+	// Schalte Fehler LED ein
+	leuchten_out.RedLed = 1;												// Setze Variable
+	HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);	// Fehler LED einschalten
 
-  // Sende Nachricht auf Uart-Interface
+	// Schalte Ok LED aus
+	leuchten_out.GreenLed = 0;												// Zuruechsetzen Variable
+	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);// Fehler LED ausschalten
+
+	// Sende Nachricht auf Uart-Interface
 #ifdef DEBUG
-  #define STRING_ERROR_HANDLER			"Error Handler wird ausgefuehrt!!!"
-  uartTransmit(STRING_ERROR_HANDLER, sizeof(STRING_ERROR_HANDLER));
+#define STRING_ERROR_HANDLER			"Error Handler wird ausgefuehrt!!!"
+	uartTransmit(STRING_ERROR_HANDLER, sizeof(STRING_ERROR_HANDLER));
 #endif
-  // Beginne Endlosschleife nachdem Fehler aufgetreten ist
-  while (1)
-  {
-
-  }
-  /* USER CODE END Error_Handler_Debug */
+	// Beginne Endlosschleife nachdem Fehler aufgetreten ist
+	while (1);
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
