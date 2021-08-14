@@ -30,32 +30,17 @@
 #include "BasicUart.h"
 #include "inputs.h"
 #include "outputs.h"
+#include "adc_inputs.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-void ADC_KL15(void);
-void ADC_Kuhlwassertemp(void);
-void ADC_Klimaflap(void);
-void ADC_Gaspedal(void);
-void ADC_PCB(void);
-void ADC_Return(void);
-void ADC_Info(void);
-void ADC_Bremsdruck(void);
-void ADC_Bremstemp(void);
-void ADC_STMTemp(void);
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TEMP_SENSOR_AVG_SLOPE_MV_PER_CELSIUS                        2.5f
-#define TEMP_SENSOR_VOLTAGE_MV_AT_25                                760.0f
-#define ADC_REFERENCE_VOLTAGE_MV                                    3300.0f
-#define ADC_MAX_OUTPUT_VALUE                                        4095.0f
-#define TEMP110_CAL_VALUE                                           ((uint16_t*)((uint32_t)0x1FF0F44E))
-#define TEMP30_CAL_VALUE                                            ((uint16_t*)((uint32_t)0x1FF0F44C))
-#define TEMP110                                                     110.0f
-#define TEMP30                                                      30.0f
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,7 +52,6 @@ void ADC_STMTemp(void);
 
 /* USER CODE BEGIN PV */
 int32_t temperature;
-float sensorValue;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,16 +93,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC1_Init();
   MX_USART2_UART_Init();
   MX_CAN3_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 	/* Schreibe Resetquelle auf die Konsole */
 #ifdef DEBUG
 	printResetSource(readResetSource());
 
   	/* Teste serielle Schnittstelle*/
-  	#define TEST_STRING_UART  "\nUART3 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	#define TEST_STRING_UART  "\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
 
   	/* Sammel Systeminformationen */
@@ -148,13 +132,10 @@ int main(void)
 	uartTransmitNumber(*TEMP110_CAL_VALUE, 10);
 	uartTransmit("\n", 1);
 
-	ADC_STMTemp();
-	HAL_ADC_Start(&hadc1);
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)
+	ADC_VAL[4] = ADC_STMTemperatur();
+	if(ADC_VAL[4] > 900 && ADC_VAL[4] < 1100)
 	{
-		sensorValue = (float)HAL_ADC_GetValue(&hadc1);
-		HAL_ADC_Stop(&hadc1);
-		temperature = (int32_t)((TEMP110 - TEMP30) / ((float)(*TEMP110_CAL_VALUE) - (float)(*TEMP30_CAL_VALUE)) * (sensorValue - (float)(*TEMP30_CAL_VALUE)) + TEMP30);
+		temperature = (int32_t)((TEMP110 - TEMP30) / ((float)(*TEMP110_CAL_VALUE) - (float)(*TEMP30_CAL_VALUE)) * (ADC_VAL[4] - (float)(*TEMP30_CAL_VALUE)) + TEMP30);
 	}
 	else
 	{
@@ -164,65 +145,16 @@ int main(void)
 	uartTransmit("\n", 1);
 
 	// Lese alle ADC-Eingaenge
-	ADC_KL15();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[0] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Kuhlwassertemp();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[1] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Klimaflap();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[2] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Gaspedal();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[3] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_PCB();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[4] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Return();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[5] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Info();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[6] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Bremsdruck();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[7] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_Bremstemp();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[8] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
-
-	ADC_STMTemp();
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 1000);
-	ADC_VAL[9] = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
+	ADC_VAL[0] = ADC_KL15();
+	ADC_VAL[1] = ADC_Kuhlwassertemperatur();
+	ADC_VAL[2] = ADC_Klimaflap();
+	ADC_VAL[3] = ADC_Gaspedal();
+	ADC_VAL[4] = ADC_PCBTemperatur();
+	ADC_VAL[5] = ADC_Return();
+	ADC_VAL[6] = ADC_Info();
+	ADC_VAL[7] = ADC_Bremsdruck();
+	ADC_VAL[8] = ADC_Bremsdrucktemperatur();
+	ADC_VAL[9] = ADC_STMTemperatur();
 
 	// Auswertung
 	#define ADC_OK				"\nADC Value ist in Ordnung\n"
@@ -251,7 +183,7 @@ int main(void)
 
 	uartTransmit("\nGas: ", 6);
 	uartTransmitNumber(ADC_VAL[3], 10);
-	if (ADC_VAL[3] > 20)
+	if (ADC_VAL[3] > 250 || ADC_VAL[3] < 200)
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
@@ -298,10 +230,11 @@ int main(void)
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
-	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-	HAL_Delay(4500);
 	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
+	HAL_Delay(4500);
+	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
 	HAL_Delay(500);
+	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
 
   /* USER CODE END 2 */
 
@@ -341,6 +274,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLN = 432;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -374,145 +308,6 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void ADC_KL15 (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_3;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Kuhlwassertemp (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_4;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Klimaflap (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_5;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Gaspedal (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_6;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_PCB (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_7;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_56CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Return (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_8;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Info (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_9;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Bremsdruck (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_14;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_Bremstemp (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_15;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
-void ADC_STMTemp (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
-	sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
-	sConfig.Rank = 1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
-	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
 /* USER CODE END 4 */
 
 /**
