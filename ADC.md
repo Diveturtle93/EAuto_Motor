@@ -71,19 +71,21 @@ mit berücksichtigt. Auch diese sollen mit aufgefürt werden.
 
 | Kanal | Funktion | Default-Wert @ 5V | Mit Sensor |
 |:----- |:-------- | -----------------:| ----------:|
-| Channel 3 | KL15 | < 10 | ... |
+| Channel 3 | KL15 | < 10 | 3000 |
 | Channel 4 | Kühlwasser | 3470 | ... |
 | Channel 5 | Klima-Flap | < 10 | ... |
-| Channel 6 | Gaspedal | < 10 | ... |
-| Channel 7 | PCB Temperatur | 2050 | ... |
-| Channel 8 | Return | 2930 | ... |
-| Channel 9 | Info | 2930 | ... |
+| Channel 6 | Gaspedal | < 10 | 253 |
+| Channel 7 | PCB Temperatur | 2050 | 1980 |
+| Channel 8 | Return | 2930 | 3060 |
+| Channel 9 | Info | 2930 | 3060 |
 | Channel 14 | Bremsdruck | 4095 | 2930 |
 | Channel 15 | Bremsdrucktemperatur | 4095 | 2050 |
-| Channel 18 | STM32 Temperatur | 965 | ... |
+| Channel 18 | STM32 Temperatur | 965 | 945 |
 
 Diese Werte sind nur durch eine einzige ADC-Messung ermittelt worden. Sie schwanken bedingt
-durch Messungenauigkeiten mit einer Genauigkeit von +/- 10 um den ermittelten Wert. Dabei
+durch Messungenauigkeiten mit einer Genauigkeit von +/- 20 um den ermittelten Wert.
+Bei einer Auflösung von 12 Bit und einer Spannung von 5V am Sensor sind 20 ADC-Punkte
+ca. 0,025V. Somit schwankt der Wert um ca. 0,05V. Dies sind ca. 0,03V am ADC-Eingang. Dabei
 wurde der 12V Anschluss offen gelassen. Die Platine wurde direkt mit 5V versorgt.
 Bei den Messungen für Kühlwasser, Klima-Flap, Gaspedal Bremsdruck und Bremsdrucktemperatur
 war jeweils kein Sensor angeschlossen. Diese werden im Verlauf ergänzt.
@@ -98,7 +100,7 @@ spannungen.
 | Channel 3 | KL15 | 2235 | 2990 |3003 |
 | Channel 4 | Kühlwasser | 3525 | 3530 | 3460 |
 | Channel 5 | Klima-Flap | < 10 | < 10 | <10 |
-| Channel 6 | Gaspedal | < 10 | < 10 | <10 |
+| Channel 6 | Gaspedal | 253 | 253 | 253 |
 | Channel 7 | PCB Temperatur | 1900 | 1915 | 1980 |
 | Channel 8 | Return | 3060 | 3065 | 3060 |
 | Channel 9 | Info | 3060 | 3065 | 3060 |
