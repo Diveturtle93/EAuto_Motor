@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// Titel	:	Systeminformationen.h
+// Titel	:	SystemInfo.h
 //----------------------------------------------------------------------
 // Sprache	:	C
 // Datum	:	16.01.2021
@@ -10,13 +10,8 @@
 
 // Dateiheader definieren
 //----------------------------------------------------------------------
-#ifndef SYSTEMINFO_H_
-#define SYSTEMINFO_H_
-//----------------------------------------------------------------------
-
-// Einfuegen der standard Include-Dateien
-//----------------------------------------------------------------------
-#include <inttypes.h>
+#ifndef _SYSTEMINFO_H_
+#define _SYSTEMINFO_H_
 //----------------------------------------------------------------------
 
 // Reset Reasons definieren
@@ -53,7 +48,8 @@ void printResetSource(reset_reason reset_flags);						// Schreibt Systemreset au
 void collectHardwareInfo(void);											// Sammle Hardware Informationen
 void collectSoftwareInfo(void);											// Sammle Software Informationen
 void collectMiddlewareInfo(void);										// Sammle Middleware Informationen
+void collectGitcounts(void);											// Sammle Git Count Informationen
 //----------------------------------------------------------------------
 
-#endif /* INC_SYSTEMINFO_H_ */
+#endif /* _INC_SYSTEMINFO_H_ */
 //----------------------------------------------------------------------
