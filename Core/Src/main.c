@@ -147,26 +147,6 @@ int main(void)
   	// Start timer
   	HAL_TIM_Base_Start(&htim6);
 
-//  	// Schreibe BamoCar CAN-Timeout
-//  	tmp[0] = 0xd0;
-//  	tmp[1] = 0x4f;
-//  	tmp[2] = 0x01;
-//
-//#define BAMOCANTIMEOUT			"\nSetze BamoCar CAN-Timeout Zeit auf 500ms\n"
-//  	uartTransmit(BAMOCANTIMEOUT, sizeof(BAMOCANTIMEOUT));
-//  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-//	hal_error(status);
-
-//  	// Loesche BamoCar Fehler
-//  	tmp[0] = 0x8e;
-//  	tmp[1] = 0x00;
-//  	tmp[2] = 0x00;
-//
-//#define BAMOCANERROR			"\nSetze Bamocar Fehler zurueck\n"
-//  	uartTransmit(BAMOCANERROR, sizeof(BAMOCANERROR));
-//  	status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-//	hal_error(status);
-
   	// Starte While-Schleife
 #define MAINWHILE				"\nStarte While Schleife\n"
   	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
@@ -187,8 +167,8 @@ int main(void)
 			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
 		}
 
-		// Task wird alle 20 Millisekunden ausgefuehrt
-		if ((count % 20) == 0)
+		// Task wird alle 50 Millisekunden ausgefuehrt
+		if ((count % 50) == 0)
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
@@ -394,7 +374,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 void Error_Handler(void)
 {
-	/* USER CODE BEGIN Error_Handler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	__disable_irq();														// Interrupts deaktivieren
 
@@ -413,7 +393,7 @@ void Error_Handler(void)
 #endif
 	// Beginne Endlosschleife nachdem Fehler aufgetreten ist
 	while (1);
-	/* USER CODE END Error_Handler_Debug */
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
