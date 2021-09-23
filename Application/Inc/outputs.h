@@ -89,8 +89,8 @@ union komfort_out_tag {
 // Definiere Konstanten
 //----------------------------------------------------------------------
 #define SYSTEM_OUTPUT				0b00000000								// 8 Bit, 8 Systemausgaenge
-#define HIGHCURRENT_OUT				0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
-#define LED_OUTPUT					0b0011100000000000						// 16 Bit, 14 Leuchtdioden
+#define HIGH_OUTPUT					0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
+#define LED_OUTPUT					0b0011100011010000						// 16 Bit, 14 Leuchtdioden
 #define KOMFORT_OUTPUT				0b00000000								// 8 Bit, 5 Komfortausgaenge
 //----------------------------------------------------------------------
 

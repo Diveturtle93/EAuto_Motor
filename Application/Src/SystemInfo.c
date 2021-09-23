@@ -70,7 +70,7 @@ void collectHardwareInfo(void)
 	uartTransmit(" MHz", 4);
 
 
-	uartTransmit("\n", 1);*/
+	uartTransmit("\n", 1);
 	uartTransmit(STRING_STM_UUID, sizeof(STRING_STM_UUID));
 	uartTransmitNumber(HAL_GetUIDw0(), 16);									// UID0 ausgeben
 

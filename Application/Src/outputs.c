@@ -23,10 +23,13 @@
 void init_outputs(void)
 {
 	// Schreibe alle Variablen auf Null
-	system_out.systemoutput = 0;																	// Alle System Ausgaenge auf null setzen
-	highcurrent_out.high_out = 0;																	// Alle Hochstrom Ausgaenge auf null setzen
-	leuchten_out.ledoutput = 0;																		// Alle Leuchten Ausgaenge auf null setzen
-	komfort_out.komfortoutput = 0;																	// Alle Komfort Ausgaenge auf null setzen
+	system_out.systemoutput = SYSTEM_OUTPUT;														// Alle System Ausgaenge auf null setzen
+	highcurrent_out.high_out = HIGH_OUTPUT;															// Alle Hochstrom Ausgaenge auf null setzen
+	leuchten_out.ledoutput = LED_OUTPUT;															// Alle Leuchten Ausgaenge auf null setzen
+	komfort_out.komfortoutput = KOMFORT_OUTPUT;														// Alle Komfort Ausgaenge auf null setzen
+
+	// Alle Ausgaenge setzen
+	writeall_outputs();																				// Auf default setzen
 }
 //----------------------------------------------------------------------
 
@@ -70,7 +73,7 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);					// Gruene LED Platine
 	HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, leuchten_out.BlueLed);						// Blaue LED Platine
 
-	// SChreibe Komfortausgaenge
+	// Schreibe Komfortausgaenge
 	HAL_GPIO_WritePin(BC_RESET_OUT_GPIO_Port, BC_RESET_OUT_Pin, komfort_out.BC_Rst_Out);			// Boardcomputer Reset Ausgang, Steuerung Kombiinstrument
 	HAL_GPIO_WritePin(BC_UP_OUT_GPIO_Port, BC_UP_OUT_Pin, komfort_out.BC_Up_Out);					// Boardcomputer Rauf Ausgang, Steuerung Kombiinstrument
 	HAL_GPIO_WritePin(BC_DOWN_OUT_GPIO_Port, BC_DOWN_OUT_Pin, komfort_out.BC_Down_Out);				// Boardcomputer Runter Ausgang, Steuerung Kombiinstrument
@@ -91,13 +94,13 @@ void writeled_outputs(void)
 void testPCB_Leds(void)
 {
 	// Leds Testen
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
     HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
     HAL_Delay(1000);
     HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
+    HAL_Delay(500);
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
     HAL_Delay(500);
     HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
     HAL_Delay(1000);
