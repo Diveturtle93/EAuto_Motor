@@ -94,41 +94,52 @@ void writeled_outputs(void)
 void testPCB_Leds(void)
 {
 	// Leds Testen
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);							// Teste Green LED, an
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);							// Teste Green LED, aus
+    HAL_Delay(500);																					// Warte 0.5s
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);								// Teste Blue LED, an
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);							// Teste Blue LED, aus
+    HAL_Delay(500);																					// Warte 0.5s
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);								// Teste Red LED, an
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);								// Teste Red LED, aus
+    HAL_Delay(500);																					// Warte 0.5s
 }
 //----------------------------------------------------------------------
 
 // PWM fuer Oelstandsensor am Kombiinstrument
 //----------------------------------------------------------------------
-void pwm_oelstand(uint16_t count)
+void pwm_oelstand(uint16_t time)
 {
-	switch (count)
+	// Auswahl wie viele Sekunden vergangen
+	switch (time)																					// Zeit wird uebergeben
 	{
 		case 0: // 0ms
-			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 0ms Oelstandsensor Ausgang low
 			break;
 		case 15: // 1x15 ms = 15 ms
-			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 15ms Oelstandsensor Ausgang high
 			break;
 		case 45: // 3x15 ms = 45 ms
-			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 45ms Oelstandsensor Ausgang low
 			break;
 		case 75: // 5x15 ms = 75 ms
-			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 75ms Oelstandsensor Ausgang high
 			break;
 		default:
 			break;
 	}
+	// Nach 405ms wird das ganze wiederholt
 }
 //----------------------------------------------------------------------
+
+// Setze Cockpit auf default, alle Fehler OK
+//----------------------------------------------------------------------
+void cockpit_default(void)
+{
+	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, GPIO_PIN_SET);
+}

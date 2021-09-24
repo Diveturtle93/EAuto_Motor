@@ -35,6 +35,7 @@ uint16_t readPedals(void)
 	uint16_t ADC_Gas = 0;
 	uint8_t tmpBrake = 0;
 
+/*
 	// Bremspedal auf Plausibilitaet pruefen
 	if ((system_in.BremseNO == 1) && (system_in.BremseNC != 1))				// Bremse nicht getreten
 	{
@@ -51,7 +52,7 @@ uint16_t readPedals(void)
 		uartTransmit(BRAKE_INVALID, sizeof(BRAKE_INVALID));
 		// Bremse invalide
 		software_error(ERROR_BREMSPEDAL);
-	}
+	}*/
 
 	// Kupplung pruefen
 	if (system_in.Kupplung == 1)

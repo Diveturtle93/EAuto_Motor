@@ -90,7 +90,7 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5], InData[5], status;
+	uint8_t TxData[8], OutData[5], InData[5], status, task_start;
 	uint16_t count = 0, adc_gas;
   	uint32_t lastcan = 0, lastsendcan = 0;
   	CAN_FilterTypeDef sFilterConfig;
@@ -115,6 +115,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
+  MX_TIM14_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
@@ -132,6 +133,9 @@ int main(void)
 
 	// Leds Testen
   	testPCB_Leds();
+
+  	// Alle Fehler Cockpit loeschen
+  	cockpit_default();
 
   	/* Lese alle Eingaenge */
   	readall_inputs();
@@ -208,8 +212,8 @@ int main(void)
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
-  	// Start timer
-  	HAL_TIM_Base_Start(&htim6);
+	// Start Timer 6 mit Interrupt
+	HAL_TIM_Base_Start_IT(&htim6);
 
   	uartTransmit("\nStarte While\n\n", 15);
 
@@ -225,23 +229,26 @@ int main(void)
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
 		{
-			count++;													// Zaehler count hochzaehlen
-			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
+			count++;																	// Zaehler count hochzaehlen
+			millisekunden_flag_1 = 0;													// Setze Millisekunden-Flag zurueck
+
+			// Setze Flag start, nur wenn millisekunden Flag gesetzt war
+			task_start = 1;																// alle Task einmal ausfuehren
 		}
 
 		// PWM Oelstandsensor Kombiinstrument ausgeben
 		pwm_oelstand(count);
 
 		// Task wird alle 20 Millisekunden ausgefuehrt
-		if ((count % 20) == 1)
+		if (((count % 20) == 0) && (task_start == 1))
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
 		}
 
-		// Task wird alle 50 Millisekunden ausgefuehrt
-		if ((count % 100) == 1)
+		// Task wird alle 100 Millisekunden ausgefuehrt
+		if (((count % 100) == 0) && (task_start == 1))
 		{
 			// alle Inputs einlesen
 			readall_inputs();
@@ -251,7 +258,7 @@ int main(void)
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
-		if ((count % 200) == 1)
+		if (((count % 200) == 0) && (task_start == 1))
 		{
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
@@ -261,7 +268,7 @@ int main(void)
 			OutData[4] = komfort_out.komfortoutput;
 
 			// Sende Nachricht digitale Ausgaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX1);
 			hal_error(status);
 
 			// Daten fuer Eingaenge zusammenfuehren
@@ -272,14 +279,18 @@ int main(void)
 			InData[4] = komfort_in.komfortinput;
 
 			// Sende Nachricht digitale Eingaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX2);
 			hal_error(status);
 		}
 
-		if ((count % 405) == 1)
+		// Task wird alle 400 Millisekunden ausgefuehrt
+		if ((count == 400) && (task_start == 1))
 		{
 			count = 0;
 		}
+
+		// Zuruecksetzen Flag start
+		task_start = 0;																	// Verhindern das Task mehrfach in einer Millisekunde ausgefuehrt werden
 
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
 	  	if (millis() - lastcan >= 5)
@@ -318,7 +329,7 @@ int main(void)
 		}
 
 		// Sende CAN Nachricht auf CAN-Bus
-		if (millis() - lastsendcan >= 993)
+		if (millis() - lastsendcan >= 1000)
 		{
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
