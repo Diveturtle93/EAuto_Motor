@@ -46,6 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -286,7 +287,7 @@ int main(void)
 		// Task wird alle 400 Millisekunden ausgefuehrt
 		if ((count == 400) && (task_start == 1))
 		{
-			count = 0;
+			count = 0;																	// Zaehler count zuruecksetzen
 		}
 
 		// Zuruecksetzen Flag start
@@ -409,9 +410,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
-	if (htim == &htim6)
+	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
 	{
-		millisekunden_flag_1 = 1;
+		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
+	}
+	if (htim == &htim14)																// Wenn Timer 14 den ueberlauf ausgeloest hat
+	{
+
 	}
 }
 /* USER CODE END 4 */

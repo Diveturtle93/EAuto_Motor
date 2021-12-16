@@ -94,9 +94,7 @@ void BAMOCAN_ID(uint8_t* data)
 #ifdef DEBUG
 			uartTransmit("Aktuelle Drehzahl\n", 18);
 #endif
-
 			break;
-
 
 		// Default Mitteilung falls Auwertung für Register noch nicht definiert ist
 		default:
