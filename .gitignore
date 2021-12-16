@@ -1,5 +1,5 @@
 # Git File
-git.h
+./Application/Inc/git.h
 
 # Prerequisites
 *.d

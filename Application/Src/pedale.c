@@ -35,6 +35,16 @@ uint16_t readPedals(void)
 	uint16_t ADC_Gas = 0;
 	uint8_t tmpBrake = 0;
 
+#ifdef DEBUG_PEDALE
+	ITM_SendString("Zustand von Bremse ausgeben\n");
+	ITM_SendString("Bremse darf nicht bei Eingaengen 1 sein.");
+	ITM_SendString("BremseNO:\t");
+	ITM_SendNumber(system_in.BremseNO);
+	ITM_SendChar('\n');
+	ITM_SendString("BremseNC:\t");
+	ITM_SendNumber(system_in.BremseNC);
+	ITM_SendChar('\n');
+#endif
 /*
 	// Bremspedal auf Plausibilitaet pruefen
 	if ((system_in.BremseNO == 1) && (system_in.BremseNC != 1))				// Bremse nicht getreten
@@ -54,11 +64,23 @@ uint16_t readPedals(void)
 		software_error(ERROR_BREMSPEDAL);
 	}*/
 
+#ifdef DEBUG_PEDALE
+	ITM_SendString("Zustand von Kupplung ausgeben, Kupplung:\t");
+	ITM_SendNumber(system_in.Kupplung);
+	ITM_SendChar('\n');
+#endif
+
 	// Kupplung pruefen
 	if (system_in.Kupplung == 1)
 	{
 		tmpBrake |= 0x02;
 	}
+
+#ifdef DEBUG_PEDALE
+	ITM_SendString("Zustand Pedale ausgeben, tmpBrake:\t");
+	ITM_SendNumber(tmpBrake);
+	ITM_SendChar('\n');
+#endif
 
 	// Gaspedal einlesen
 	ADC_Gas = ADC_Gaspedal();

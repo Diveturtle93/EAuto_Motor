@@ -21,12 +21,17 @@
 // Einfügen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "adc_inputs.h"
+#include "error.h"
 //----------------------------------------------------------------------
 
 // Gaspedal einlesen
 //----------------------------------------------------------------------
 uint16_t ADC_Gaspedal(void)
 {
+#ifdef DEBUG_ADC_INPUTS
+	ITM_SendString("ADC von Gaspedal einlesen\n");
+#endif
+
 	// Temporaere Variable anlegen
 	uint16_t ADC_Data = 0;
 
@@ -46,6 +51,12 @@ uint16_t ADC_Gaspedal(void)
 	ADC_Data = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 
+#ifdef DEBUG_ADC_INPUTS
+	ITM_SendString("ADC-Wert Gaspedal:\t");
+	ITM_SendNumber(ADC_Data);
+	ITM_SendChar('\n');
+#endif
+
 	//ADC Wert zurueck geben
 	return ADC_Data;
 }
@@ -55,6 +66,10 @@ uint16_t ADC_Gaspedal(void)
 //----------------------------------------------------------------------
 uint16_t ADC_Bremsdruck(void)
 {
+#ifdef DEBUG_ADC_INPUTS
+	ITM_SendString("ADC von Bremsdruck einlesen\n");
+#endif
+
 	// Temporaere Variable anlegen
 	uint16_t ADC_Data = 0;
 
@@ -73,6 +88,12 @@ uint16_t ADC_Bremsdruck(void)
 	HAL_ADC_PollForConversion(&hadc1, 1000);
 	ADC_Data = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
+
+#ifdef DEBUG_ADC_INPUTS
+	ITM_SendString("ADC-Wert Bremsdruck:\t");
+	ITM_SendNumber(ADC_Data);
+	ITM_SendChar('\n');
+#endif
 
 	//ADC Wert zurueck geben
 	return ADC_Data;

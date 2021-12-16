@@ -16,12 +16,17 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
+#include "error.h"
 //----------------------------------------------------------------------
 
 // Initialisiere alle Ausgangsstrukturen auf default Werte
 //----------------------------------------------------------------------
 void init_outputs(void)
 {
+#ifdef DEBUG_OUTPUT
+	ITM_SendString("Initialisiere Ausgaenge.\n");
+#endif
+
 	// Schreibe alle Variablen auf Null
 	system_out.systemoutput = SYSTEM_OUTPUT;														// Alle System Ausgaenge auf null setzen
 	highcurrent_out.high_out = HIGH_OUTPUT;															// Alle Hochstrom Ausgaenge auf null setzen
@@ -79,6 +84,22 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(BC_DOWN_OUT_GPIO_Port, BC_DOWN_OUT_Pin, komfort_out.BC_Down_Out);				// Boardcomputer Runter Ausgang, Steuerung Kombiinstrument
 	HAL_GPIO_WritePin(BAMOCAR_OUT1_GPIO_Port, BAMOCAR_OUT1_Pin, komfort_out.BamoOut1);				// Ausgang Bamocar 1
 	HAL_GPIO_WritePin(BAMOCAR_OUT2_GPIO_Port, BAMOCAR_OUT2_Pin, komfort_out.BamoOut2);				// Ausgang Bamocar 2
+
+#ifdef DEBUG_OUTPUT
+	ITM_SendString("Ausgaenge gesetzt.\n");
+	ITM_SendString("system_out: ");
+	ITM_SendNumber(system_out.systemoutput);
+	ITM_SendChar('\n');
+	ITM_SendString("highcurrent_out: ");
+	ITM_SendNumber(highcurrent_out.high_out);
+	ITM_SendChar('\n');
+	ITM_SendString("komfort_out: ");
+	ITM_SendNumber(komfort_out.komfortoutput);
+	ITM_SendChar('\n');
+	ITM_SendString("leuchten_out: ");
+	ITM_SendNumber(leuchten_out.ledoutput);
+	ITM_SendChar('\n');
+#endif
 }
 //----------------------------------------------------------------------
 
@@ -139,7 +160,10 @@ void pwm_oelstand(uint16_t time)
 //----------------------------------------------------------------------
 void cockpit_default(void)
 {
-	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, GPIO_PIN_SET);
+	leuchten_out.Ruechwarn = 1;																		// Ruecklichtwarnung setzen
+	leuchten_out.Wischwarn = 1;																		// Wischwasserwarnung setzen
+	leuchten_out.Bremswarn = 1;																		// Bremslichtwarnung setzen
+	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
+	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
+	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
 }

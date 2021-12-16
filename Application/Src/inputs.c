@@ -16,12 +16,17 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "inputs.h"
+#include "error.h"
 //----------------------------------------------------------------------
 
 // Lese alle Eingaenge
 //----------------------------------------------------------------------
 void readall_inputs(void)
 {
+#ifdef DEBUG_INPUT
+	ITM_SendString("Lese Inputs ein\n");
+#endif
+
 	// Systemeingaenge einlesen
 	system_in.Kickdown = HAL_GPIO_ReadPin(KICKDOWN_GPIO_Port, KICKDOWN_Pin);					// Eingang Gaspedal getreten
 	system_in.Leerlauf = HAL_GPIO_ReadPin(LEERLAUF_GPIO_Port, LEERLAUF_Pin);					// Eingang Gaspedal nicht getreten
@@ -64,5 +69,18 @@ void readall_inputs(void)
 	komfort_in.GRA3 = HAL_GPIO_ReadPin(GRA3_GPIO_Port, GRA3_Pin);								// Tempomat 3 Eingang
 	komfort_in.GRA4 = HAL_GPIO_ReadPin(GRA4_GPIO_Port, GRA4_Pin);								// Tempomat 4 Eingang
 	komfort_in.Durchfluss = HAL_GPIO_ReadPin(DURCHFLUSS_GPIO_Port, DURCHFLUSS_Pin);				// Durchflusssensor Eingang
+
+#ifdef DEBUG_INPUT
+	ITM_SendString("Eingaenge gelesen.\n");
+	ITM_SendString("system_in: ");
+	ITM_SendNumber(system_in.systeminput);
+	ITM_SendChar('\n');
+	ITM_SendString("sdc_in: ");
+	ITM_SendNumber(sdc_in.sdcinput);
+	ITM_SendChar('\n');
+	ITM_SendString("komfort_in: ");
+	ITM_SendNumber(komfort_in.komfortinput);
+	ITM_SendChar('\n');
+#endif
 }
 //----------------------------------------------------------------------
