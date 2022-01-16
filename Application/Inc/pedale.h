@@ -14,9 +14,11 @@
 #define INC_PEDALE_H_
 //----------------------------------------------------------------------
 
-// Define Debug Symbols
+// Definiere Debug Symbol
 //----------------------------------------------------------------------
-#define DEBUG_PEDALE
+#ifdef DEBUG
+	#define DEBUG_PEDALE
+#endif
 //----------------------------------------------------------------------
 
 // Konstanten definieren

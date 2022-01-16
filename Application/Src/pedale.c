@@ -37,7 +37,7 @@ uint16_t readPedals(void)
 
 #ifdef DEBUG_PEDALE
 	ITM_SendString("Zustand von Bremse ausgeben\n");
-	ITM_SendString("Bremse darf nicht bei Eingaengen 1 sein.");
+	ITM_SendString("Bremse darf nicht bei beiden Eingaengen 1 sein.");
 	ITM_SendString("BremseNO:\t");
 	ITM_SendNumber(system_in.BremseNO);
 	ITM_SendChar('\n');
@@ -85,14 +85,14 @@ uint16_t readPedals(void)
 	// Gaspedal einlesen
 	ADC_Gas = ADC_Gaspedal();
 
-	// Wenn Bremse oder Kupplung nicht getreten ist, Gaspedal auswerten
-	if (tmpBrake == 0)
+	// Wenn Bremse oder Kupplung nicht getreten ist, Gaspedal auswerten, KL15 muss an sein
+	if (tmpBrake == 0 && (system_in.KL15 != 1))
 	{
 		// Wenn Leerlauf und Kickdown aktiv Plausibilitaetsfehler
 		if ((system_in.Leerlauf == 1) && (system_in.Kickdown == 1))
 		{
 			// Fehlermeldung auf Uart ausgeben
-#define TROTTLE_INVALID				"ERROR_Gaspedal_1 Plausibilitaetsfehler: Kickdown und Leerlauf"
+#define TROTTLE_INVALID				"Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown und Leerlauf"
 			uartTransmit(TROTTLE_INVALID, sizeof(TROTTLE_INVALID));
 			// Gaspedal invalide
 			software_error(ERROR_GASPEDAL);
