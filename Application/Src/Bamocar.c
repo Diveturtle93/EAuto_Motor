@@ -8,17 +8,17 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der standard Include-Dateien
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "can.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "Bamocar.h"
 #include "BasicUart.h"
@@ -41,17 +41,18 @@ void readBAMOReg(uint8_t REG)
 	BamoTxMsg.DLC = 3;
 	BamoTxMsg.TransmitGlobalTime=DISABLE;
 
-	// Daten zusammenfügen
-	BamoTxData[0] = BAMOCAR_REG_READ;										// Einstellung für lesen des Registers
+	// Daten zusammenfuegen
+	BamoTxData[0] = BAMOCAR_REG_READ;										// Einstellung fuer lesen des Registers
 	BamoTxData[1] = REG;													// Register das gelesen werden soll
 	BamoTxData[2] = INTVL_IMMEDIATE;										// Register sofort senden, einmalig
 
+	// Bamocar Register ueber CAN abrufen
 	status = HAL_CAN_AddTxMessage(&hcan3, &BamoTxMsg, BamoTxData, (uint32_t *)CAN_TX_MAILBOX0);
 	hal_error(status);
 }
 //----------------------------------------------------------------------
 
-// Lese Bamocar Register, Zeitinterval für wiederholten Rückgabewert
+// Lese Bamocar Register, Zeitinterval für wiederholten Rueckgabewert
 //----------------------------------------------------------------------
 void readBAMORegIntvl(uint8_t REG, uint8_t interval)
 {
@@ -66,11 +67,12 @@ void readBAMORegIntvl(uint8_t REG, uint8_t interval)
 	BamoTxMsg.DLC = 3;
 	BamoTxMsg.TransmitGlobalTime=DISABLE;
 
-	// Daten zusammenfügen
-	BamoTxData[0] = BAMOCAR_REG_READ;										// Einstellung für lesen des Registers
+	// Daten zusammenfuegen
+	BamoTxData[0] = BAMOCAR_REG_READ;										// Einstellung fuer lesen des Registers
 	BamoTxData[1] = REG;													// Register das gelesen werden soll
 	BamoTxData[2] = interval;												// Interval wie oft das Register gelesen werden soll
 
+	// Bamocar Zeitinterval einstellen ueber CAN
 	status = HAL_CAN_AddTxMessage(&hcan3, &BamoTxMsg, BamoTxData, (uint32_t *)CAN_TX_MAILBOX0);
 	hal_error(status);
 }
@@ -91,12 +93,12 @@ void BAMOCAN_ID(uint8_t* data)
 			speed = ((data[2]<<8) + data[1]);
 			motor1.Drehzahl = speed;
 // Uart Ausgabe
-#ifdef DEBUG
-			uartTransmit("Aktuelle Drehzahl\n", 18);
+#ifdef DEBUG_BAMOCAR
+			ITM_SendString("Aktuelle Drehzahl\n");
 #endif
 			break;
 
-		// Default Mitteilung falls Auwertung für Register noch nicht definiert ist
+		// Default Mitteilung falls Auwertung fuer Register noch nicht definiert ist
 		default:
 			uartTransmit("Bamocar Register nicht definiert\n", 33);
 			break;

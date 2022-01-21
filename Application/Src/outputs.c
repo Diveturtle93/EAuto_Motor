@@ -87,16 +87,16 @@ void writeall_outputs(void)
 
 #ifdef DEBUG_OUTPUT
 	ITM_SendString("Ausgaenge gesetzt.\n");
-	ITM_SendString("system_out: ");
+	ITM_SendString("system_out:\t");
 	ITM_SendNumber(system_out.systemoutput);
 	ITM_SendChar('\n');
-	ITM_SendString("highcurrent_out: ");
+	ITM_SendString("highcurrent_out:\t");
 	ITM_SendNumber(highcurrent_out.high_out);
 	ITM_SendChar('\n');
-	ITM_SendString("komfort_out: ");
+	ITM_SendString("komfort_out:\t");
 	ITM_SendNumber(komfort_out.komfortoutput);
 	ITM_SendChar('\n');
-	ITM_SendString("leuchten_out: ");
+	ITM_SendString("leuchten_out:\t");
 	ITM_SendNumber(leuchten_out.ledoutput);
 	ITM_SendChar('\n');
 #endif
@@ -167,3 +167,19 @@ void cockpit_default(void)
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
 }
+//----------------------------------------------------------------------
+
+// Testen der Spannung am Shutdown-Circuit, Signal 1 = offen, Signal = 0 geschlossen
+//----------------------------------------------------------------------
+void testSDC(void)
+{
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_SET);					// Einschalten von Shutdown-Circuit zum testen
+	HAL_Delay(100);																					// Wartezeit zum setzen
+	if (HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin) == 1)								// Einlesen von SDC0 Eingang
+	{
+		software_error(ERROR_SDC_SPANNUNG);															// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
+	}
+	HAL_Delay(100);																					// Wartezeit zum setzen
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_RESET);					// Auschalten von Shutdown-Circuit
+}
+//----------------------------------------------------------------------

@@ -50,9 +50,10 @@ union sdc_in_tag {
 	struct {
 		uint8_t EmergencyRun : 1;				// 0
 		uint8_t SDC0 : 1;						// 1
-		uint8_t AkkuSDC : 1;					// 2
+		uint8_t Akku1SDC : 1;					// 2
 		uint8_t BTB_SDC : 1;					// 3
 		uint8_t DCDC_Fault : 1;					// 4
+		uint8_t SDC12V : 1;						// 5						// Sicherung von Shutdown-Circuit
 	};
 
 	uint8_t sdcinput;							// 1 Byte

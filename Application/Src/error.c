@@ -18,6 +18,7 @@
 #include "error.h"
 #include "BasicUart.h"
 #include "outputs.h"
+#include "inputs.h"
 //----------------------------------------------------------------------
 
 // Hal Error auswerten und ausgeben
@@ -53,8 +54,11 @@ void software_error(uint8_t errorcode)
 
 	// Schalte Ok LED aus
 	leuchten_out.GreenLed = 0;												// Zuruechsetzen Variable
-	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);// Fehler LED ausschalten
+	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);// OK LED ausschalten
 
+	// Schalte SDC_Motor aus
+	system_out.MotorSDC = 0;												// Zuruecksetzen Variable
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, system_out.MotorSDC);// SDC oeffnen
 #ifdef DEBUG																// Serielle Kommunukation nur waehrend Debugging
 #define SOFTERRORMESSAGE			"\nError Handler ausgeloest\n"			// Ausgabe das Fehler aufgetreten ist
 	uartTransmit(SOFTERRORMESSAGE,sizeof(SOFTERRORMESSAGE));
@@ -69,7 +73,7 @@ void software_error(uint8_t errorcode)
 
 // Debug Nachricht ueber SWO senden
 // Nachricht SWO ITM Data Console
-// Core Clock := Maximalfrequenz
+// Core Clock := Maximalfrequenz ; HCLK fuer Serial Wire Viewer
 // Im String #GRN# oder #RED# oder #ORG# erscheint die Nachricht in einer Farbe
 //----------------------------------------------------------------------
 void ITM_SendString(char *text)

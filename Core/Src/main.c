@@ -97,9 +97,13 @@ int main(void)
 	CAN_FilterTypeDef sFilterConfig;
 
   	// Erstelle Can-Nachrichten
+    // Sendenachricht erstellen
 	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
 	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
 	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+	// Sendenachricht Motorsteuergeraet Motor1 erstellen
 	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
 
   /* USER CODE END Init */
@@ -120,26 +124,29 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
-  	/* Schreibe Resetquelle auf die Konsole */
+  	// Schreibe Resetquelle auf die Konsole
 #ifdef DEBUG
 	printResetSource(readResetSource());
 
-  	/* Teste serielle Schnittstelle*/
+  	// Teste serielle Schnittstelle
   	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
-  	ITM_SendString(TEST_STRING_UART);
 
-  	/* Sammel Systeminformationen */
+  	// Sammel Systeminformationen
   	collectSystemInfo();
 #endif
 
-	//Leds Testen
+	// Leds Testen
   	testPCB_Leds();
+
+  	// Testen der Versorgungsspannung am Shutdown-Circuit
+  	testSDC();
+  	sdc_in.SDC12V = 1;																	// SDC Spannungsversorgung OK
 
   	// Alle Fehler Cockpit loeschen
   	cockpit_default();
 
-  	/* Lese alle Eingaenge */
+  	// Lese alle Eingaenge
   	readall_inputs();
 
   	// Starte CAN Bus
@@ -154,7 +161,7 @@ int main(void)
   	// Aktiviere Interrupts für CAN Bus
   	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
   	{
-  		/* Notification Error */
+  		// Notification Error
   		hal_error(status);
   		Error_Handler();
   	}
@@ -174,43 +181,12 @@ int main(void)
     // Filter Bank schreiben
     if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
     {
-    	/* Filter configuration Error */
+    	// Filter configuration Error
   		hal_error(status);
   		Error_Handler();
     }
 
-    // Sendenachricht erstellen
-  	/*TxMessage.StdId = 0x123;
-  	TxMessage.ExtId = 0;
-  	TxMessage.RTR = CAN_RTR_DATA;
-  	TxMessage.IDE = CAN_ID_STD;
-  	TxMessage.DLC = 8;
-  	TxMessage.TransmitGlobalTime=DISABLE;*/
-
-	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
-  	/*TxOutput.StdId = MOTOR_CAN_DIGITAL_OUT;
-  	TxOutput.ExtId = 0;
-  	TxOutput.RTR = CAN_RTR_DATA;
-  	TxOutput.IDE = CAN_ID_STD;
-  	TxOutput.DLC = 8;
-  	TxOutput.TransmitGlobalTime=DISABLE;*/
-
-	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
-  	/*TxInput.StdId = MOTOR_CAN_DIGITAL_IN;
-  	TxInput.ExtId = 0;
-  	TxInput.RTR = CAN_RTR_DATA;
-  	TxInput.IDE = CAN_ID_STD;
-  	TxInput.DLC = 8;
-  	TxInput.TransmitGlobalTime=DISABLE;*/
-
-	// Sendenachricht Motorsteuergeraet Motor1 erstellen
-	/*TxMotor1.StdId = MOTOR_CAN_DREHZAHL;
-	TxMotor1.ExtId = 0;
-	TxMotor1.RTR = CAN_RTR_DATA;
-	TxMotor1.IDE = CAN_ID_STD;
-	TxMotor1.DLC = 8;
-	TxMotor1.TransmitGlobalTime=DISABLE;*/
-
+    // Sendenachricht 0x123 mit Dummy-Daten füllen
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
@@ -323,6 +299,7 @@ int main(void)
 						break;
 				}
 
+				// Drehzahl ausgeben
 				TxData[2] = motor1.output[2];
 				TxData[3] = motor1.output[3];
 				lastcan = millis();

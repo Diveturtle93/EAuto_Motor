@@ -37,7 +37,7 @@ uint16_t readPedals(void)
 
 #ifdef DEBUG_PEDALE
 	ITM_SendString("Zustand von Bremse ausgeben\n");
-	ITM_SendString("Bremse darf nicht bei beiden Eingaengen 1 sein.");
+	ITM_SendString("Bremse darf nicht bei beiden Eingaengen 1 sein.\n");
 	ITM_SendString("BremseNO:\t");
 	ITM_SendNumber(system_in.BremseNO);
 	ITM_SendChar('\n');

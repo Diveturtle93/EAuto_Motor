@@ -16,9 +16,7 @@
 
 // Definiere Debug Symbol
 //----------------------------------------------------------------------
-#ifdef DEBUG
-	#define HAL_DEBUG
-#endif
+//#define HAL_DEBUG
 //----------------------------------------------------------------------
 
 // Festlegen der Fehlercodes
@@ -26,6 +24,7 @@
 #define ERROR_NONE						0
 #define ERROR_GASPEDAL					1
 #define ERROR_BREMSPEDAL				2
+#define ERROR_SDC_SPANNUNG				3
 //----------------------------------------------------------------------
 
 // Funktionen definieren
