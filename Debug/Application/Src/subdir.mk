@@ -42,3 +42,10 @@ C_DEPS += \
 Application/Src/%.o: ../Application/Src/%.c Application/Src/subdir.mk
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F767xx -DDEBUG -c -I../Application/Inc -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
 
+clean: clean-Application-2f-Src
+
+clean-Application-2f-Src:
+	-$(RM) ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/pedale.d ./Application/Src/pedale.o
+
+.PHONY: clean-Application-2f-Src
+

@@ -57,8 +57,8 @@
 
 /* USER CODE BEGIN PV */
 CAN_RxHeaderTypeDef RxMessage;
-uint8_t RxData[8], can_change = 0;
-volatile uint8_t millisekunden_flag_1 = 0;
+uint8_t RxData[8];
+volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,8 +90,8 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5] = {0}, InData[5] = {0}, status, tmp[4];
-	uint16_t count = 0, gas_adc, gas_mean = 0;
+	uint8_t TxData[8], OutData[5] = {0}, InData[5] = {0}, status, tmp[4], task = 0;
+	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
 
   	// Erstelle Can-Nachrichten
@@ -144,9 +144,6 @@ int main(void)
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
-  	// Start timer
-  	HAL_TIM_Base_Start(&htim6);
-
   	// Starte While-Schleife
 #define MAINWHILE				"\nStarte While Schleife\n"
   	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
@@ -165,10 +162,12 @@ int main(void)
 		{
 			count++;													// Zaehler count hochzaehlen
 			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
+
+			task = 1;
 		}
 
 		// Task wird alle 50 Millisekunden ausgefuehrt
-		if ((count % 50) == 0)
+		if (((count % 20) == 0) && (task == 1))
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
@@ -176,7 +175,7 @@ int main(void)
 		}
 
 		// Task wird alle 100 Millisekunden ausgefuehrt
-		if ((count % 100) == 0)
+		if (((count % 100) == 0) && (task == 1))
 		{
 			// alle Inputs einlesen
 			readall_inputs();
@@ -198,11 +197,11 @@ int main(void)
 
 			// Drehmoment an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			hal_error(status);
+			//hal_error(status);
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
-		if ((count % 200) == 0)
+		if (((count % 200) == 0) && (task == 1))
 		{
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
@@ -214,7 +213,7 @@ int main(void)
 
 			// Sende Nachricht digitale Ausgaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX2);
-			hal_error(status);
+			//hal_error(status);
 
 			// Daten fuer Eingaenge zusammenfuehren
 			InData[0] ++;
@@ -226,7 +225,7 @@ int main(void)
 
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
-			hal_error(status);
+			//hal_error(status);
 
 			// Bamocar Fehler auslesen
 			tmp[0] = 0x3D;
@@ -235,19 +234,24 @@ int main(void)
 
 			// Befehl Fehler auslesen an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			hal_error(status);
+			//hal_error(status);
 
 			// Variable count auf 0 zuruecksetzen
 			count = 0;
 		}
 
+		task = 0;
+
+
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
 	  	if (millis() - lastcan >= 5)
 		{
+	  		HAL_CAN_GetRxMessage(&hcan3, CAN_RX_FIFO0, &RxMessage, TxData);
+
 			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
 			if (can_change == 1)
 			{
-				// Nachricht ID über UART ausgeben
+				// Nachricht ID ueber UART ausgeben
 				uartTransmitNumber(RxMessage.StdId, 16);
 				uartTransmit("\t", 1);
 				for (uint8_t i = 0; i < RxMessage.DLC; i++)
@@ -256,7 +260,7 @@ int main(void)
 				}
 				uartTransmit("\n", 1);
 
-				// Sortieren der IDs nach Geräten
+				// Sortieren der IDs nach Geraeten
 				switch (RxMessage.StdId)
 				{
 					case BAMOCAR_RX_ID:
@@ -273,16 +277,17 @@ int main(void)
 				TxData[2] = motor1.output[2];
 				TxData[3] = motor1.output[3];
 				lastcan = millis();
+
 				can_change = 0;
 			}
 		}
 
 #ifdef DEBUG
 		// Sende CAN Nachricht auf CAN-Bus / Teste CAN-BUS
-		if (millis() - lastsendcan >= 993)
+		if (millis() - lastsendcan >= 1000)
 		{
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
-			hal_error(status);
+			//hal_error(status);
 			lastsendcan = millis();
 		}
 #endif
@@ -355,6 +360,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	// Nachricht aus Speicher auslesen
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
 	can_change = 1;
+}
+
+// Can-Interrupt: Fifo0 ist voll
+void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
+{
+	// Fifo0 voll
+	uartTransmit("Fifo0 von CAN3 ist voll\n", 24);
+
+	Error_Handler();
 }
 
 // Timer-Interrupt: Timer ist uebergelaufen
