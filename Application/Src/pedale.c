@@ -47,6 +47,49 @@ uint16_t readPedals(void)
 #endif
 /*
 	// Bremspedal auf Plausibilitaet pruefen
+	// Gaspedal auf Plausibilitaet pruefen
+//	if ((system_in.Kickdown != 1) && (system_in.Leerlauf == 1))				// Gaspedal voll getreten
+//	{
+//
+//	}
+//	else if ((system_in.Kickdown == 1))										// Gaspedal nicht oder teilweise getreten
+//	{
+//		// Gaspedal einlesen
+		ADC_Gas = ADC_Gaspedal();
+//	}
+//	else																	// Falls beide Schalter betaetigt sind
+//	{
+//		// Gaspedal invalide
+//		software_error(ERROR_GASPEDAL);
+//	}
+
+	if (ADC_Gas < 300)
+	{
+		ADC_Gas = 0;
+	}
+
+	if (ADC_Gas >= 300)
+	{
+		ADC_Gas -= 300;
+	}
+
+	if (ADC_Gas >= 1000)
+	{
+		ADC_Gas = 1000;
+	}
+
+	return ADC_Gas;
+}
+//----------------------------------------------------------------------
+
+/* // Bremse auswerten
+//----------------------------------------------------------------------
+void readBrake(void)
+{
+	// Variablen anlegen
+	uint16_t ADC_Bremse = 0;
+
+	// Gaspedal auf Plausibilitaet pruefen
 	if ((system_in.BremseNO == 1) && (system_in.BremseNC != 1))				// Bremse nicht getreten
 	{
 		tmpBrake = 0;
@@ -131,4 +174,4 @@ uint16_t readPedals(void)
 
 	return ADC_Gas;
 }
-//----------------------------------------------------------------------
+//----------------------------------------------------------------------*/

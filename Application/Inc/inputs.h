@@ -21,7 +21,7 @@
 
 // Eingangsstrukturen definieren
 //----------------------------------------------------------------------
-union system_input_tag {
+typedef union __system_input_tag {
 	struct {
 		uint8_t Kickdown : 1;					// 0
 		uint8_t Leerlauf : 1;					// 1
@@ -42,11 +42,11 @@ union system_input_tag {
 	};
 
 	uint16_t systeminput;						// 2 Byte
-} system_in;
+} system_input_tag;
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-union sdc_in_tag {
+typedef union __sdc_in_tag {
 	struct {
 		uint8_t EmergencyRun : 1;				// 0
 		uint8_t SDC0 : 1;						// 1
@@ -57,11 +57,11 @@ union sdc_in_tag {
 	};
 
 	uint8_t sdcinput;							// 1 Byte
-} sdc_in;
+} sdc_in_tag;
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-union komfort_in_tag {
+typedef union __komfort_in_tag {
 	struct {
 		uint8_t ASR1 : 1;						// 0
 		uint8_t ASR2 : 1;						// 1
@@ -82,7 +82,7 @@ union komfort_in_tag {
 	};
 
 	uint16_t komfortinput;						// 2 Byte
-} komfort_in;
+} komfort_in_tag;
 //----------------------------------------------------------------------
 
 // Definiere Konstanten
@@ -90,6 +90,13 @@ union komfort_in_tag {
 #define SYSTEM_INPUT					0b0000000000000000					// 16 Bit, 16 Systemeingaenge
 #define KOMFORT_INPUT					0b0000000000000000					// 16 Bit, 16 Komforteingaenge
 #define SDC_INPUT						0b00000000							// 8 Bit, 5 SDC-Eingaenge
+//----------------------------------------------------------------------
+
+// Definiere globale Variablen
+//----------------------------------------------------------------------
+extern system_input_tag system_in;											// Variable fuer Systemeingaenge definieren
+extern sdc_in_tag sdc_in;													// Variable fuer SDC-Eingaenge definieren
+extern komfort_in_tag komfort_in;											// Variable fuer Komforteingaenge definieren
 //----------------------------------------------------------------------
 
 // Funktionen definieren

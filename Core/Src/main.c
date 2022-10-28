@@ -58,8 +58,10 @@
 
 /* USER CODE BEGIN PV */
 CAN_RxHeaderTypeDef RxMessage;
-uint8_t RxData[8], can_change = 0;
-volatile uint8_t millisekunden_flag_1 = 0;
+uint8_t RxData[8];
+volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
+motor1_tag motor1;																	// Variable fuer Motor CAN-Nachricht 1 definieren
+motor2_tag motor2;																	// Variable fuer Motor CAN-Nachricht 2 definieren
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,20 +93,20 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5], InData[5], status, task_start;
-	uint16_t count = 0, adc_gas;
-	uint32_t lastcan = 0, lastsendcan = 0;
-	CAN_FilterTypeDef sFilterConfig;
+	uint8_t TxData[8], OutData[5] = {0}, InData[5] = {0}, status, tmp[4], task = 0;
+	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
+  	uint32_t lastcan = 0, lastsendcan = 0;
 
   	// Erstelle Can-Nachrichten
     // Sendenachricht erstellen
-	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
 	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
-	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
 	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
-	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 5, DISABLE};
+  	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
 	// Sendenachricht Motorsteuergeraet Motor1 erstellen
-	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 
   /* USER CODE END Init */
 
@@ -123,6 +125,9 @@ int main(void)
   MX_TIM14_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+
+  	// Start Timer 6 Interrupt
+  	HAL_TIM_Base_Start_IT(&htim6);
 
   	// Schreibe Resetquelle auf die Konsole
 #ifdef DEBUG
@@ -191,10 +196,9 @@ int main(void)
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
-	// Start Timer 6 mit Interrupt
-	HAL_TIM_Base_Start_IT(&htim6);
-
-  	uartTransmit("\nStarte While\n\n", 15);
+  	// Starte While-Schleife
+#define MAINWHILE				"\nStarte While Schleife\n"
+  	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 
   /* USER CODE END 2 */
 
@@ -212,6 +216,7 @@ int main(void)
 			millisekunden_flag_1 = 0;													// Setze Millisekunden-Flag zurueck
 
 			// Setze Flag start, nur wenn millisekunden Flag gesetzt war
+			task = 1;
 			task_start = 1;																// alle Task einmal ausfuehren
 		}
 
@@ -219,7 +224,7 @@ int main(void)
 		pwm_oelstand(count);
 
 		// Task wird alle 20 Millisekunden ausgefuehrt
-		if (((count % 20) == 0) && (task_start == 1))
+		if (((count % 20) == 0) && (task == 1))
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
@@ -227,17 +232,34 @@ int main(void)
 		}
 
 		// Task wird alle 100 Millisekunden ausgefuehrt
-		if (((count % 100) == 0) && (task_start == 1))
+		if (((count % 100) == 0) && (task == 1))
 		{
 			// alle Inputs einlesen
 			readall_inputs();
 
-			// Pedale pruefen, ADC-Gaspedal ausgeben
+			// Bremse pruefen
+//			readBrake();
+
+			// Gaspedal pruefen
+			gas_adc = readTrottle();
 			adc_gas = readPedals();
+
+			// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+			// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergrößern)
+			gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+
+			// Daten in Bamocarformat umwandeln
+			tmp[0] = 0x90;
+			tmp[1] = (gas_mean);
+			tmp[2] = ((gas_mean) >> 8);
+
+			// Drehmoment an Bamocar senden
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			//hal_error(status);
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
-		if (((count % 200) == 0) && (task_start == 1))
+		if (((count % 200) == 0) && (task == 1))
 		{
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
@@ -245,35 +267,46 @@ int main(void)
 			OutData[2] = (leuchten_out.ledoutput >> 8);
 			OutData[3] = leuchten_out.ledoutput;
 			OutData[4] = komfort_out.komfortoutput;
+			OutData[5] ++;
 
 			// Sende Nachricht digitale Ausgaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX1);
-			hal_error(status);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX2);
+			//hal_error(status);
 
 			// Daten fuer Eingaenge zusammenfuehren
-			InData[0] = (system_in.systeminput >> 8);
-			InData[1] = system_in.systeminput;
-			InData[2] = sdc_in.sdcinput;
-			InData[3] = (komfort_in.komfortinput >> 8);
-			InData[4] = komfort_in.komfortinput;
+			InData[0] ++;
+			InData[1] = (system_in.systeminput >> 8);
+			InData[2] = system_in.systeminput;
+			InData[3] = sdc_in.sdcinput;
+			InData[4] = (komfort_in.komfortinput >> 8);
+			InData[5] = komfort_in.komfortinput;
 
 			// Sende Nachricht digitale Eingaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX2);
-			hal_error(status);
-		}
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
+			//hal_error(status);
 
-		// Task wird alle 400 Millisekunden ausgefuehrt
-		if ((count == 400) && (task_start == 1))
-		{
-			count = 0;																	// Zaehler count zuruecksetzen
+			// Bamocar Fehler auslesen
+			tmp[0] = 0x3D;
+			tmp[1] = 0x8F;
+			tmp[2] = 0x00;
+
+			// Befehl Fehler auslesen an Bamocar senden
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			//hal_error(status);
+
+			// Variable count auf 0 zuruecksetzen
+			count = 0;
 		}
 
 		// Zuruecksetzen Flag start
-		task_start = 0;																	// Verhindern das Task mehrfach in einer Millisekunde ausgefuehrt werden
+		task = 0;
+
 
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
 	  	if (millis() - lastcan >= 5)
 		{
+	  		HAL_CAN_GetRxMessage(&hcan3, CAN_RX_FIFO0, &RxMessage, TxData);
+
 			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
 			if (can_change == 1)
 			{
@@ -286,11 +319,11 @@ int main(void)
 				}
 				uartTransmit("\n", 1);
 
-				// Sortieren der IDs nach Geräten
+				// Sortieren der IDs nach Geraeten
 				switch (RxMessage.StdId)
 				{
 					case BAMOCAR_RX_ID:
-						BAMOCAN_ID(&RxData[0]);
+						BAMOCAN_ID(&RxData[0], RxMessage.DLC);
 						break;
 					case 0x111:
 						uartTransmit("CAN-ID Computer config\n", 23);
@@ -304,17 +337,20 @@ int main(void)
 				TxData[2] = motor1.output[2];
 				TxData[3] = motor1.output[3];
 				lastcan = millis();
+
 				can_change = 0;
 			}
 		}
 
-		// Sende CAN Nachricht auf CAN-Bus
+#ifdef DEBUG
+		// Sende CAN Nachricht auf CAN-Bus / Teste CAN-BUS
 		if (millis() - lastsendcan >= 1000)
 		{
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
-			hal_error(status);
+			//hal_error(status);
 			lastsendcan = millis();
 		}
+#endif
   }
   /* USER CODE END 3 */
 }
@@ -374,8 +410,18 @@ void SystemClock_Config(void)
 // Can-Interrupt: Nachricht wartet
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
+	// Nachricht aus Speicher auslesen
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
 	can_change = 1;
+}
+
+// Can-Interrupt: Fifo0 ist voll
+void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
+{
+	// Fifo0 voll
+	uartTransmit("Fifo0 von CAN3 ist voll\n", 24);
+
+	Error_Handler();
 }
 
 // Timer-Interrupt: Timer ist uebergelaufen
@@ -400,16 +446,24 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();														// Interrupts deaktivieren
+
+	// Schalte Fehler LED ein
+	leuchten_out.RedLed = 1;												// Setze Variable
+	HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);	// Fehler LED einschalten
+
+	// Schalte Ok LED aus
+	leuchten_out.GreenLed = 0;												// Zuruechsetzen Variable
+	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);// Fehler LED ausschalten
+
+	// Sende Nachricht auf Uart-Interface
 #ifdef DEBUG
-#define ERRORMESSAGE			"\nError Handler ausgeloest\n"
-  uartTransmit(ERRORMESSAGE,sizeof(ERRORMESSAGE));
+#define STRING_ERROR_HANDLER			"Error Handler wird ausgefuehrt!!!"
+	uartTransmit(STRING_ERROR_HANDLER, sizeof(STRING_ERROR_HANDLER));
 #endif
-  while (1)
-  {
-  }
+	// Beginne Endlosschleife nachdem Fehler aufgetreten ist
+	while (1);
   /* USER CODE END Error_Handler_Debug */
 }
 
