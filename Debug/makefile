@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (9-2020-q2-update)
+# Toolchain: GNU Tools for STM32 (10.3-2021.10)
 ################################################################################
 
 -include ../makefile.init
@@ -44,14 +44,14 @@ BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ART
 EXECUTABLES += \
 Motorsteuergeraet.elf \
 
+MAP_FILES += \
+Motorsteuergeraet.map \
+
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
 Motorsteuergeraet.list \
-
-OBJCOPY_BIN += \
-Motorsteuergeraet.bin \
 
 
 # All Target
@@ -62,7 +62,7 @@ all:
 main-build: Motorsteuergeraet.elf secondary-outputs
 
 # Tool invocations
-Motorsteuergeraet.elf: $(OBJS) $(USER_OBJS) C:\Users\Frederik\Documents\Git\Audi_Motor\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+Motorsteuergeraet.elf Motorsteuergeraet.map: $(OBJS) $(USER_OBJS) C:\Users\Frederik\Documents\Git\Audi_Motor\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	arm-none-eabi-gcc -o "Motorsteuergeraet.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Frederik\Documents\Git\Audi_Motor\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Motorsteuergeraet.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
@@ -77,21 +77,16 @@ Motorsteuergeraet.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEP
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Motorsteuergeraet.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Motorsteuergeraet.bin"
-	@echo 'Finished building: $@'
-	@echo ' '
-
 # Other Targets
 clean:
-	-$(RM) Motorsteuergeraet.bin Motorsteuergeraet.elf Motorsteuergeraet.list default.size.stdout
+	-$(RM) Motorsteuergeraet.elf Motorsteuergeraet.list Motorsteuergeraet.map default.size.stdout
 	-@echo ' '
 
 pre-build:
 	$(MAKE) -f ../Make/git.mk
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

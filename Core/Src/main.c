@@ -59,6 +59,8 @@
 CAN_RxHeaderTypeDef RxMessage;
 uint8_t RxData[8];
 volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
+motor1_tag motor1;																	// Variable fuer Motor CAN-Nachricht 1 definieren
+motor2_tag motor2;																	// Variable fuer Motor CAN-Nachricht 2 definieren
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

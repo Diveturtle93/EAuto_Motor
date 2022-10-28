@@ -16,7 +16,7 @@
 
 // Strukturen definieren
 //----------------------------------------------------------------------
-union system_out_tag {
+typedef union __system_out_tag {
 	struct {
 		uint8_t J317 : 1;						// 0
 		uint8_t F54 : 1;						// 1
@@ -29,11 +29,11 @@ union system_out_tag {
 	};
 
 	uint8_t systemoutput;						// Byte
-} system_out;
+} system_out_tag;
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-union highcurrent_out_tag {
+typedef union __highcurrent_out_tag {
 	struct {
 		uint8_t Digital1 : 1;					// 0
 		uint8_t Digital2 : 1;					// 1
@@ -46,11 +46,11 @@ union highcurrent_out_tag {
 	};
 
 	uint8_t high_out;							// Byte
-} highcurrent_out;
+} highcurrent_out_tag;
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-union leuchten_out_tag {
+typedef union __leuchten_out_tag {
 	struct {
 		uint8_t Bremslicht : 1;					// 0
 		uint8_t Rueckfahrlicht : 1;				// 1
@@ -69,11 +69,11 @@ union leuchten_out_tag {
 	};
 
 	uint16_t ledoutput;							// 2 Byte
-} leuchten_out;
+} leuchten_out_tag;
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-union komfort_out_tag {
+typedef union __komfort_out_tag {
 	struct {
 		uint8_t BC_Rst_Out : 1;					// 0
 		uint8_t BC_Up_Out : 1;					// 1
@@ -83,7 +83,7 @@ union komfort_out_tag {
 	};
 
 	uint8_t komfortoutput;						// Byte
-} komfort_out;
+} komfort_out_tag;
 //----------------------------------------------------------------------
 
 // Definiere Konstanten
@@ -92,6 +92,14 @@ union komfort_out_tag {
 #define HIGHCURRENT_OUT				0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
 #define LED_OUTPUT					0b0001000000000000						// 16 Bit, 14 Leuchtdioden
 #define KOMFORT_OUTPUT				0b00000000								// 8 Bit, 5 Komfortausgaenge
+//----------------------------------------------------------------------
+
+// Definiere globale Variablen
+//----------------------------------------------------------------------
+extern system_out_tag system_out;											// Variable fuer Systemausgaenge definieren
+extern highcurrent_out_tag highcurrent_out;									// Variable fuer Hochstromausgaenge definieren
+extern leuchten_out_tag leuchten_out;										// Variable fuer Leuchtenausgaenge definieren
+extern komfort_out_tag komfort_out;											// Variable fuer Komfortausgaenge definieren
 //----------------------------------------------------------------------
 
 // Funktionen definieren

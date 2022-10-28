@@ -315,7 +315,7 @@
 
 // Definiere Union Statusinformationen Ein- / Augaenge (NDrive S.21)
 //----------------------------------------------------------------------
-union bamocar_statusIO_tag {
+typedef union __bamocar_statusIO_tag {
 	struct {
 		uint8_t LMT1 : 1;													// Digitaler Eingang Limit 1 aktiv
 		uint8_t LMT2 : 1;													// Digitaler Eingang Limit 2 aktiv
@@ -337,12 +337,12 @@ union bamocar_statusIO_tag {
 	uint16_t status1;														// Status in 16 Bit Variable
 
 	uint8_t status[2];														// Status in Array
-} bamocar_statIO;
+} bamocar_statusIO_tag;
 //----------------------------------------------------------------------
 
 // Definiere Union Status Geraeteinformationen (NDrive S. 22)
 //----------------------------------------------------------------------
-union bamocar_status_tag {
+typedef union __bamocar_status_tag {
 	struct {
 		uint8_t Ena : 1;													// Antrieb freigegeben (Kombination Hardware RUN und Software)
 		uint8_t NcR0 : 1;													// Drehzahl auf null begrenzt
@@ -381,12 +381,12 @@ union bamocar_status_tag {
 	uint32_t status1;														// Status in 32 Bit Variable
 
 	uint8_t status[4];														// Status in Array
-} bamocar_stat;
+} bamocar_status_tag;
 //----------------------------------------------------------------------
 
 // Definiere Union Bamocar Error (NDrive S. 23)
 //----------------------------------------------------------------------
-union bamocar_error_tag {
+typedef union __bamocar_error_tag {
 	struct {
 		uint8_t BadParas : 1;												// Parameter beschaedigt
 		uint8_t PowerFault : 1;												// Hardware-Fehler
@@ -408,12 +408,12 @@ union bamocar_error_tag {
 	uint16_t error1;														// Status in 16 Bit Variable
 
 	uint8_t error[2];														// Status in Array
-} bamocar_error;
+} bamocar_error_tag;
 //----------------------------------------------------------------------
 
 // Definiere Union Bamocar Warnungen (NDrive S. 24)
 //----------------------------------------------------------------------
-union bamocar_warnung_tag {
+typedef union __bamocar_warnung_tag {
 	struct {
 		uint8_t Warnung0 : 1;												// Geraeteerkennung inkonsistent
 		uint8_t IllegalStatus : 1;											// RUN Signal gestoert, EMV
@@ -432,16 +432,25 @@ union bamocar_warnung_tag {
 	uint16_t warnung1;														// Status in 16 Bit Variable
 
 	uint8_t warnung[2];														// Status in Array
-} bamocar_warnung;
+} bamocar_warnung_tag;
 //----------------------------------------------------------------------
 
 // Daten gelesener Register
 //----------------------------------------------------------------------
-union bamocar_can_read_tag {
+typedef union __bamocar_can_read_tag {
 	uint32_t data;															// Status in 16 Bit Variable
 
 	uint8_t can[4];															// Status in Array
-} bamocar_data;
+} bamocar_can_read_tag;
+//----------------------------------------------------------------------
+
+// Definiere globale Variablen
+//----------------------------------------------------------------------
+extern bamocar_statusIO_tag bamocar_IOstatus;								// Variable fuer IO Status definieren
+extern bamocar_status_tag bamocar_stat;										// Variable fuer Status definieren
+extern bamocar_error_tag bamocar_error;										// Variable fuer Error definieren
+extern bamocar_warnung_tag bamocar_warnung;									// Variable fuer Warnung definieren
+extern bamocar_can_read_tag bamocar_data;									// Variable fuer CAN-Daten definieren
 //----------------------------------------------------------------------
 
 // Funktionen definieren

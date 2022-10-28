@@ -26,6 +26,15 @@
 #include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
+// Variablen einbinden
+//----------------------------------------------------------------------
+bamocar_statusIO_tag bamocar_IOstatus;										// Variable fuer IO Status definieren
+bamocar_status_tag bamocar_stat;											// Variable fuer Status definieren
+bamocar_error_tag bamocar_error;											// Variable fuer Error definieren
+bamocar_warnung_tag bamocar_warnung;										// Variable fuer Warnung definieren
+bamocar_can_read_tag bamocar_data;											// Variable fuer CAN-Daten definieren
+//----------------------------------------------------------------------
+
 // Lese Bamocar Register
 //----------------------------------------------------------------------
 void readBAMOReg(uint8_t REG)
@@ -149,14 +158,14 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 
 		// Status IO Register von Bamocar bekommen
 		case BAMOCAR_REG_STATUS_IO:
-			bamocar_statIO.status1 = ((data[2] << 8) + data[1]);
+			bamocar_IOstatus.status1 = ((data[2] << 8) + data[1]);
 
 // Uart Ausgabe
 #ifdef DEBUG
 			uartTransmit("Bamocar IO Status\n", 18);
 			for (uint8_t i = 0; i < 2; i++)
 			{
-				uartTransmitNumber(bamocar_statIO.status[i], 16);
+				uartTransmitNumber(bamocar_IOstatus.status[i], 16);
 				uartTransmit(" ", 1);
 			}
 			uartTransmit("\n", 1);

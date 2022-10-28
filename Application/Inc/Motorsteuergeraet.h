@@ -52,7 +52,7 @@
 
 // Definiere CAN Strukturen
 //----------------------------------------------------------------------
-union motor1_tag {
+typedef union __motor1_tag {
 	struct {
 		uint8_t xxxx : 4;													// Ersten 4 Bit
 		uint8_t Bremse : 1;													// Bit 3 des ersten Bytes
@@ -67,9 +67,9 @@ union motor1_tag {
 	};
 
 	uint8_t output[8];														// 8 Byte
-} motor1;
+} motor1_tag;
 //----------------------------------------------------------------------
-union motor2_tag {
+typedef union __motor2_tag {
 	struct {
 		uint8_t Sicherheit;													// Byte 7, Vier Werte wiedeholend, je 4 mal, 07, 53, 8F, D9
 		uint8_t xxxx;														// Byte 6, ??
@@ -82,7 +82,13 @@ union motor2_tag {
 	};
 
 	uint8_t motor2output[8];												// 8 Byte
-} motor2;
+} motor2_tag;
+//----------------------------------------------------------------------
+
+// Definiere globale Variablen
+//----------------------------------------------------------------------
+extern motor1_tag motor1;													// Variable fuer Motor CAN-Nachricht 1 definieren
+extern motor2_tag motor2;													// Variable fuer Motor CAN-Nachricht 2 definieren
 //----------------------------------------------------------------------
 
 #endif /* MOTORSTEUERGERAET_H_ */
