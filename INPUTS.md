@@ -28,32 +28,32 @@ Nachfolgend ist eine Auflistung aller Eingangspins vom Mikrocontroller.
 
 | Funktionsgruppe | Pin | Funktion | Relevanz | Getestet |
 |:--------------- |:---:|:-------- |:-------- | --------:|
-| Shutdown Circuit | PA0 | Crash | System | No |
+| Shutdown Circuit | PA0 | Crash | System | Ja |
 | Shutdown Circuit | PA1 | Emergency Run | System | No |
 | STM32 | PA2 | Wakeup | Komfort | No |
 | Navibedienelement | PA9 | Out A | Komfort | Ja |
 | Navibedienelement | PA10 | Out B | Komfort | Ja |
 | Board Computer | PA11 | Up In | Komfort | No |
 | Shutdown Circuit | PB10 | BTB Sense | System | No |
-| Fahrzeug | PB15 | Anlasser | System | No |
+| Fahrzeug | PB15 | Anlasser | System | Ja |
 | SD-Card | PC6 | SD Switch | Komfort | No |
 | Navibedienelement | PC7 | Enter | Komfort | Ja |
 | STM32 | PC13 | Button 1 | Komfort | No |
 | ASR | PD4 | ASR 2 | Komfort | No |
-| Fahrzeug | PD8 | KL15 | System | No |
+| Fahrzeug | PD8 | KL15 | System | Ja |
 | Bamocar | PD10 | Bamo In 2 | Komfort | No |
 | Bamocar | PD12 | Bamo In 1 | Komfort | No |
 | ASR | PE3 | Eco | Komfort | No |
 | Board Computer | PE4 | Down In | Komfort | No |
 | Fahrzeug | PE5 | Durchfluss | Komfort | No |
 | STM32 | PE6 | Button 2 | Komfort | No |
-| Pedale | PE8 | Kickdown | System | No |
-| Pedale | PE9 | Leerlauf | System | No |
-| Pedale | PE10 | Kuplung NO | System | No |
+| Pedale | PE8 | Kickdown | System | Ja |
+| Pedale | PE9 | Leerlauf | System | Ja |
+| Pedale | PE10 | Kuplung NO | System | Ja |
 | Pedale | PE11 | Bremse NC | System | No |
 | Pedale | PE12 | Bremse NO | System | No |
 | Shutdown Circuit | PE13 | AKKU Sense | System | No |
-| Shutdown Circuit | PE14 | SDC0 Sense | System | No |
+| Shutdown Circuit | PE14 | SDC0 Sense | System | Ja |
 | ASR | PF1 | ECON | Komfort | No |
 | Fahrzeug | PF11 | Recuperation | Komfort | No |
 | DCDC | PG0 | Instruction | System | No |

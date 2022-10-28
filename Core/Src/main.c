@@ -138,6 +138,7 @@ int main(void)
 
 	// Leds Testen
   	testPCB_Leds();
+	testCockpit_Leds();
 
   	// Testen der Versorgungsspannung am Shutdown-Circuit
   	testSDC();
@@ -171,10 +172,10 @@ int main(void)
     sFilterConfig.FilterBank = 0;
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterIdHigh = 0x0111 << 5;
+    sFilterConfig.FilterIdLow = 0;
+    sFilterConfig.FilterMaskIdHigh = 0x111 << 5;
+    sFilterConfig.FilterMaskIdLow = 0;
     sFilterConfig.FilterFIFOAssignment = 0;
     sFilterConfig.FilterActivation = ENABLE;
 
@@ -276,7 +277,7 @@ int main(void)
 			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
 			if (can_change == 1)
 			{
-				// Nachricht ID über UART ausgeben
+				// Nachricht ID ueber UART ausgeben
 				uartTransmitNumber(RxMessage.StdId, 16);
 				uartTransmit("\t", 1);
 				for (uint8_t i = 0; i < RxMessage.DLC; i++)

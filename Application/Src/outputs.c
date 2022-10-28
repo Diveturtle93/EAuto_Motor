@@ -130,6 +130,22 @@ void testPCB_Leds(void)
 }
 //----------------------------------------------------------------------
 
+// Teste Cockpit LEDs
+//----------------------------------------------------------------------
+void testCockpit_Leds(void)
+{
+	// Leds Testen
+    HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, GPIO_PIN_SET);							// Teste Anhaenger LED, an (Cockpit ECO)
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, GPIO_PIN_RESET);							// Teste Anhaenger LED, aus (Cockpit ECO)
+    HAL_Delay(500);																					// Warte 0.5s
+    HAL_GPIO_WritePin(RESERVE_OUT_GPIO_Port, RESERVE_OUT_Pin, GPIO_PIN_SET);						// Teste Reserve LED, an (Cockpit Niveauregulierung)
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(RESERVE_OUT_GPIO_Port, RESERVE_OUT_Pin, GPIO_PIN_RESET);						// Teste Reserve LED, aus (Cockpit Niveauregulierung)
+    HAL_Delay(500);																					// Warte 0.5s
+}
+//----------------------------------------------------------------------
+
 // PWM fuer Oelstandsensor am Kombiinstrument
 //----------------------------------------------------------------------
 void pwm_oelstand(uint16_t time)

@@ -105,6 +105,7 @@ void init_outputs(void);													// Initialisiere Ausgaenge
 void writeall_outputs(void);												// Schreibe alle Ausgaenge
 void writeled_outputs(void);												// Schreibe alle LED-Ausgaenge
 void testPCB_Leds(void);													// Teste PCB LEDs fuer je 1s
+void testCockpit_Leds(void);												// Teste Cockpit LEDs fuer je 1s
 void pwm_oelstand(uint16_t time);											// Oelstandsensor simulieren, Fehler in Cockpit unterdruecken
 void cockpit_default(void);													// Fehler am Cockpit deaktivieren
 void testSDC(void);															// Teste SDC Spannung
