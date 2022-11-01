@@ -8,17 +8,17 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der standard Include-Dateien
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "adc.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "adc_inputs.h"
 #include "error.h"

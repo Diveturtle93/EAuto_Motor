@@ -16,7 +16,9 @@
 
 // Definiere Debug Symbol
 //----------------------------------------------------------------------
-//#define HAL_DEBUG
+//#define DEBUG_HAL
+//#define DEBUG_SWO
+#define DEBUG_SDC
 //----------------------------------------------------------------------
 
 // Festlegen der Fehlercodes

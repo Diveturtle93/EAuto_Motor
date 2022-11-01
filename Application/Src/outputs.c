@@ -201,7 +201,10 @@ void testSDC(void)
 	HAL_Delay(100);																					// Wartezeit zum setzen
 	if (HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin) == 1)								// Einlesen von SDC0 Eingang
 	{
+#ifndef DEBUG_SDC
 		software_error(ERROR_SDC_SPANNUNG);															// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
+		// TODO: Else schreiben
+#endif
 	}
 	HAL_Delay(100);																					// Wartezeit zum setzen
 	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_RESET);					// Auschalten von Shutdown-Circuit

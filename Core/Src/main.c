@@ -93,7 +93,7 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5] = {0}, InData[5] = {0}, status, tmp[4], task = 0;
+	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, status, tmp[4], task = 0;
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
 
@@ -106,6 +106,7 @@ int main(void)
   	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
 	// Sendenachricht Motorsteuergeraet Motor1 erstellen
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
   	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 
   /* USER CODE END Init */
@@ -155,44 +156,7 @@ int main(void)
   	// Lese alle Eingaenge
   	readall_inputs();
 
-  	// Starte CAN Bus
-  	if((status = HAL_CAN_Start(&hcan3)) != HAL_OK)
-  	{
-  		/* Start Error */
-  		hal_error(status);
-  		Error_Handler();
-  	}
-  	uartTransmit("CAN START\n", 10);
-
-  	// Aktiviere Interrupts für CAN Bus
-  	if((status = HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
-  	{
-  		// Notification Error
-  		hal_error(status);
-  		Error_Handler();
-  	}
-  	uartTransmit("Send Message\n", 13);
-
-  	// Filter Bank initialisieren um Daten zu empfangen
-    sFilterConfig.FilterBank = 0;
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0111 << 5;
-    sFilterConfig.FilterIdLow = 0;
-    sFilterConfig.FilterMaskIdHigh = 0x111 << 5;
-    sFilterConfig.FilterMaskIdLow = 0;
-    sFilterConfig.FilterFIFOAssignment = 0;
-    sFilterConfig.FilterActivation = ENABLE;
-
-    // Filter Bank schreiben
-    if((status = HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
-    {
-    	// Filter configuration Error
-  		hal_error(status);
-  		Error_Handler();
-    }
-
-    // Sendenachricht 0x123 mit Dummy-Daten füllen
+    // Sendenachricht 0x123 mit Dummy-Daten fuellen
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
@@ -217,7 +181,6 @@ int main(void)
 
 			// Setze Flag start, nur wenn millisekunden Flag gesetzt war
 			task = 1;
-			task_start = 1;																// alle Task einmal ausfuehren
 		}
 
 		// PWM Oelstandsensor Kombiinstrument ausgeben
@@ -242,7 +205,6 @@ int main(void)
 
 			// Gaspedal pruefen
 			gas_adc = readTrottle();
-			adc_gas = readPedals();
 
 			// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
 			// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergrößern)
@@ -280,6 +242,8 @@ int main(void)
 			InData[3] = sdc_in.sdcinput;
 			InData[4] = (komfort_in.komfortinput >> 8);
 			InData[5] = komfort_in.komfortinput;
+
+			HAL_Delay(10);
 
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
@@ -431,10 +395,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
 	{
 		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
-	}
-	if (htim == &htim14)																// Wenn Timer 14 den ueberlauf ausgeloest hat
-	{
-
 	}
 }
 /* USER CODE END 4 */

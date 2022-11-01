@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------
 void hal_error(uint8_t status)
 {
-#ifdef HAL_DEBUG
+#ifdef DEBUG_HAL
 	if (status == HAL_OK) {													// HAL OK
 		uartTransmit("HAL OK\n", 7);
 	}
@@ -47,14 +47,6 @@ void hal_error(uint8_t status)
 void software_error(uint8_t errorcode)
 {
 	__disable_irq();														// Interrupts deaktivieren
-
-	// Schalte Fehler LED ein
-	leuchten_out.RedLed = 1;												// Setze Variable
-	HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);	// Fehler LED einschalten
-
-	// Schalte Ok LED aus
-	leuchten_out.GreenLed = 0;												// Zuruechsetzen Variable
-	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);// Fehler LED ausschalten
 
 	// Schalte Fehler LED ein
 	leuchten_out.RedLed = 1;												// Setze Variable
@@ -86,7 +78,7 @@ void software_error(uint8_t errorcode)
 //----------------------------------------------------------------------
 void ITM_SendString(char *text)
 {
-#ifdef DEBUG
+#ifdef DEBUG_SWO
 	// So lange *text != '\0', also ungleich dem "String-Endezeichen(Terminator)"
 	while(*text)															// Starte Pointerschleife
 	{
@@ -101,7 +93,7 @@ void ITM_SendString(char *text)
 //----------------------------------------------------------------------
 void ITM_SendNumber(long number)
 {
-#ifdef DEBUG
+#ifdef DEBUG_SWO
 	// Variablen definieren
 	unsigned char buf[8 * sizeof(long)];
 	unsigned int i = 0;
@@ -141,7 +133,7 @@ void ITM_SendNumber(long number)
 //----------------------------------------------------------------------
 void ITM_SendFloat(double number, int digits)
 {
-#ifdef DEBUG
+#ifdef DEBUG_SWO
 	int i = 0;
 
 	// Wenn Zahl negativ ist
