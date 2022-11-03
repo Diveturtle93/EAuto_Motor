@@ -34,8 +34,8 @@ uint16_t readTrottle(void)
 	// Variablen anlegen
 	uint16_t ADC_Gas = 0;
 
-	// Pruefen ob KL15 aktiv ist
-	if (system_in.KL15 != 1)
+	// Pruefen ob Variable Anlasser aktiv ist
+	if (sdc_in.Anlasser == 1)												// Nur aktiv, wenn KL15 an und Anlasser einmal betaetigt.
 	{
 		// Gaspedal einlesen
 		ADC_Gas = ADC_Gaspedal();
@@ -89,7 +89,7 @@ uint16_t readTrottle(void)
 }
 //----------------------------------------------------------------------
 
-/* // Bremse auswerten
+// Bremse auswerten
 //----------------------------------------------------------------------
 void readBrake(void)
 {
@@ -116,4 +116,4 @@ void readBrake(void)
 		software_error(ERROR_BREMSPEDAL);
 	}
 }
-//----------------------------------------------------------------------*/
+//----------------------------------------------------------------------

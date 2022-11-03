@@ -16,6 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
+#include "inputs.h"
 #include "error.h"
 //----------------------------------------------------------------------
 
@@ -203,8 +204,14 @@ void testSDC(void)
 	{
 #ifndef DEBUG_SDC
 		software_error(ERROR_SDC_SPANNUNG);															// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
-		// TODO: Else schreiben
+#else
+#warning Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren.
+		software_error_debug(ERROR_SDC_SPANNUNG);													// Errorfunktion stoppt Programm nicht
 #endif
+	}
+	else
+	{
+	  	sdc_in.SDC12V = 1;																			// SDC Spannungsversorgung OK
 	}
 	HAL_Delay(100);																					// Wartezeit zum setzen
 	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_RESET);					// Auschalten von Shutdown-Circuit

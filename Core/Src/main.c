@@ -123,7 +123,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
-  MX_TIM14_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
@@ -148,10 +147,12 @@ int main(void)
 
   	// Testen der Versorgungsspannung am Shutdown-Circuit
   	testSDC();
-  	sdc_in.SDC12V = 1;																	// SDC Spannungsversorgung OK
 
   	// Alle Fehler Cockpit loeschen
   	cockpit_default();
+  	// Setze LED Green
+  	leuchten_out.GreenLed = 1;
+  	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
 
   	// Lese alle Eingaenge
   	readall_inputs();
@@ -200,15 +201,26 @@ int main(void)
 			// alle Inputs einlesen
 			readall_inputs();
 
+			// Anlasser abfragen
+			readAnlasser();
+
 			// Bremse pruefen
-//			readBrake();
+			readBrake();
 
 			// Gaspedal pruefen
 			gas_adc = readTrottle();
 
-			// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
-			// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergrößern)
-			gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+			// Abfrage ob Mittelwertbildung
+			if (gas_adc > 0)															// Wenn Gaspedal Plausible dann Mittelwertbildung
+			{
+				// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+				// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
+				gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+			}
+			else																		// Wenn Gaspedal unplausible oder Kupplung getreten
+			{
+				gas_mean = 0;
+			}
 
 			// Daten in Bamocarformat umwandeln
 			tmp[0] = 0x90;
@@ -332,6 +344,7 @@ void SystemClock_Config(void)
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -348,12 +361,14 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Activate the Over-Drive mode
   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -443,4 +458,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

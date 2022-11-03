@@ -23,14 +23,14 @@
 
 // Konstanten definieren
 //----------------------------------------------------------------------
-#define GAS_MAX_ADC							4095
-#define GAS_THRESHOLD						300
+#define GAS_MAX_ADC							4095							// Maximaler ADC-Wert
+#define GAS_THRESHOLD						300								// Thresholdwert fuer Gaspedal ADC
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-uint16_t readTrottle(void);
-uint16_t readPedals(void);
+uint16_t readTrottle(void);													// Gaspedal auswerten
+void readBrake(void);														// Bremspedal auswerten
 //----------------------------------------------------------------------
 
 #endif /* INC_PEDALE_H_ */

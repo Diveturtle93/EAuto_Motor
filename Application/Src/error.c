@@ -71,6 +71,32 @@ void software_error(uint8_t errorcode)
 }
 //----------------------------------------------------------------------
 
+// Diagnose Funktion falls ein Fehler auftritt (Nur Debugzwecke)
+//----------------------------------------------------------------------
+void software_error_debug(uint8_t errorcode)
+{
+	// Schalte Fehler LED ein
+	leuchten_out.RedLed = 1;												// Setze Variable
+	HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);	// Fehler LED einschalten
+
+	// Schalte Ok LED aus
+	leuchten_out.GreenLed = 0;												// Zuruechsetzen Variable
+	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);// OK LED ausschalten
+
+	// Schalte SDC_Motor aus
+	system_out.MotorSDC = 0;												// Zuruecksetzen Variable
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, system_out.MotorSDC);// SDC oeffnen
+#ifdef DEBUG																// Serielle Kommunukation nur waehrend Debugging
+#define SOFTERRORMESSAGE			"\nSoftware Error Handler ausgeloest\n"	// Ausgabe das Fehler aufgetreten ist
+	uartTransmit(SOFTERRORMESSAGE,sizeof(SOFTERRORMESSAGE));
+
+#define ERRORCODE					"Error Code:\t"							// Ausgabe des Fehlers anhand von Fehlercode
+	uartTransmit(ERRORCODE,sizeof(ERRORCODE));
+	uartTransmitNumber(errorcode, 10);										// Fehlercode ausgeben
+#endif
+}
+//----------------------------------------------------------------------
+
 // Debug Nachricht ueber SWO senden
 // Nachricht SWO ITM Data Console
 // Core Clock := Maximalfrequenz ; HCLK fuer Serial Wire Viewer

@@ -39,6 +39,7 @@ void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 1 */
 
   /* USER CODE END ADC1_Init 1 */
+
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
   hadc1.Instance = ADC1;
@@ -57,6 +58,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_14;
@@ -66,6 +68,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_6;
@@ -74,6 +77,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_4;
@@ -83,6 +87,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_5;
@@ -91,6 +96,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_15;
@@ -100,6 +106,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_3;
@@ -109,6 +116,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_7;
@@ -117,6 +125,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
@@ -125,6 +134,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_8;
@@ -134,6 +144,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
   sConfig.Channel = ADC_CHANNEL_9;

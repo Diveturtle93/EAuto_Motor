@@ -26,7 +26,7 @@ sdc_in_tag sdc_in;															// Variable fuer SDC-Eingaenge definieren
 komfort_in_tag komfort_in;													// Variable fuer Komforteingaenge definieren
 //----------------------------------------------------------------------
 
-// Lese alle Eingaenge
+// Alle Eingaenge einlesen und speichern
 //----------------------------------------------------------------------
 void readall_inputs(void)
 {
@@ -89,5 +89,20 @@ void readall_inputs(void)
 	ITM_SendNumber(komfort_in.komfortinput);
 	ITM_SendChar('\n');
 #endif
+}
+//----------------------------------------------------------------------
+
+// Anlasser einlesen, Wert in Variable speichern, bis KL15 abfaellt
+//----------------------------------------------------------------------
+void readAnlasser(void)
+{
+	if (system_in.Anlasser == 1)
+	{
+		sdc_in.Anlasser = 1;
+	}
+	else if ((sdc_in.Anlasser == 1) && (system_in.KL15 != 1))
+	{
+		sdc_in.Anlasser = 0;
+	}
 }
 //----------------------------------------------------------------------

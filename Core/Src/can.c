@@ -104,8 +104,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
   /* USER CODE END CAN3_MspInit 0 */
     /* CAN3 clock enable */
     __HAL_RCC_CAN3_CLK_ENABLE();
-    __HAL_RCC_CAN2_CLK_ENABLE();
-    __HAL_RCC_CAN1_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**CAN3 GPIO Configuration
@@ -138,8 +136,6 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
   /* USER CODE END CAN3_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_CAN3_CLK_DISABLE();
-    __HAL_RCC_CAN2_CLK_DISABLE();
-    __HAL_RCC_CAN1_CLK_DISABLE();
 
     /**CAN3 GPIO Configuration
     PA8     ------> CAN3_RX
