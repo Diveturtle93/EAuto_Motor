@@ -52,6 +52,9 @@
 
 /* USER CODE BEGIN PV */
 int32_t temperature;
+uint8_t UART2_rxBuffer[12] = {0};
+uint8_t UART2_msg[12] = {0};
+uint8_t uart_count = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -162,7 +165,7 @@ int main(void)
 
 	uartTransmit("KL15: ", 6);
 	uartTransmitNumber(ADC_VAL[0], 10);
-	if (ADC_VAL[0] > 3030 || ADC_VAL[1] < 2980)						// @12V Versorgungsspannung
+	if (ADC_VAL[0] > 3030 || ADC_VAL[0] < 2980)						// @12V Versorgungsspannung
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
@@ -235,6 +238,7 @@ int main(void)
 	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
 	HAL_Delay(500);
 	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
+    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
 
   /* USER CODE END 2 */
 
@@ -243,6 +247,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  if (UART2_msg[0] == 1)
+	  {
+		  HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
+		  NVIC_SystemReset();
+	  }
+	  HAL_Delay(1000);
+	  HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
 
     /* USER CODE BEGIN 3 */
   }
@@ -303,7 +314,42 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	HAL_UART_Transmit(&huart2, &UART2_rxBuffer[uart_count], 1, 100);
 
+	if (UART2_rxBuffer[uart_count] == 0x7F)
+	{
+		uart_count--;
+	}
+	else
+	{
+		uart_count++;
+	}
+
+	if (UART2_rxBuffer[uart_count-1] == '\r')
+	{
+		HAL_UART_Transmit(&huart2, (uint8_t*)"\nEingabe OK\r\n", 13, 100);
+		if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'S')
+		{
+			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
+			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
+			HAL_UART_Transmit(&huart2, c, 10, 100);
+			UART2_msg[0] = 1;
+		}
+		uart_count = 0;
+	}
+
+	if (uart_count == 12)
+	{
+		uint8_t tmp = 0x81;
+		HAL_UART_Transmit(&huart2, (uint8_t*) "\r\nEingabe Ung", 13, 100);
+		HAL_UART_Transmit(&huart2, &tmp, 1, 100);
+		HAL_UART_Transmit(&huart2, (uint8_t*) "ltig\r\n", 6, 100);
+		uart_count = 0;
+	}
+    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
+}
 /* USER CODE END 4 */
 
 /**
