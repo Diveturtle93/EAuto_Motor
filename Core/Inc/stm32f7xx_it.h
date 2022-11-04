@@ -56,6 +56,7 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
+void USART2_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 void CAN3_RX0_IRQHandler(void);
 /* USER CODE BEGIN EFP */
@@ -67,5 +68,3 @@ void CAN3_RX0_IRQHandler(void);
 #endif
 
 #endif /* __STM32F7xx_IT_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

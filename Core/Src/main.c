@@ -305,12 +305,12 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -327,12 +327,14 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Activate the Over-Drive mode
   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -346,16 +348,47 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2;
-  PeriphClkInitStruct.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
 }
 
 /* USER CODE BEGIN 4 */
 // Interrupts
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	HAL_UART_Transmit(&huart2, &UART2_rxBuffer[uart_count], 1, 100);
+
+	if (UART2_rxBuffer[uart_count] == 0x7F)
+	{
+		uart_count--;
+	}
+	else
+	{
+		uart_count++;
+	}
+
+	if (UART2_rxBuffer[uart_count-1] == '\r')
+	{
+		HAL_UART_Transmit(&huart2, (uint8_t*)"\nEingabe OK\r\n", 13, 100);
+		if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'S')
+		{
+			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
+			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
+			HAL_UART_Transmit(&huart2, c, 10, 100);
+			UART2_msg[0] = 1;
+		}
+		uart_count = 0;
+	}
+
+	if (uart_count == 12)
+	{
+		uint8_t tmp = 0x81;
+		HAL_UART_Transmit(&huart2, (uint8_t*) "\r\nEingabe Ung", 13, 100);
+		HAL_UART_Transmit(&huart2, &tmp, 1, 100);
+		HAL_UART_Transmit(&huart2, (uint8_t*) "ltig\r\n", 6, 100);
+		uart_count = 0;
+	}
+    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
+}
+
 // Can-Interrupt: Nachricht wartet
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
@@ -428,5 +461,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,3 +1,4 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    usart.c
@@ -6,17 +7,16 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
 
@@ -62,11 +62,22 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(uartHandle->Instance==USART2)
   {
   /* USER CODE BEGIN USART2_MspInit 0 */
 
   /* USER CODE END USART2_MspInit 0 */
+
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+    PeriphClkInitStruct.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     /* USART2 clock enable */
     __HAL_RCC_USART2_CLK_ENABLE();
 
@@ -82,6 +93,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+    /* USART2 interrupt Init */
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspInit 1 */
 
   /* USER CODE END USART2_MspInit 1 */
@@ -105,6 +119,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOD, DEBUG_UART2TX_Pin|DEBUG_UART2RX_Pin);
 
+    /* USART2 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspDeInit 1 */
 
   /* USER CODE END USART2_MspDeInit 1 */
@@ -114,5 +130,3 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
