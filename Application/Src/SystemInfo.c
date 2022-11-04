@@ -8,7 +8,7 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der standard Include-Dateien
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
 #include "inttypes.h"
 #include "stdlib.h"
@@ -16,14 +16,14 @@
 #include "stdbool.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include-Dateien
+// Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
 #include "SystemInfo.h"
 #include "BasicUart.h"
 #include "git.h"
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "stm32f7xx_hal.h"
 //#include "cmsis_os.h"													//Collect Information from RTOS CMSIS LAYER
@@ -190,25 +190,25 @@ reset_reason readResetSource(void)
 {
 	reset_reason reset_flags = STARTUP;
 
-	// Prüfe Reset Flag Internen Watchdog
+	// Pruefe Reset Flag Internen Watchdog
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_IWDGRST) == true)
 	{
 		reset_flags += IWDG1;
 	}
 
-	// Prüfe Reset Flag Window Watchdog
+	// Pruefe Reset Flag Window Watchdog
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_WWDGRST) == true)
 	{
 		reset_flags += WWDG1;
 	}
 
-	// Prüfe Reset Flag Low Power Reset
+	// Pruefe Reset Flag Low Power Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_LPWRRST) == true)
 	{
 		reset_flags += CPURST1;
 	}
 
-	// Prüfe Reset Flag Brown Out Reset
+	// Pruefe Reset Flag Brown Out Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_BORRST) == true)
 	{
 		reset_flags += BORST1;
@@ -220,19 +220,19 @@ reset_reason readResetSource(void)
 		reset_flags += PORST1;
 	}
 
-	// Prüfe Reset Flag Software Reset
+	// Pruefe Reset Flag Software Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_SFTRST) == true)
 	{
 		reset_flags += SFTRST1;
 	}
 
-	// Prüfe Reset Flag Pin-Reset
+	// Pruefe Reset Flag Pin-Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) == true)
 	{
 		reset_flags += PINRST1;
 	}
 
-	// Lösche alle Reset Flags
+	// Loesche alle Reset Flags
 	__HAL_RCC_CLEAR_RESET_FLAGS();
 
 	return reset_flags;
@@ -243,7 +243,7 @@ reset_reason readResetSource(void)
 //----------------------------------------------------------------------
 void printResetSource(reset_reason reset_flags)
 {
-	if (reset_flags == STARTUP)											// Regulärer Start
+	if (reset_flags == STARTUP)											// Regulaerer Start
 	{
 		uartTransmit("Regular Start\r\n", 15);
 	}

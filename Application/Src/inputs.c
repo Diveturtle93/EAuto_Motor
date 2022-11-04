@@ -8,12 +8,12 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "main.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "inputs.h"
 //----------------------------------------------------------------------
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------
 void readall_inputs(void)
 {
-	// Systemeingaenge einlesen
+/*	// Systemeingaenge einlesen
 	system_in.Kickdown = HAL_GPIO_ReadPin(KICKDOWN_GPIO_Port, KICKDOWN_Pin);
 	system_in.Leerlauf = HAL_GPIO_ReadPin(LEERLAUF_GPIO_Port, LEERLAUF_Pin);
 	system_in.BremseNO = HAL_GPIO_ReadPin(BREMSE_NO_GPIO_Port, BREMSE_NO_Pin);
@@ -63,6 +63,6 @@ void readall_inputs(void)
 	komfort_in.GRA2 = HAL_GPIO_ReadPin(GRA2_GPIO_Port, GRA2_Pin);
 	komfort_in.GRA3 = HAL_GPIO_ReadPin(GRA3_GPIO_Port, GRA3_Pin);
 	komfort_in.GRA4 = HAL_GPIO_ReadPin(GRA4_GPIO_Port, GRA4_Pin);
-	komfort_in.Durchfluss = HAL_GPIO_ReadPin(DURCHFLUSS_GPIO_Port, DURCHFLUSS_Pin);
+	komfort_in.Durchfluss = HAL_GPIO_ReadPin(DURCHFLUSS_GPIO_Port, DURCHFLUSS_Pin);*/
 }
 //----------------------------------------------------------------------

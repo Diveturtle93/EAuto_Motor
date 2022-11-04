@@ -16,7 +16,7 @@
 
 // Strukturen definieren
 //----------------------------------------------------------------------
-struct system_out_tag {
+/*struct system_out_tag {
 	uint8_t J317 : 1;						// 0
 	uint8_t F54 : 1;						// 1
 	uint8_t F18 : 1;						// 2
@@ -61,7 +61,7 @@ struct komfort_out_tag {
 	uint8_t BC_Down_Out : 1;				// 2
 	uint8_t BamoOut1 : 1;					// 3
 	uint8_t BamoOut2 : 1;					// 4
-} komfort_out;
+} komfort_out;*/
 //----------------------------------------------------------------------
 
 // Definiere Konstanten

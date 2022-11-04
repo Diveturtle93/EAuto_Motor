@@ -8,17 +8,17 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der standard Include-Dateien
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "adc.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "adc_inputs.h"
 #include "error.h"
@@ -35,7 +35,7 @@ uint16_t ADC_Gaspedal(void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_6;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -71,7 +71,7 @@ uint16_t ADC_Bremsdruck(void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_14;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -107,7 +107,7 @@ uint16_t ADC_KL15 (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_3;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -143,7 +143,7 @@ uint16_t ADC_Kuhlwassertemperatur (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_4;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -179,7 +179,7 @@ uint16_t ADC_Klimaflap (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_5;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -215,7 +215,7 @@ uint16_t ADC_PCBTemperatur (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_7;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -251,7 +251,7 @@ uint16_t ADC_Return (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_8;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -287,7 +287,7 @@ uint16_t ADC_Info (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_9;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -323,7 +323,7 @@ uint16_t ADC_Bremsdrucktemperatur (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_15;										// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben
@@ -359,7 +359,7 @@ uint16_t ADC_STMTemperatur (void)
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;								// ADC Kanal einstellen
 	sConfig.Rank = 1;														// Rang einstellen
-	sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;							// ADC Sampletime einstellen
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;							// ADC Sampletime einstellen
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)					// Wenn Config nicht Ok ist
 	{
 		Error_Handler();													// Fehler HAL ausgeben

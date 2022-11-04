@@ -16,7 +16,7 @@
 
 // Eingangsstrukturen definieren
 //----------------------------------------------------------------------
-struct system_in_tag {
+/*struct system_in_tag {
 	uint8_t Kickdown : 1;					// 0
 	uint8_t Leerlauf : 1;					// 1
 	uint8_t BremseNO : 1;					// 2
@@ -60,7 +60,7 @@ struct komfort_in_tag {
 	uint8_t GRA3 : 1;						// D
 	uint8_t GRA4 : 1;						// E
 	uint8_t Durchfluss : 1;					// F
-}komfort_in;
+}komfort_in;*/
 //----------------------------------------------------------------------
 
 // Definiere Konstanten

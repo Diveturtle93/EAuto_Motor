@@ -8,12 +8,12 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "main.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
 //----------------------------------------------------------------------
@@ -27,7 +27,7 @@ void writeall_outputs(void)
 	leuchten_out = LED_OUTPUT;
 	komfort_out = KOMFORT_OUTPUT;*/
 
-	// Schreibe System Ausgaenge
+/*	// Schreibe System Ausgaenge
 	HAL_GPIO_WritePin(J317_GPIO_Port, J317_Pin, system_out.J317);
 	HAL_GPIO_WritePin(F54_GPIO_Port, F54_Pin, system_out.F54);
 	HAL_GPIO_WritePin(F18_GPIO_Port, F18_Pin, system_out.F18);
@@ -63,11 +63,11 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
 	HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, leuchten_out.BlueLed);
 
-	// SChreibe Komfortausgaenge
+	// Schreibe Komfortausgaenge
 	HAL_GPIO_WritePin(BC_RESET_OUT_GPIO_Port, BC_RESET_OUT_Pin, komfort_out.BC_Rst_Out);
 	HAL_GPIO_WritePin(BC_UP_OUT_GPIO_Port, BC_UP_OUT_Pin, komfort_out.BC_Up_Out);
 	HAL_GPIO_WritePin(BC_DOWN_OUT_GPIO_Port, BC_DOWN_OUT_Pin, komfort_out.BC_Down_Out);
 	HAL_GPIO_WritePin(BAMOCAR_OUT1_GPIO_Port, BAMOCAR_OUT1_Pin, komfort_out.BamoOut1);
-	HAL_GPIO_WritePin(BAMOCAR_OUT2_GPIO_Port, BAMOCAR_OUT2_Pin, komfort_out.BamoOut2);
+	HAL_GPIO_WritePin(BAMOCAR_OUT2_GPIO_Port, BAMOCAR_OUT2_Pin, komfort_out.BamoOut2);*/
 }
 //----------------------------------------------------------------------

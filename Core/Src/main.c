@@ -123,7 +123,7 @@ int main(void)
     HAL_Delay(500);
 
   	/* Lese alle Eingaenge */
-  	readall_inputs();
+  	//readall_inputs();
 
   	// Lese Temperatur
   	uartTransmit("Temperatur messen\n", 18);
@@ -197,35 +197,35 @@ int main(void)
 
 	uartTransmit("\nReturn: ", 9);
 	uartTransmitNumber(ADC_VAL[5], 10);
-	if (ADC_VAL[5] > 3070 || ADC_VAL[5] < 3000)					// Mit Konsolenelement
+	if (ADC_VAL[5] > 3070 || ADC_VAL[5] < 3000)						// Mit Konsolenelement
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nInfo: ", 7);
 	uartTransmitNumber(ADC_VAL[6], 10);
-	if (ADC_VAL[6] > 3070 || ADC_VAL[6] < 3000)					// Mit Konsolenelement
+	if (ADC_VAL[6] > 3070 || ADC_VAL[6] < 3000)						// Mit Konsolenelement
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremsdruck: ", 13);
 	uartTransmitNumber(ADC_VAL[7], 10);
-	if (ADC_VAL[7] > 1500 || ADC_VAL[7] < 1450)					// @Umgebungsdruck
+	if (ADC_VAL[7] > 1500 || ADC_VAL[7] < 1450)						// @Umgebungsdruck
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nBremstemp: ", 12);
 	uartTransmitNumber(ADC_VAL[8], 10);
-	if (ADC_VAL[8] > 2300 || ADC_VAL[8] < 2250)					// @Zimmertemperatur
+	if (ADC_VAL[8] > 2300 || ADC_VAL[8] < 2250)						// @Zimmertemperatur
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
 
 	uartTransmit("\nSTM Temp: ", 11);
 	uartTransmitNumber(ADC_VAL[9], 10);
-	if (ADC_VAL[9] > 955 || ADC_VAL[9] < 935)					// Nach 2h Betrieb
+	if (ADC_VAL[9] > 955 || ADC_VAL[9] < 935)						// Nach 2h Betrieb
 		uartTransmit(ADC_NOK, sizeof(ADC_NOK));
 	else
 		uartTransmit(ADC_OK, sizeof(ADC_OK));
@@ -257,12 +257,12 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -279,12 +279,14 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Activate the Over-Drive mode
   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -295,12 +297,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2;
-  PeriphClkInitStruct.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
@@ -341,5 +337,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
