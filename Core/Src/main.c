@@ -121,6 +121,13 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
+  // ITM HCLK
+  ITM_SendChar('H');
+  ITM_SendChar('a');
+  ITM_SendChar('l');
+  ITM_SendChar('l');
+  ITM_SendChar('o');
+  ITM_SendChar(' ');
   	// Start Timer 6 Interrupt
   	HAL_TIM_Base_Start_IT(&htim6);
 
