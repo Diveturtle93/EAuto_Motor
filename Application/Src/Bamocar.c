@@ -8,17 +8,17 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
-// Einfügen der standard Include-Dateien
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 
-// Einfügen der STM Include-Dateien
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "can.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include Dateien
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "Bamocar.h"
 #include "BasicUart.h"

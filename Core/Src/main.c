@@ -57,6 +57,9 @@
 
 /* USER CODE BEGIN PV */
 CAN_RxHeaderTypeDef RxMessage;
+uint8_t UART2_rxBuffer[12] = {0};
+uint8_t UART2_msg[12] = {0};
+uint8_t uart_count = 0;
 uint8_t RxData[8];
 volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
 motor1_tag motor1;																	// Variable fuer Motor CAN-Nachricht 1 definieren
