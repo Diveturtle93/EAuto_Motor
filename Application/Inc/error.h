@@ -27,6 +27,7 @@
 #define ERROR_GASPEDAL					1
 #define ERROR_BREMSPEDAL				2
 #define ERROR_SDC_SPANNUNG				3
+#define ERROR_ADC						4
 //----------------------------------------------------------------------
 
 // Funktionen definieren

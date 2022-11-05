@@ -57,6 +57,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+int32_t temperature;
 CAN_RxHeaderTypeDef RxMessage;
 uint8_t UART2_rxBuffer[12] = {0};
 uint8_t UART2_msg[12] = {0};
@@ -85,7 +86,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	uint16_t ADC_VAL[10] = {0};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -182,6 +183,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  if (UART2_msg[0] == 1)
+	  {
+		  HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
+		  NVIC_SystemReset();
+	  }
+	  HAL_Delay(1000);
+	  HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
 
     /* USER CODE BEGIN 3 */
 	  	// Task wird jede Millisekunde ausgefuehrt
