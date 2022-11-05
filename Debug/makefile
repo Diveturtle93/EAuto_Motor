@@ -53,6 +53,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 Motorsteuergeraet.list \
 
+OBJCOPY_HEX += \
+Motorsteuergeraet.hex \
+
 
 # All Target
 all:
@@ -77,16 +80,21 @@ Motorsteuergeraet.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEP
 	@echo 'Finished building: $@'
 	@echo ' '
 
+Motorsteuergeraet.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "Motorsteuergeraet.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) Motorsteuergeraet.elf Motorsteuergeraet.list Motorsteuergeraet.map default.size.stdout
+	-$(RM) Motorsteuergeraet.elf Motorsteuergeraet.hex Motorsteuergeraet.list Motorsteuergeraet.map default.size.stdout
 	-@echo ' '
 
 pre-build:
 	$(MAKE) -f ../Make/git.mk
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

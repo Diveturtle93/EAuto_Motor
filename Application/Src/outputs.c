@@ -16,6 +16,8 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
+#include "inputs.h"
+#include "error.h"
 //----------------------------------------------------------------------
 
 // Variablen einbinden
@@ -30,11 +32,18 @@ komfort_out_tag komfort_out;																		// Variable fuer Komfortausgaenge 
 //----------------------------------------------------------------------
 void init_outputs(void)
 {
+#ifdef DEBUG_OUTPUT
+	ITM_SendString("Initialisiere Ausgaenge.\n");
+#endif
+
 	// Schreibe alle Variablen auf Null
-	system_out.systemoutput = 0;																	// Alle System Ausgaenge auf null setzen
-	highcurrent_out.high_out = 0;																	// Alle Hochstrom Ausgaenge auf null setzen
-	leuchten_out.ledoutput = 0;																		// Alle Leuchten Ausgaenge auf null setzen
-	komfort_out.komfortoutput = 0;																	// Alle Komfort Ausgaenge auf null setzen
+	system_out.systemoutput = SYSTEM_OUTPUT;														// Alle System Ausgaenge auf null setzen
+	highcurrent_out.high_out = HIGH_OUTPUT;															// Alle Hochstrom Ausgaenge auf null setzen
+	leuchten_out.ledoutput = LED_OUTPUT;															// Alle Leuchten Ausgaenge auf null setzen
+	komfort_out.komfortoutput = KOMFORT_OUTPUT;														// Alle Komfort Ausgaenge auf null setzen
+
+	// Alle Ausgaenge setzen
+	writeall_outputs();																				// Auf default setzen
 }
 //----------------------------------------------------------------------
 
@@ -84,6 +93,22 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(BC_DOWN_OUT_GPIO_Port, BC_DOWN_OUT_Pin, komfort_out.BC_Down_Out);				// Boardcomputer Runter Ausgang, Steuerung Kombiinstrument
 	HAL_GPIO_WritePin(BAMOCAR_OUT1_GPIO_Port, BAMOCAR_OUT1_Pin, komfort_out.BamoOut1);				// Ausgang Bamocar 1
 	HAL_GPIO_WritePin(BAMOCAR_OUT2_GPIO_Port, BAMOCAR_OUT2_Pin, komfort_out.BamoOut2);				// Ausgang Bamocar 2
+
+#ifdef DEBUG_OUTPUT
+	ITM_SendString("Ausgaenge gesetzt.\n");
+	ITM_SendString("system_out:\t");
+	ITM_SendNumber(system_out.systemoutput);
+	ITM_SendChar('\n');
+	ITM_SendString("highcurrent_out:\t");
+	ITM_SendNumber(highcurrent_out.high_out);
+	ITM_SendChar('\n');
+	ITM_SendString("komfort_out:\t");
+	ITM_SendNumber(komfort_out.komfortoutput);
+	ITM_SendChar('\n');
+	ITM_SendString("leuchten_out:\t");
+	ITM_SendNumber(leuchten_out.ledoutput);
+	ITM_SendChar('\n');
+#endif
 }
 //----------------------------------------------------------------------
 
@@ -99,17 +124,96 @@ void writeled_outputs(void)
 void testPCB_Leds(void)
 {
 	// Leds Testen
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);							// Teste Green LED, an
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);							// Teste Green LED, aus
+    HAL_Delay(500);																					// Warte 0.5s
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_SET);								// Teste Blue LED, an
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, GPIO_PIN_RESET);							// Teste Blue LED, aus
+    HAL_Delay(500);																					// Warte 0.5s
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);								// Teste Red LED, an
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);								// Teste Red LED, aus
+    HAL_Delay(500);																					// Warte 0.5s
+}
+//----------------------------------------------------------------------
+
+// Teste Cockpit LEDs
+//----------------------------------------------------------------------
+void testCockpit_Leds(void)
+{
+	// Leds Testen
+    HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, GPIO_PIN_SET);							// Teste Anhaenger LED, an (Cockpit ECO)
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, GPIO_PIN_RESET);							// Teste Anhaenger LED, aus (Cockpit ECO)
+    HAL_Delay(500);																					// Warte 0.5s
+    HAL_GPIO_WritePin(RESERVE_OUT_GPIO_Port, RESERVE_OUT_Pin, GPIO_PIN_SET);						// Teste Reserve LED, an (Cockpit Niveauregulierung)
+    HAL_Delay(1000);																				// Warte 1s
+    HAL_GPIO_WritePin(RESERVE_OUT_GPIO_Port, RESERVE_OUT_Pin, GPIO_PIN_RESET);						// Teste Reserve LED, aus (Cockpit Niveauregulierung)
+    HAL_Delay(500);																					// Warte 0.5s
+}
+//----------------------------------------------------------------------
+
+// PWM fuer Oelstandsensor am Kombiinstrument
+//----------------------------------------------------------------------
+void pwm_oelstand(uint16_t time)
+{
+	// Auswahl wie viele Sekunden vergangen
+	switch (time)																					// Zeit wird uebergeben
+	{
+		case 0: // 0ms
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 0ms Oelstandsensor Ausgang low
+			break;
+		case 15: // 1x15 ms = 15 ms
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 15ms Oelstandsensor Ausgang high
+			break;
+		case 45: // 3x15 ms = 45 ms
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 45ms Oelstandsensor Ausgang low
+			break;
+		case 75: // 5x15 ms = 75 ms
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 75ms Oelstandsensor Ausgang high
+			break;
+		default:
+			break;
+	}
+	// Nach 405ms wird das ganze wiederholt
+}
+//----------------------------------------------------------------------
+
+// Setze Cockpit auf default, alle Fehler OK
+//----------------------------------------------------------------------
+void cockpit_default(void)
+{
+	leuchten_out.Ruechwarn = 1;																		// Ruecklichtwarnung setzen
+	leuchten_out.Wischwarn = 1;																		// Wischwasserwarnung setzen
+	leuchten_out.Bremswarn = 1;																		// Bremslichtwarnung setzen
+	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
+	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
+	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
+}
+//----------------------------------------------------------------------
+
+// Testen der Spannung am Shutdown-Circuit, Signal 1 = offen, Signal = 0 geschlossen
+//----------------------------------------------------------------------
+void testSDC(void)
+{
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_SET);					// Einschalten von Shutdown-Circuit zum testen
+	HAL_Delay(100);																					// Wartezeit zum setzen
+	if (HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin) == 1)								// Einlesen von SDC0 Eingang
+	{
+#ifndef DEBUG_SDC
+		software_error(ERROR_SDC_SPANNUNG);															// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
+#else
+#warning Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren.
+		software_error_debug(ERROR_SDC_SPANNUNG);													// Errorfunktion stoppt Programm nicht
+#endif
+	}
+	else
+	{
+	  	sdc_in.SDC12V = 1;																			// SDC Spannungsversorgung OK
+	}
+	HAL_Delay(100);																					// Wartezeit zum setzen
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_RESET);					// Auschalten von Shutdown-Circuit
 }
 //----------------------------------------------------------------------

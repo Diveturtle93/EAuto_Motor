@@ -10,13 +10,14 @@
 
 // Dateiheader definieren
 //----------------------------------------------------------------------
-#ifndef MOTORSTEUERGERAET_H_
-#define MOTORSTEUERGERAET_H_
+#ifndef INC_MOTORSTEUERGERAET_H_
+#define INC_MOTORSTEUERGERAET_H_
 //----------------------------------------------------------------------
 
 // CAN-IDs definieren
 //----------------------------------------------------------------------
 // Motorsteuergeraet neu
+//----------------------------------------------------------------------
 #define MOTOR_CAN_SAFETY							0x139					// Shutdown Circuit Motorsteuergeraet, Sicherheitsrelevante Daten
 #define MOTOR_CAN_DIGITAL_OUT						0x240					// Digitale Ausgaenge Motorsteuergeraet, Alle digitalen Ausgaenge
 #define MOTOR_CAN_DIGITAL_IN						0x241					// Digitale Eingaenge Motorsteuergeraet, Alle digitalen Eingaenge
@@ -25,13 +26,13 @@
 //----------------------------------------------------------------------
 // Motorsteuergeraet alt
 //----------------------------------------------------------------------
-#define MOTOR_CAN_DREHZAHL							0x280					// Motorsteuergerät ID MotorSTG1
-#define MOTOR_CAN_MOTOR2							0x288					// Motorsteuergerät ID MotorSTG2
-#define MOTOR_CAN_GASPEDAL							0x380					// Motorsteuergerät ID MotorSTG3
-#define MOTOR_CAN_GRA								0x388					// Motorsteuergerät ID MotorSTG4
-#define MOTOR_CAN_LEUCHTEN							0x480					// Motorsteuergerät ID MotorSTG5
-#define MOTOR_CAN_GAS								0x488					// Motorsteuergerät ID MotorSTG6
-#define MOTOR_CAN_FLEXIA							0x580					// Motorsteuergerät ID MotorFlexia
+#define MOTOR_CAN_DREHZAHL							0x280					// Motorsteuergeraet ID MotorSTG1
+#define MOTOR_CAN_MOTOR2							0x288					// Motorsteuergeraet ID MotorSTG2
+#define MOTOR_CAN_GASPEDAL							0x380					// Motorsteuergeraet ID MotorSTG3
+#define MOTOR_CAN_GRA								0x388					// Motorsteuergeraet ID MotorSTG4
+#define MOTOR_CAN_LEUCHTEN							0x480					// Motorsteuergeraet ID MotorSTG5
+#define MOTOR_CAN_GAS								0x488					// Motorsteuergeraet ID MotorSTG6
+#define MOTOR_CAN_FLEXIA							0x580					// Motorsteuergeraet ID MotorFlexia
 //----------------------------------------------------------------------
 // CAN-IDs auf dem BUS Fahrzeug intern
 //----------------------------------------------------------------------
@@ -63,7 +64,7 @@ typedef union __motor1_tag {
 		uint8_t leer2;														// Byte 3, Leer Byte
 		uint8_t Winkel_Drosselklape;										// Byte 2, Drosselklappe
 		uint8_t leer3;														// Byte 1, Leer Byte
-		uint8_t Oeldruck;													// Byte 0, Öldruck, Verbrauch in Liter
+		uint8_t Oeldruck;													// Byte 0, Oeldruck, Verbrauch in Liter
 	};
 
 	uint8_t output[8];														// 8 Byte
@@ -91,5 +92,5 @@ extern motor1_tag motor1;													// Variable fuer Motor CAN-Nachricht 1 def
 extern motor2_tag motor2;													// Variable fuer Motor CAN-Nachricht 2 definieren
 //----------------------------------------------------------------------
 
-#endif /* MOTORSTEUERGERAET_H_ */
+#endif /* INC_MOTORSTEUERGERAET_H_ */
 //----------------------------------------------------------------------

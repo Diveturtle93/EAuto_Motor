@@ -16,6 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "inputs.h"
+#include "error.h"
 //----------------------------------------------------------------------
 
 // Variablen einbinden
@@ -25,10 +26,14 @@ sdc_in_tag sdc_in;															// Variable fuer SDC-Eingaenge definieren
 komfort_in_tag komfort_in;													// Variable fuer Komforteingaenge definieren
 //----------------------------------------------------------------------
 
-// Lese alle Eingaenge
+// Alle Eingaenge einlesen und speichern
 //----------------------------------------------------------------------
 void readall_inputs(void)
 {
+#ifdef DEBUG_INPUT
+	ITM_SendString("Lese Inputs ein\n");
+#endif
+
 	// Systemeingaenge einlesen
 	system_in.Kickdown = HAL_GPIO_ReadPin(KICKDOWN_GPIO_Port, KICKDOWN_Pin);					// Eingang Gaspedal getreten
 	system_in.Leerlauf = HAL_GPIO_ReadPin(LEERLAUF_GPIO_Port, LEERLAUF_Pin);					// Eingang Gaspedal nicht getreten
@@ -50,7 +55,7 @@ void readall_inputs(void)
 	// SDC-Eingaenge einlesen
 	sdc_in.EmergencyRun = HAL_GPIO_ReadPin(EMERGENCY_RUN_GPIO_Port, EMERGENCY_RUN_Pin);			// Emergency Run, Akku
 	sdc_in.SDC0 = HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin);						// Shutdown-Circuit, OK
-	sdc_in.AkkuSDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
+	sdc_in.Akku1SDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
 	sdc_in.BTB_SDC = HAL_GPIO_ReadPin(SENSE_SDC_BTB_GPIO_Port, SENSE_SDC_BTB_Pin);				// Shutdown-Circuit Bamocar, OK
 	sdc_in.DCDC_Fault = HAL_GPIO_ReadPin(DCDC_FAULT_GPIO_Port, DCDC_FAULT_Pin);					// DCDC Wandler funktioniert nicht richtig
 
@@ -71,5 +76,33 @@ void readall_inputs(void)
 	komfort_in.GRA3 = HAL_GPIO_ReadPin(GRA3_GPIO_Port, GRA3_Pin);								// Tempomat 3 Eingang
 	komfort_in.GRA4 = HAL_GPIO_ReadPin(GRA4_GPIO_Port, GRA4_Pin);								// Tempomat 4 Eingang
 	komfort_in.Durchfluss = HAL_GPIO_ReadPin(DURCHFLUSS_GPIO_Port, DURCHFLUSS_Pin);				// Durchflusssensor Eingang
+
+#ifdef DEBUG_INPUT
+	ITM_SendString("Eingaenge gelesen.\n");
+	ITM_SendString("system_in:\t");
+	ITM_SendNumber(system_in.systeminput);
+	ITM_SendChar('\n');
+	ITM_SendString("sdc_in:\t");
+	ITM_SendNumber(sdc_in.sdcinput);
+	ITM_SendChar('\n');
+	ITM_SendString("komfort_in:\t");
+	ITM_SendNumber(komfort_in.komfortinput);
+	ITM_SendChar('\n');
+#endif
+}
+//----------------------------------------------------------------------
+
+// Anlasser einlesen, Wert in Variable speichern, bis KL15 abfaellt
+//----------------------------------------------------------------------
+void readAnlasser(void)
+{
+	if (system_in.Anlasser == 1)
+	{
+		sdc_in.Anlasser = 1;
+	}
+	else if ((sdc_in.Anlasser == 1) && (system_in.KL15 != 1))
+	{
+		sdc_in.Anlasser = 0;
+	}
 }
 //----------------------------------------------------------------------

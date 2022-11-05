@@ -32,7 +32,13 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+//#if REVISION == 255
+//#error "Revision ist nicht definiert"
+//#elif REVISION == 1
+//#warning "PCB Revision 1.0 definiert"
+//#elif REVISION == 2
+//#warning "PCB Revision 1.1 definiert"
+//#endif
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

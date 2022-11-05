@@ -14,6 +14,11 @@
 #define INC_OUTPUTS_H_
 //----------------------------------------------------------------------
 
+// Define Debug Symbols
+//----------------------------------------------------------------------
+#define DEBUG_OUTPUT
+//----------------------------------------------------------------------
+
 // Strukturen definieren
 //----------------------------------------------------------------------
 typedef union __system_out_tag {
@@ -89,8 +94,8 @@ typedef union __komfort_out_tag {
 // Definiere Konstanten
 //----------------------------------------------------------------------
 #define SYSTEM_OUTPUT				0b00000000								// 8 Bit, 8 Systemausgaenge
-#define HIGHCURRENT_OUT				0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
-#define LED_OUTPUT					0b0001000000000000						// 16 Bit, 14 Leuchtdioden
+#define HIGH_OUTPUT					0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
+#define LED_OUTPUT					0b0011100011010000						// 16 Bit, 14 Leuchtdioden
 #define KOMFORT_OUTPUT				0b00000000								// 8 Bit, 5 Komfortausgaenge
 //----------------------------------------------------------------------
 
@@ -108,6 +113,10 @@ void init_outputs(void);													// Initialisiere Ausgaenge
 void writeall_outputs(void);												// Schreibe alle Ausgaenge
 void writeled_outputs(void);												// Schreibe alle LED-Ausgaenge
 void testPCB_Leds(void);													// Teste PCB LEDs fuer je 1s
+void testCockpit_Leds(void);												// Teste Cockpit LEDs fuer je 1s
+void pwm_oelstand(uint16_t time);											// Oelstandsensor simulieren, Fehler in Cockpit unterdruecken
+void cockpit_default(void);													// Fehler am Cockpit deaktivieren
+void testSDC(void);															// Teste SDC Spannung
 //----------------------------------------------------------------------
 
 #endif /* INC_OUTPUTS_H_ */

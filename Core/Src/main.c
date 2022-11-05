@@ -46,6 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -95,17 +96,21 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[5] = {0}, InData[5] = {0}, status, tmp[4], task = 0;
+	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, status, tmp[4], task = 0;
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
 
   	// Erstelle Can-Nachrichten
+    // Sendenachricht erstellen
   	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
   	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
+	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
   	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
+	// Sendenachricht Motorsteuergeraet Motor1 erstellen
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
   	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
-
 
   /* USER CODE END Init */
 
@@ -138,7 +143,7 @@ int main(void)
 #ifdef DEBUG
 	printResetSource(readResetSource());
 
-  	/* Teste serielle Schnittstelle*/
+  	// Teste serielle Schnittstelle
   	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
   	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
 
@@ -148,11 +153,21 @@ int main(void)
 
 	// Leds Testen
   	testPCB_Leds();
+	testCockpit_Leds();
+
+  	// Testen der Versorgungsspannung am Shutdown-Circuit
+  	testSDC();
+
+  	// Alle Fehler Cockpit loeschen
+  	cockpit_default();
+  	// Setze LED Green
+  	leuchten_out.GreenLed = 1;
+  	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
 
   	// Lese alle Eingaenge
   	readall_inputs();
 
-  	// Daten fuer TxMassage erstellen
+    // Sendenachricht 0x123 mit Dummy-Daten fuellen
   	for (uint8_t j = 0; j < 8; j++)
   		TxData[j] = (j + 1);
 
@@ -172,13 +187,17 @@ int main(void)
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
 		{
-			count++;													// Zaehler count hochzaehlen
-			millisekunden_flag_1 = 0;									// Setze Millisekunden-Flag zurueck
+			count++;																	// Zaehler count hochzaehlen
+			millisekunden_flag_1 = 0;													// Setze Millisekunden-Flag zurueck
 
+			// Setze Flag start, nur wenn millisekunden Flag gesetzt war
 			task = 1;
 		}
 
-		// Task wird alle 50 Millisekunden ausgefuehrt
+		// PWM Oelstandsensor Kombiinstrument ausgeben
+		pwm_oelstand(count);
+
+		// Task wird alle 20 Millisekunden ausgefuehrt
 		if (((count % 20) == 0) && (task == 1))
 		{
 			// Sende Nachricht Motor1
@@ -192,15 +211,26 @@ int main(void)
 			// alle Inputs einlesen
 			readall_inputs();
 
+			// Anlasser abfragen
+			readAnlasser();
+
 			// Bremse pruefen
-//			readBrake();
+			readBrake();
 
 			// Gaspedal pruefen
 			gas_adc = readTrottle();
 
-			// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
-			// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergrößern)
-			gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+			// Abfrage ob Mittelwertbildung
+			if (gas_adc > 0)															// Wenn Gaspedal Plausible dann Mittelwertbildung
+			{
+				// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+				// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
+				gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+			}
+			else																		// Wenn Gaspedal unplausible oder Kupplung getreten
+			{
+				gas_mean = 0;
+			}
 
 			// Daten in Bamocarformat umwandeln
 			tmp[0] = 0x90;
@@ -235,6 +265,8 @@ int main(void)
 			InData[4] = (komfort_in.komfortinput >> 8);
 			InData[5] = komfort_in.komfortinput;
 
+			HAL_Delay(10);
+
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
 			//hal_error(status);
@@ -252,6 +284,7 @@ int main(void)
 			count = 0;
 		}
 
+		// Zuruecksetzen Flag start
 		task = 0;
 
 
@@ -286,6 +319,7 @@ int main(void)
 						break;
 				}
 
+				// Drehzahl ausgeben
 				TxData[2] = motor1.output[2];
 				TxData[3] = motor1.output[3];
 				lastcan = millis();
@@ -319,7 +353,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -350,11 +384,11 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
   {
     Error_Handler();
   }
@@ -420,9 +454,9 @@ void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
-	if (htim == &htim6)
+	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
 	{
-		millisekunden_flag_1 = 1;
+		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
 	}
 }
 /* USER CODE END 4 */

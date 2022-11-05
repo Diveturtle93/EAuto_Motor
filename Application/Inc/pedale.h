@@ -14,10 +14,23 @@
 #define INC_PEDALE_H_
 //----------------------------------------------------------------------
 
+// Definiere Debug Symbol
+//----------------------------------------------------------------------
+#ifdef DEBUG
+	#define DEBUG_PEDALE
+#endif
+//----------------------------------------------------------------------
+
+// Konstanten definieren
+//----------------------------------------------------------------------
+#define GAS_MAX_ADC							4095							// Maximaler ADC-Wert
+#define GAS_THRESHOLD						300								// Thresholdwert fuer Gaspedal ADC
+//----------------------------------------------------------------------
+
 // Funktionen definieren
 //----------------------------------------------------------------------
-uint16_t readTrottle(void);
-void readBrake(void);
+uint16_t readTrottle(void);													// Gaspedal auswerten
+void readBrake(void);														// Bremspedal auswerten
 //----------------------------------------------------------------------
 
 #endif /* INC_PEDALE_H_ */
