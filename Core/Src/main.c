@@ -41,7 +41,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+// TODO: OELDRUCKSCHALTER
+// FIXME: CAN Bus *(CAN-Bus braucht Ablaufprogramm)
+// xxx: Schlechte Performance
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -97,7 +99,8 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, status, tmp[4], task = 0;
+	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
+	uint8_t status, tmp[4], task = 0;
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
 
@@ -112,6 +115,10 @@ int main(void)
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
   	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
+	// Sendenachricht Motorsteuergeraet analoge Eingaenge erstellen
+  	CAN_TxHeaderTypeDef TxAnalog = {MOTOR_CAN_ANALOG_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	// Sendenachricht Motorsteuergeraet Temperatur Eingaenge erstellen
+  	CAN_TxHeaderTypeDef TxTemperatur = {MOTOR_CAN_TEMPERATUR, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
 
   /* USER CODE END Init */
 
@@ -139,6 +146,7 @@ int main(void)
   ITM_SendChar(' ');
   	// Start Timer 6 Interrupt
   	HAL_TIM_Base_Start_IT(&htim6);
+  	HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
 
   	// Schreibe Resetquelle auf die Konsole
 #ifdef DEBUG
@@ -160,7 +168,7 @@ int main(void)
   	testSDC();
 
   	// Alle Fehler Cockpit loeschen
-  	cockpit_default();
+  	//cockpit_default();
   	// Setze LED Green
   	leuchten_out.GreenLed = 1;
   	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
@@ -188,8 +196,6 @@ int main(void)
 		  HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
 		  NVIC_SystemReset();
 	  }
-	  HAL_Delay(1000);
-	  HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
 
     /* USER CODE BEGIN 3 */
 	  	// Task wird jede Millisekunde ausgefuehrt
@@ -223,7 +229,7 @@ int main(void)
 			readAnlasser();
 
 			// Bremse pruefen
-			readBrake();
+			//readBrake();
 
 			// Gaspedal pruefen
 			gas_adc = readTrottle();
@@ -265,6 +271,12 @@ int main(void)
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX2);
 			//hal_error(status);
 
+			// ADC-Werte einlesen Bremse und Temperaturen
+			ADC_VAL[0] = ADC_Bremsdruck();
+			ADC_VAL[1] = ADC_Bremsdrucktemperatur();
+			ADC_VAL[2] = ADC_STMTemperatur();
+			ADC_VAL[3] = ADC_PCBTemperatur();
+
 			// Daten fuer Eingaenge zusammenfuehren
 			InData[0] ++;
 			InData[1] = (system_in.systeminput >> 8);
@@ -273,11 +285,26 @@ int main(void)
 			InData[4] = (komfort_in.komfortinput >> 8);
 			InData[5] = komfort_in.komfortinput;
 
-			HAL_Delay(10);
-
+			HAL_Delay(5);
 			// Sende Nachricht digitale Eingaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
 			//hal_error(status);
+
+			// ADC-Werte einlesen Navi, Klima, KL15
+			ADC_VAL[4] = ADC_KL15();
+			ADC_VAL[5] = ADC_Klimaflap();
+			ADC_VAL[6] = ADC_Info();
+			ADC_VAL[7] = ADC_Return();
+
+			// ADC-Werte umwandeln
+			AnalogData[0] = ADC_VAL[4];
+			AnalogData[1] = (ADC_VAL[4] >> 8) | (ADC_VAL[0] << 4);
+			AnalogData[2] = (ADC_VAL[0] >> 4);
+			AnalogData[3] = ADC_VAL[6];
+			AnalogData[4] = (ADC_VAL[6] >> 8) | (ADC_VAL[7] << 4);
+			AnalogData[5] = (ADC_VAL[7] >> 4);
+			AnalogData[6] = ADC_VAL[5];
+			AnalogData[7] = (ADC_VAL[5] >> 8);
 
 			// Bamocar Fehler auslesen
 			tmp[0] = 0x3D;
@@ -287,6 +314,23 @@ int main(void)
 			// Befehl Fehler auslesen an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
+
+			// ADC-Werte einlesen Kuehlwassertemperatur
+			ADC_VAL[8] = ADC_Kuhlwassertemperatur();
+
+			// ADC-Werte umwandeln
+			TempData[0] = ADC_VAL[2];
+			TempData[1] = (ADC_VAL[2] >> 8) | (ADC_VAL[3] << 4);
+			TempData[2] = (ADC_VAL[3] >> 4);
+			TempData[3] = ADC_VAL[8];
+			TempData[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
+			TempData[5] = (ADC_VAL[1] >> 4);
+
+			HAL_Delay(5);
+
+			// Befehl Fehler auslesen an Bamocar senden
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX1);
 
 			// Variable count auf 0 zuruecksetzen
 			count = 0;
@@ -343,6 +387,8 @@ int main(void)
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 			lastsendcan = millis();
+
+			HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
 		}
 #endif
   }

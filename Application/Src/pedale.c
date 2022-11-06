@@ -91,7 +91,7 @@ uint16_t readTrottle(void)
 
 // Bremse auswerten
 //----------------------------------------------------------------------
-void readBrake(void)
+/*void readBrake(void)
 {
 	// Variablen anlegen
 	uint16_t ADC_Bremse = 0;
@@ -115,5 +115,5 @@ void readBrake(void)
 		// Bremse invalide
 		software_error(ERROR_BREMSPEDAL);
 	}
-}
+}*/
 //----------------------------------------------------------------------
