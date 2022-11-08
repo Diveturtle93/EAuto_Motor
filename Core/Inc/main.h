@@ -39,6 +39,22 @@ extern "C" {
 //#elif REVISION == 2
 //#warning "PCB Revision 1.1 definiert"
 //#endif
+
+// FIXME: BAMOCAR_IN1
+// FIXME: BAMOCAR_IN2
+// FIXME: BAMOCAR_Out1
+// FIXME: BAMOCAR_Out2
+// FIXME: Anhaenger
+// FIXME: Klima_PWM
+// FIXME: Klima Out
+// FIXME: DCDC_Instruction
+// FIXME: EGas
+// FIXME: Reserve
+// FIXME: DCDC_Fault
+// FIXME: HW_Wake
+// FIXME: BC_Rst_Out
+// FIXME: Niveau
+// FIXME: BC_Rst_Out
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -166,14 +182,14 @@ void Error_Handler(void);
 #define KLIMA_OUT_GPIO_Port GPIOB
 #define GREEN_LED_Pin GPIO_PIN_14
 #define GREEN_LED_GPIO_Port GPIOB
-#define ANLASSER_Pin GPIO_PIN_15
-#define ANLASSER_GPIO_Port GPIOB
+#define BAMOCAR_IN2_Pin GPIO_PIN_15
+#define BAMOCAR_IN2_GPIO_Port GPIOB
 #define KL15_Pin GPIO_PIN_8
 #define KL15_GPIO_Port GPIOD
 #define BREMSLICHT_Pin GPIO_PIN_9
 #define BREMSLICHT_GPIO_Port GPIOD
-#define BAMOCAR_IN2_Pin GPIO_PIN_10
-#define BAMOCAR_IN2_GPIO_Port GPIOD
+#define ANLASSER_Pin GPIO_PIN_10
+#define ANLASSER_GPIO_Port GPIOD
 #define RUECKFAHRLICHT_Pin GPIO_PIN_11
 #define RUECKFAHRLICHT_GPIO_Port GPIOD
 #define BAMOCAR_IN1_Pin GPIO_PIN_12
@@ -214,8 +230,8 @@ void Error_Handler(void);
 #define OUTB_GPIO_Port GPIOA
 #define BC_UP_IN_Pin GPIO_PIN_11
 #define BC_UP_IN_GPIO_Port GPIOA
-#define RUECKWARNUNG_Pin GPIO_PIN_12
-#define RUECKWARNUNG_GPIO_Port GPIOA
+#define OELSTAND_TEMP_Pin GPIO_PIN_12
+#define OELSTAND_TEMP_GPIO_Port GPIOA
 #define ACAN_TX_Pin GPIO_PIN_15
 #define ACAN_TX_GPIO_Port GPIOA
 #define SD_D2_Pin GPIO_PIN_10
@@ -238,8 +254,8 @@ void Error_Handler(void);
 #define DEBUG_UART2TX_GPIO_Port GPIOD
 #define DEBUG_UART2RX_Pin GPIO_PIN_6
 #define DEBUG_UART2RX_GPIO_Port GPIOD
-#define OELSTAND_TEMP_Pin GPIO_PIN_7
-#define OELSTAND_TEMP_GPIO_Port GPIOD
+#define RUECKWARNUNG_Pin GPIO_PIN_7
+#define RUECKWARNUNG_GPIO_Port GPIOD
 #define WISCHWARNUNG_Pin GPIO_PIN_9
 #define WISCHWARNUNG_GPIO_Port GPIOG
 #define BREMSWARNUNG_Pin GPIO_PIN_10

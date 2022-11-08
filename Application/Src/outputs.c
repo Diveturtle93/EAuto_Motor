@@ -188,9 +188,11 @@ void cockpit_default(void)
 	leuchten_out.Ruechwarn = 1;																		// Ruecklichtwarnung setzen
 	leuchten_out.Wischwarn = 1;																		// Wischwasserwarnung setzen
 	leuchten_out.Bremswarn = 1;																		// Bremslichtwarnung setzen
+	leuchten_out.Oelstand = 1;																		// Oelstandwarnung setzen
 	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
+	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oelstand);						// Fehlermeldung fuer Oeldruckwarnung einschalten
 }
 //----------------------------------------------------------------------
 

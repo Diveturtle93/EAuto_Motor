@@ -73,14 +73,14 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
-                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
+                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BUZZER_Pin|GENERATOR_LED_Pin|WISCHWARNUNG_Pin|BREMSWARNUNG_Pin
                           |PUMPE_BREMSE_Pin|PUMPE_KUEHLUNG_Pin|FAN2_Pin|FAN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin */
@@ -174,13 +174,13 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin */
-  GPIO_InitStruct.Pin = SENSE_SDC_BTB_Pin|ANLASSER_Pin;
+  GPIO_InitStruct.Pin = SENSE_SDC_BTB_Pin|BAMOCAR_IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = KL15_Pin|BAMOCAR_IN2_Pin|BAMOCAR_IN1_Pin|ASR_IN2_Pin;
+  GPIO_InitStruct.Pin = KL15_Pin|ANLASSER_Pin|BAMOCAR_IN1_Pin|ASR_IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -188,7 +188,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin */
   GPIO_InitStruct.Pin = BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
-                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|OELSTAND_TEMP_Pin;
+                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -210,11 +210,11 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ENTER_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = RUECKWARNUNG_Pin;
+  GPIO_InitStruct.Pin = OELSTAND_TEMP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RUECKWARNUNG_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(OELSTAND_TEMP_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin */
   GPIO_InitStruct.Pin = CAN1_TX_Pin|CAN1_RX_Pin|SD_CMD_Pin;

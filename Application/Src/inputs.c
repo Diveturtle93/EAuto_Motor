@@ -42,8 +42,7 @@ void readall_inputs(void)
 	system_in.Kupplung = HAL_GPIO_ReadPin(KUPPLUNG_NO_GPIO_Port, KUPPLUNG_NO_Pin);				// Eingang Kupplung nicht getreten
 	system_in.Recuperation = HAL_GPIO_ReadPin(RECUPERATION_GPIO_Port, RECUPERATION_Pin);		// Eingang Recuperation
 	system_in.ECON = HAL_GPIO_ReadPin(ECON_GPIO_Port, ECON_Pin);								// Eingang Klima
-	// FIXME: Anlasser Zuordnung neu gestallten
-	system_in.Anlasser = HAL_GPIO_ReadPin(BAMOCAR_IN2_GPIO_Port, BAMOCAR_IN2_Pin);					// Eingang Zuendschloss, Motor starten
+	system_in.Anlasser = HAL_GPIO_ReadPin(ANLASSER_GPIO_Port, ANLASSER_Pin);					// Eingang Zuendschloss, Motor starten
 	system_in.KL15 = HAL_GPIO_ReadPin(KL15_GPIO_Port, KL15_Pin);								// Eingang Auto an
 	system_in.DCDC_Inst = HAL_GPIO_ReadPin(DCDC_INSTRUCTION_GPIO_Port, DCDC_INSTRUCTION_Pin);	// DCDC Wandler funktioniert einwandfrei
 	system_in.Button1 = HAL_GPIO_ReadPin(BUTTON1_GPIO_Port, BUTTON1_Pin);						// Zusatzeingang Taster 1

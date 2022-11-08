@@ -168,7 +168,7 @@ int main(void)
   	testSDC();
 
   	// Alle Fehler Cockpit loeschen
-  	//cockpit_default();
+  	cockpit_default();
   	// Setze LED Green
   	leuchten_out.GreenLed = 1;
   	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
@@ -191,11 +191,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if (UART2_msg[0] == 1)
-	  {
-		  HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
-		  NVIC_SystemReset();
-	  }
 
     /* USER CODE BEGIN 3 */
 	  	// Task wird jede Millisekunde ausgefuehrt
@@ -216,6 +211,11 @@ int main(void)
 		{
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
+			tmp[0] = 0;
+			tmp[1] = 1;
+
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
 		}
 
@@ -268,7 +268,7 @@ int main(void)
 			OutData[5] ++;
 
 			// Sende Nachricht digitale Ausgaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX2);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 
 			// ADC-Werte einlesen Bremse und Temperaturen
@@ -285,9 +285,9 @@ int main(void)
 			InData[4] = (komfort_in.komfortinput >> 8);
 			InData[5] = komfort_in.komfortinput;
 
-			HAL_Delay(5);
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht digitale Eingaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX1);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 
 			// ADC-Werte einlesen Navi, Klima, KL15
@@ -307,12 +307,12 @@ int main(void)
 			AnalogData[7] = (ADC_VAL[5] >> 8);
 
 			// Bamocar Fehler auslesen
-			tmp[0] = 0x3D;
-			tmp[1] = 0x8F;
-			tmp[2] = 0x00;
+//			tmp[0] = 0x3D;
+//			tmp[1] = 0x8F;
+//			tmp[2] = 0x00;
 
-			// Befehl Fehler auslesen an Bamocar senden
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+//			// Befehl Fehler auslesen an Bamocar senden
+//			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 
 			// ADC-Werte einlesen Kuehlwassertemperatur
@@ -326,12 +326,15 @@ int main(void)
 			TempData[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
 			TempData[5] = (ADC_VAL[1] >> 4);
 
-			HAL_Delay(5);
-
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Befehl Fehler auslesen an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX1);
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX0);
+		}
 
+		if (((count % 400) == 0) && (task == 1))
+		{
 			// Variable count auf 0 zuruecksetzen
 			count = 0;
 		}
