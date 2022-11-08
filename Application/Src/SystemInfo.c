@@ -13,7 +13,7 @@
 #include "stdbool.h"
 //----------------------------------------------------------------------
 
-// Einfügen der eigenen Include-Dateien
+// Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
 #include "git.h"
 #include "SystemInfo.h"
@@ -32,10 +32,10 @@
 //----------------------------------------------------------------------
 void collectHardwareInfo(void)
 {
-	#define STRING_STM_DEVICE_ID			"\nSTM32 Device ID:\t"
-	#define STRING_STM_REVISION				"\nSTM32 Revision ID:\t"
-	#define STRING_STM_FREQ					"\nSTM32 CPU-Freq:\t\t"
-	#define STRING_STM_UUID					"\nSTM32 UUID:\t\t"
+	#define STRING_STM_DEVICE_ID			"\nSTM32 Device ID:\t\t"
+	#define STRING_STM_REVISION				"\nSTM32 Revision ID:\t\t"
+	#define STRING_STM_FREQ					"\nSTM32 CPU-Freq:\t\t\t"
+	#define STRING_STM_UUID					"\nSTM32 UUID:\t\t\t"
 
 	uartTransmit(STRING_STM_DEVICE_ID, sizeof(STRING_STM_DEVICE_ID));
 	uartTransmitNumber(HAL_GetDEVID(), 10);									// Mikrocontroller Typ
@@ -70,6 +70,7 @@ void collectHardwareInfo(void)
 	uartTransmit(" MHz", 4);
 
 
+	uartTransmit("\n", 1);
 	uartTransmit(STRING_STM_UUID, sizeof(STRING_STM_UUID));
 	uartTransmitNumber(HAL_GetUIDw0(), 16);									// UID0 ausgeben
 
@@ -87,14 +88,14 @@ void collectHardwareInfo(void)
 //----------------------------------------------------------------------
 void collectSoftwareInfo(void)
 {
-	#define STRING_GIT_COMMIT				"\nGit Commit:\t\t"
-	#define STRING_GIT_BRANCH				"\nGit Branch:\t\t"
-	#define STRING_GIT_HASH					"\nGit Hash:\t\t"
+	#define STRING_GIT_COMMIT				"\nGit Commit:\t\t\t"
+	#define STRING_GIT_BRANCH				"\nGit Branch:\t\t\t"
+	#define STRING_GIT_HASH					"\nGit Hash:\t\t\t"
 	#define STRING_GIT_LAST_TAG				"\nGit letzter Tags:\t\t"
 	#define STRING_GIT_TAG_COMMIT			"\nGit Tags commit:\t\t"
 	#define STRING_GIT_TAG_DIRTY			"\nGit Dirty commit:\t\t"
-	#define STRING_BUILD_DATE				"\nBuild Date:\t\t"
-	#define STRING_BUILD_TIME				"\nBuild Time:\t\t"
+	#define STRING_BUILD_DATE				"\nBuild Date:\t\t\t"
+	#define STRING_BUILD_TIME				"\nBuild Time:\t\t\t"
 
 	uartTransmit(STRING_GIT_COMMIT, sizeof(STRING_GIT_COMMIT));
 	uartTransmit(GIT_COMMIT, sizeof(GIT_COMMIT));							// Git Commit anzeigen
@@ -132,10 +133,10 @@ void collectSoftwareInfo(void)
 //----------------------------------------------------------------------
 void collectMiddlewareInfo(void)
 {
-	#define STRING_CMSIS_VERSION			"\nCMSIS Version:\t\t"
-	#define STRING_HAL_VERSION				"\nHAL Version:\t\t"
-	#define STRING_RTOS_CMSIS_VERSION		"\nRTOS CMSIS Version:\t"
-	#define STRING_RTOS_VERSION				"\nRTOS Version:\t\t"
+	#define STRING_CMSIS_VERSION			"\nCMSIS Version:\t\t\t"
+	#define STRING_HAL_VERSION				"\nHAL Version:\t\t\t"
+	#define STRING_RTOS_CMSIS_VERSION		"\nRTOS CMSIS Version:\t\t"
+	#define STRING_RTOS_VERSION				"\nRTOS Version:\t\t\t"
 
 	uartTransmit(STRING_CMSIS_VERSION, sizeof(STRING_CMSIS_VERSION));
 	uartTransmitNumber(__CM7_CMSIS_VERSION_MAIN, 10);						// CMSIS Version anzeigen
@@ -183,7 +184,7 @@ void collectGitcounts(void)
 {
 	#define STRING_GIT_TAG_DIRTY_COUNT		"\nGit Dirty count:\t\t"
 	#define STRING_GIT_OVERALL_COMMIT_COUNT	"\nGit Overall count:\t\t"
-	#define STRING_GIT_BRANCH_COMMIT_COUNT	"\nGit Branch commit count:\t\t"
+	#define STRING_GIT_BRANCH_COMMIT_COUNT	"\nGit Branch commit count:\t"
 	#define STRING_GIT_ACTIVE_BRANCHES		"\nGit active Branches:\t\t"
 	#define STRING_GIT_TAG_COUNT			"\nGit Tags count:\t\t"
 
@@ -235,49 +236,49 @@ reset_reason readResetSource(void)
 {
 	reset_reason reset_flags = STARTUP;
 
-	// Prüfe Reset Flag Internen Watchdog
+	// Pruefe Reset Flag Internen Watchdog
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_IWDGRST) == true)
 	{
 		reset_flags += IWDG1;
 	}
 
-	// Prüfe Reset Flag Window Watchdog
+	// Pruefe Reset Flag Window Watchdog
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_WWDGRST) == true)
 	{
 		reset_flags += WWDG1;
 	}
 
-	// Prüfe Reset Flag Low Power Reset
+	// Pruefe Reset Flag Low Power Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_LPWRRST) == true)
 	{
 		reset_flags += CPURST1;
 	}
 
-	// Prüfe Reset Flag Brown Out Reset
+	// Pruefe Reset Flag Brown Out Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_BORRST) == true)
 	{
 		reset_flags += BORST1;
 	}
 
-	// Prüfe Reset Flag Power On Reset
+	// Pruefe Reset Flag Power On Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_PORRST) == true)
 	{
 		reset_flags += PORST1;
 	}
 
-	// Prüfe Reset Flag Software Reset
+	// Pruefe Reset Flag Software Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_SFTRST) == true)
 	{
 		reset_flags += SFTRST1;
 	}
 
-	// Prüfe Reset Flag Pin-Reset
+	// Pruefe Reset Flag Pin-Reset
 	if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) == true)
 	{
 		reset_flags += PINRST1;
 	}
 
-	// Lösche alle Reset Flags
+	// Loesche alle Reset Flags
 	__HAL_RCC_CLEAR_RESET_FLAGS();
 
 	return reset_flags;
@@ -298,41 +299,41 @@ void printResetSource(reset_reason reset_flags)
 	}
 	else
 	{
-		if (reset_flags & IWDG1)										// Interner watchdog Reset
+		if (reset_flags & IWDG1)											// Interner watchdog Reset
 		{
 			uartTransmit("Interner Watchdog Reset\n", 24);
 		}
 
-		if (reset_flags & WWDG1)										// Window watchdog Reset
+		if (reset_flags & WWDG1)											// Window watchdog Reset
 		{
 			uartTransmit("Window Watchdog Reset\n", 22);
 		}
 
-		if (reset_flags & CPURST1)										// CPU Reset
+		if (reset_flags & CPURST1)											// CPU Reset
 		{
 			uartTransmit("CPU Reset\n", 10);
 		}
-		if (reset_flags & BORST1)										// Brown out Reset
+		if (reset_flags & BORST1)											// Brown out Reset
 		{
 			uartTransmit("Brown Out Reset\n", 16);
 		}
 
-		if (reset_flags & PORST1)										//Power on Reset / Power down Reser
+		if (reset_flags & PORST1)											//Power on Reset / Power down Reser
 		{
 			uartTransmit("Power On Reset\n", 15);
 		}
 
-		if (reset_flags & SFTRST1)										// Software Reset
+		if (reset_flags & SFTRST1)											// Software Reset
 		{
 			uartTransmit("Software Reset\n", 15);
 		}
 
-		if (reset_flags & PINRST1)										//NRST pin
+		if (reset_flags & PINRST1)											//NRST pin
 		{
 			uartTransmit("PIN Reset\n", 10);
 		}
 
-		if (reset_flags & RMVF1)										//NRST pin
+		if (reset_flags & RMVF1)											//NRST pin
 		{
 			uartTransmit("RMVF\n", 5);
 		}

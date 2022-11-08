@@ -41,22 +41,24 @@ Die Nachfolgenden CAN-IDs sind auf dem Antriebs-CAN aktuell messbar.
 | CAN3 | 0x280 | Motorsteuergerät | ... | 20 | 8 |
 | CAN3 | 0x288 | Motorsteuergerät | ... | 20 | 8 |
 | CAN3 | 0x2A0 | Bremse | ... | ... | ... |
-| CAN3 | 0x320 | ... | ... | 20 | 8 |
+| CAN3 | 0x320 | Kombiinstrument | ... | 20 | 8 |
 | CAN3 | 0x380 | Motorsteuergerät | ... | 20 | 8 |
 | CAN3 | 0x388 | Motorsteuergerät | ... | 20 | 3 |
 | CAN3 | 0x3D0 | ... | ... | 20 | 2 |
 | CAN3 | 0x411 | Batteriemanagement | Stromsensor | xxx | 8 |
-| CAN3 | 0x420 | ... | ... | 200 | 8 |
+| CAN3 | 0x420 | Kombiinstrument | ... | 200 | 8 |
 | CAN3 | 0x480 | Motorsteuergerät | ... | 20 | 8 |
 | CAN3 | 0x488 | Motorsteuergerät | ... | 20 | 8 |
 | CAN3 | 0x4A0 | Bremse | ... | 14 | 8 |
 | CAN3 | 0x4A8 | Bremse | ... | 20 | 8 |
 | CAN3 | 0x511 | Stromsensor | Batteriemanagement | xxx | 8 |
+| CAN3 | 0x520 | Kombiinstrument | ... | 200 | 8 |
 | CAN3 | 0x521 | Stromsensor | Batteriemanagement | 100 | 8 |
 | CAN3 | 0x580 | Motorsteuergerät | ... | 10 | 8 |
 | CAN3 | 0x5A0 | Bremse | ... | 14 | 8 |
 | CAN3 | 0x5D0 | ... | ... | 100 | 6 |
 | CAN3 | 0x5DE | ... | ... | 200 | 5 |
+| CAN3 | 0x5E0 | ... | ... | 110 | 8 |
 
 ... :	Aktuell keine Erkenntnis über den Wert vorhanden.
 xxx :	Timing nich vorhanden. CAN-ID auf dem Bus nur messbar nach Aufforderung

@@ -28,32 +28,32 @@ Nachfolgend ist eine Auflistung aller Eingangspins vom Mikrocontroller.
 
 | Funktionsgruppe | Pin | Funktion | Relevanz | Getestet |
 |:--------------- |:---:|:-------- |:-------- | --------:|
-| Shutdown Circuit | PA0 | Crash | System | No |
+| Shutdown Circuit | PA0 | Crash | System | Ja |
 | Shutdown Circuit | PA1 | Emergency Run | System | No |
 | STM32 | PA2 | Wakeup | Komfort | No |
 | Navibedienelement | PA9 | Out A | Komfort | Ja |
 | Navibedienelement | PA10 | Out B | Komfort | Ja |
 | Board Computer | PA11 | Up In | Komfort | No |
 | Shutdown Circuit | PB10 | BTB Sense | System | No |
-| Fahrzeug | PB15 | Anlasser | System | No |
+| Fahrzeug | PB15 | Anlasser | System | Ja |
 | SD-Card | PC6 | SD Switch | Komfort | No |
 | Navibedienelement | PC7 | Enter | Komfort | Ja |
 | STM32 | PC13 | Button 1 | Komfort | No |
 | ASR | PD4 | ASR 2 | Komfort | No |
-| Fahrzeug | PD8 | KL15 | System | No |
+| Fahrzeug | PD8 | KL15 | System | Ja |
 | Bamocar | PD10 | Bamo In 2 | Komfort | No |
 | Bamocar | PD12 | Bamo In 1 | Komfort | No |
 | ASR | PE3 | Eco | Komfort | No |
 | Board Computer | PE4 | Down In | Komfort | No |
 | Fahrzeug | PE5 | Durchfluss | Komfort | No |
 | STM32 | PE6 | Button 2 | Komfort | No |
-| Pedale | PE8 | Kickdown | System | No |
-| Pedale | PE9 | Leerlauf | System | No |
-| Pedale | PE10 | Kuplung NO | System | No |
+| Pedale | PE8 | Kickdown | System | Ja |
+| Pedale | PE9 | Leerlauf | System | Ja |
+| Pedale | PE10 | Kuplung NO | System | Ja |
 | Pedale | PE11 | Bremse NC | System | No |
 | Pedale | PE12 | Bremse NO | System | No |
 | Shutdown Circuit | PE13 | AKKU Sense | System | No |
-| Shutdown Circuit | PE14 | SDC0 Sense | System | No |
+| Shutdown Circuit | PE14 | SDC0 Sense | System | Ja |
 | ASR | PF1 | ECON | Komfort | No |
 | Fahrzeug | PF11 | Recuperation | Komfort | No |
 | DCDC | PG0 | Instruction | System | No |
@@ -90,3 +90,50 @@ werden erstmal nicht mit ihren eigentlichen Funktionen belegt und werden aktuell
 Debug-Zwecke verwendet.
 
 Im weiteren Verlauf bekommen diese Eingänge ihrer eigentlichen Funktion zugewiesen.
+
+## Standart Werte
+
+Für sämtliche Eingänge liegen standart Werte für die Auswertung vor. Diese liegen auch am
+Mikrocontroller an wenn kein Stecker am Motorsteuergerät gesteckt ist. Darüber hinaus
+wird noch in der nachfolgenden Tabelle mit aufgeführt, welche Werte am Mikrocontroller
+eingelesen werden können, wenn das Motorsteuergerät im Fahrzeug verbaut ist. Diese beiden
+Werte können sich gegebenenfalls von einander unterscheiden.
+
+| Funktionsgruppe | Pin | Funktion | Standart Wert | Wert KFZ KL15 aus| Wert KFZ KL15 an |
+|:--------------- |:---:|:-------- | -------------:| ----------------:| ----------------:|
+| Shutdown Circuit | PA0 | Crash | 1 | 1 | 1 |
+| Shutdown Circuit | PA1 | Emergency Run | 1 | 1 | 1 |
+| STM32 | PA2 | Wakeup | 1 | 1 | 1 |
+| Navibedienelement | PA9 | Out A | 1 | 1 | 1 |
+| Navibedienelement | PA10 | Out B | 1 | 1 | 1 |
+| Board Computer | PA11 | Up In | 1 | 1 | 1 |
+| Shutdown Circuit | PB10 | BTB Sense | 1 | 1 | 1 |
+| Fahrzeug | PB15 | Anlasser | 1 | 1 | 1 |
+| SD-Card | PC6 | SD Switch | 1 | 1 | 1 |
+| Navibedienelement | PC7 | Enter | 1 | 1 | 1 |
+| STM32 | PC13 | Button 1 | 1 | 1 | 1 |
+| ASR | PD4 | ASR 2 | 1 | 1 | 1 |
+| Fahrzeug | PD8 | KL15 | 1 | 1 | 1 |
+| Bamocar | PD10 | Bamo In 2 | 1 | 1 | 1 |
+| Bamocar | PD12 | Bamo In 1 | 1 | 1 | 1 |
+| ASR | PE3 | Eco | 1 | 1 | 1 |
+| Board Computer | PE4 | Down In | 1 | 1 | 1 |
+| Fahrzeug | PE5 | Durchfluss | 1 | 1 | 1 |
+| STM32 | PE6 | Button 2 | 1 | 1 | 1 |
+| Pedale | PE8 | Kickdown | 1 | 1 | 1 |
+| Pedale | PE9 | Leerlauf | 1 | 1 | 1 |
+| Pedale | PE10 | Kuplung NO | 1 | 1 | 1 |
+| Pedale | PE11 | Bremse NC | 1 | 1 | 1 |
+| Pedale | PE12 | Bremse NO | 1 | 1 | 1 |
+| Shutdown Circuit | PE13 | AKKU Sense | 1 | 1 | 1 |
+| Shutdown Circuit | PE14 | SDC0 Sense | 1 | 1 | 1 |
+| ASR | PF1 | ECON | 1 | 1 | 1 |
+| Fahrzeug | PF11 | Recuperation | 1 | 1 | 1 |
+| DCDC | PG0 | Instruction | 1 | 1 | 1 |
+| DCDC | PG1 | Fault | 1 | 1 | 1 |
+| ASR | PG4 | ASR 1 | 1 | 1 | 1 |
+| Tempomat | PG5 | GRA 4 | 1 | 1 | 1 |
+| Tempomat | PG6 | GRA 3 | 1 | 1 | 1 |
+| Tempomat | PG7 | GRA 2 | 1 | 1 | 1 |
+| Tempomat | PG8 | GRA 1 | 1 | 1 | 1 |
+| Board Computer | PG12 | Reset In | 1 | 1 | 1 |

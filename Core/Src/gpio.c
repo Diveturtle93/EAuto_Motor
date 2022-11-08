@@ -1,3 +1,4 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    gpio.c
@@ -6,16 +7,16 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
@@ -72,14 +73,14 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
-                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
+                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BUZZER_Pin|GENERATOR_LED_Pin|WISCHWARNUNG_Pin|BREMSWARNUNG_Pin
                           |PUMPE_BREMSE_Pin|PUMPE_KUEHLUNG_Pin|FAN2_Pin|FAN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin */
@@ -166,20 +167,20 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PGPin PGPin PGPin PGPin
                            PGPin PGPin PGPin PGPin */
-  GPIO_InitStruct.Pin = DCDC_INSTRUCTION_Pin|DCCDC_FAULT_Pin|ASR_IN1_Pin|GRA1_Pin
+  GPIO_InitStruct.Pin = DCDC_INSTRUCTION_Pin|DCDC_FAULT_Pin|ASR_IN1_Pin|GRA1_Pin
                           |GRA2_Pin|GRA3_Pin|GRA4_Pin|BC_RESET_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin */
-  GPIO_InitStruct.Pin = SENSE_SDC_BTB_Pin|ANLASSER_Pin;
+  GPIO_InitStruct.Pin = SENSE_SDC_BTB_Pin|BAMOCAR_IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = KL15_Pin|BAMOCAR_IN2_Pin|BAMOCAR_IN1_Pin|ASR_IN2_Pin;
+  GPIO_InitStruct.Pin = KL15_Pin|ANLASSER_Pin|BAMOCAR_IN1_Pin|ASR_IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -187,7 +188,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin */
   GPIO_InitStruct.Pin = BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
-                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|OELSTAND_TEMP_Pin;
+                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -209,11 +210,11 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ENTER_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = RUECKWARNUNG_Pin;
+  GPIO_InitStruct.Pin = OELSTAND_TEMP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(RUECKWARNUNG_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(OELSTAND_TEMP_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PDPin PDPin PDPin */
   GPIO_InitStruct.Pin = CAN1_TX_Pin|CAN1_RX_Pin|SD_CMD_Pin;
@@ -232,5 +233,3 @@ void MX_GPIO_Init(void)
 /* USER CODE BEGIN 2 */
 
 /* USER CODE END 2 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

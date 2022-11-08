@@ -24,7 +24,7 @@ Nachfolgend ist eine Auflistung aller Ausgangspins vom Mikrocontroller.
 
 | Funktionsgruppe | Pin | Funktion | Relevanz | Getestet |
 |:--------------- |:---:|:-------- |:-------- | --------:|
-| Fahrzeug | PA12 | Crash | Komfort | No |
+| Fahrzeug | PA12 | Rücklichtwarnung | Komfort | Ja |
 | STM32 | PB2 | LED Red | Komfort | Ja |
 | Fahrzeug | PB4 | Heizung 2 | System | No |
 | STM32 | PB7 | LED Green | Komfort | Ja |
@@ -34,12 +34,12 @@ Nachfolgend ist eine Auflistung aller Ausgangspins vom Mikrocontroller.
 | STM32 | PB14 | LED Blue | Komfort | Ja |
 | ASR | PC3 | WS2812 LED | Komfort | Ja |
 | Fahrzeug | PD3 | Ladeleuchte | Komfort | No |
-| Fahrzeug | PD7 | Öltemp | Komfort | No |
+| Fahrzeug | PD7 | Öltemp | Komfort | Ja |
 | Fahrzeug | PD9 | Bremslicht | Komfort | No |
 | Fahrzeug | PD11 | Rücklicht | Komfort | No |
 | Fahrzeug | PD13 | Klima PWM Out | System | No |
-| Fahrzeug | PD14 | Anhänger | Komfort | No |
-| Fahrzeug | PD15 | Reserve | Komfort | No |
+| Fahrzeug | PD14 | Anhänger | Komfort | Ja |
+| Fahrzeug | PD15 | Reserve | Komfort | Ja |
 | Fahrzeug | PE0 | Heizung 1 | System | No |
 | Fahrzeug | PE1 | Digital 2 | Komfort | No |
 | Fahrzeug | PE2 | Digital 1 | Komfort | No |
@@ -55,8 +55,8 @@ Nachfolgend ist eine Auflistung aller Ausgangspins vom Mikrocontroller.
 | DCDC | PF15 | Enable | System | No |
 | Fahrzeug | PG2 | Buzzer | System | No |
 | Fahrzeug | PG3 | Generator LED | System | No |
-| Fahrzeug | PG9 | Wischwarn | Komfort | No |
-| Fahrzeug | PG10 | Bremswarn | Komfort | No |
+| Fahrzeug | PG9 | Wischwarn | Komfort | Ja |
+| Fahrzeug | PG10 | Bremswarn | Komfort | Ja |
 | Fahrzeug | PG11 | Pumpe Bremse | System | No |
 | Fahrzeug | PG13 | Pumpe Kühlung | System | No |
 | Fahrzeug | PG14 | Lüfter 2 | System | No |
