@@ -135,6 +135,7 @@ int main(void)
   MX_CAN3_Init();
   MX_ADC1_Init();
   MX_TIM6_Init();
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
 
   // ITM HCLK
@@ -193,6 +194,182 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  	switch (UART2_msg[0])
+	  	{
+	  		case 1:
+				HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
+				NVIC_SystemReset();
+				break;
+	  		case 2:
+	  			UART2_msg[0] = 0;
+
+				a_nav[0] = 0x10 | (0x0F & nav_count);
+				a_nav[1] = 0x52;
+				a_nav[2] = 0x05;
+				a_nav[3] = 0x82;
+				a_nav[4] = 0x00;
+				a_nav[5] = 0x1B;
+				a_nav[6] = 0x40;
+				a_nav[7] = 0x30;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				while(1)
+				{
+					HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxNavi, RxDataNav);
+
+					if (RxNavi.StdId == 0x6C1)
+					{
+						if (RxDataNav[0] == (0xB0 | (0x0F & nav_count)))
+						{
+						  break;
+						}
+					}
+				}
+
+				// 1
+				a_nav[0] = 0x20 | (0x0F & nav_count);
+				a_nav[1] = 0x57;
+				a_nav[2] = 0x0E;
+				a_nav[3] = 0x02;
+				a_nav[4] = 0x00;
+				a_nav[5] = 0x15;
+				a_nav[6] = 0x65;
+				a_nav[7] = 0x65;
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				// 2
+				a_nav[0] = 0x20 | (0x0F & nav_count);
+				a_nav[1] = 0x65;
+				a_nav[2] = 0x65;
+				a_nav[3] = 0x65;
+				a_nav[4] = 0x65;
+				a_nav[5] = 0x65;
+				a_nav[6] = 0x65;
+				a_nav[7] = 0x65;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				// 3
+				a_nav[0] = 0x20 | (0x0F & nav_count);
+				a_nav[1] = 0x65;
+				a_nav[2] = 0x57;
+				a_nav[3] = 0x0E;
+				a_nav[4] = 0x02;
+				a_nav[5] = 0x00;
+				a_nav[6] = 0x1F;
+				a_nav[7] = 0x65;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				// 4
+				a_nav[0] = 0x20 | (0x0F & nav_count);
+				a_nav[1] = 0x65;
+				a_nav[2] = 0x65;
+				a_nav[3] = 0x65;
+				a_nav[4] = 0x65;
+				a_nav[5] = 0x65;
+				a_nav[6] = 0x65;
+				a_nav[7] = 0x65;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				// 5
+				a_nav[0] = 0x20 | (0x0F & nav_count);
+				a_nav[1] = 0x65;
+				a_nav[2] = 0x65;
+				a_nav[3] = 0x65;
+				a_nav[4] = 0x65;
+				a_nav[5] = 0x57;
+				a_nav[6] = 0x0E;
+				a_nav[7] = 0x02;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				// 6
+				a_nav[0] = 0x20 | (0x0F & nav_count);
+				a_nav[1] = 0x00;
+				a_nav[2] = 0x29;
+				a_nav[3] = 0x65;
+				a_nav[4] = 0x65;
+				a_nav[5] = 0x65;
+				a_nav[6] = 0x65;
+				a_nav[7] = 0x65;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+
+				// 7
+				a_nav[0] = 0x10 | (0x0F & nav_count);
+				a_nav[1] = 0x65;
+				a_nav[2] = 0x65;
+				a_nav[3] = 0x65;
+				a_nav[4] = 0x65;
+				a_nav[5] = 0x65;
+				a_nav[6] = 0x65;
+
+				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
+				{
+
+				}
+
+				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
+				nav_count++;
+				nav = 1;
+
+				while(nav == 1)
+				{
+					HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxNavi, RxDataNav);
+
+					if (RxNavi.StdId == 0x6C1)
+					{
+						if (RxDataNav[0] == (0xB0 | (0x0F & nav_count)))
+						{
+							nav = 0;
+						}
+					}
+				}
+				break;
+			default:
+				break;
+		}
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
 		{
@@ -475,6 +652,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
 			HAL_UART_Transmit(&huart2, c, 10, 100);
 			UART2_msg[0] = 1;
+		}
+		else if (UART2_rxBuffer[0] == 'N' && UART2_rxBuffer[1] == 'A' && UART2_rxBuffer[2] == 'V')
+		{
+			uartTransmit("Display\r\n", 9);
+			UART2_msg[0] = 2;
+		}
+		else
+		{
+			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
+			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
+			HAL_UART_Transmit(&huart2, c, 10, 100);
+			uartTransmit("Falsche Eingabe\r\n", 17);
 		}
 		uart_count = 0;
 	}

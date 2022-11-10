@@ -240,10 +240,6 @@ void Error_Handler(void);
 #define SD_D3_GPIO_Port GPIOC
 #define SD_SCK_Pin GPIO_PIN_12
 #define SD_SCK_GPIO_Port GPIOC
-#define CAN1_TX_Pin GPIO_PIN_0
-#define CAN1_TX_GPIO_Port GPIOD
-#define CAN1_RX_Pin GPIO_PIN_1
-#define CAN1_RX_GPIO_Port GPIOD
 #define SD_CMD_Pin GPIO_PIN_2
 #define SD_CMD_GPIO_Port GPIOD
 #define LADELEUCHTE_Pin GPIO_PIN_3
