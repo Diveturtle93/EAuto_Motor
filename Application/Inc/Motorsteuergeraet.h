@@ -14,6 +14,12 @@
 #define INC_MOTORSTEUERGERAET_H_
 //----------------------------------------------------------------------
 
+// Programmversion definieren
+//----------------------------------------------------------------------
+#define MAJOR 0																// Motorsteuergeraet Major version Number
+#define MINOR 1																// Motorsteuergeraet Minor version Number
+//----------------------------------------------------------------------
+
 // CAN-IDs definieren
 //----------------------------------------------------------------------
 // Motorsteuergeraet neu

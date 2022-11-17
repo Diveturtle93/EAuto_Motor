@@ -114,7 +114,9 @@ int main(void)
 	// Sendenachricht Motorsteuergeraet Motor1 erstellen
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
-  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
+  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
+  	CAN_TxHeaderTypeDef TxLenkung = {LENKUNG1_CAN, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 	// Sendenachricht Motorsteuergeraet analoge Eingaenge erstellen
   	CAN_TxHeaderTypeDef TxAnalog = {MOTOR_CAN_ANALOG_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet Temperatur Eingaenge erstellen
@@ -154,8 +156,14 @@ int main(void)
 	printResetSource(readResetSource());
 
   	// Teste serielle Schnittstelle
-  	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
-  	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
+  	#define WILLKOMM_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
+  	uartTransmit(WILLKOMM_STRING_UART, sizeof(WILLKOMM_STRING_UART));
+	#define VERSION_STRING_UART		"Starting Application "
+	uartTransmit(VERSION_STRING_UART, sizeof(VERSION_STRING_UART));
+	uartTransmitNumber(MAJOR, 10);
+	uartTransmit(".", 1);
+	uartTransmitNumber(MINOR, 10);
+	uartTransmit("\n", 1);
 
   	// Sammel Systeminformationen
   	collectSystemInfo();
@@ -201,171 +209,6 @@ int main(void)
 				NVIC_SystemReset();
 				break;
 	  		case 2:
-	  			UART2_msg[0] = 0;
-
-				a_nav[0] = 0x10 | (0x0F & nav_count);
-				a_nav[1] = 0x52;
-				a_nav[2] = 0x05;
-				a_nav[3] = 0x82;
-				a_nav[4] = 0x00;
-				a_nav[5] = 0x1B;
-				a_nav[6] = 0x40;
-				a_nav[7] = 0x30;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				while(1)
-				{
-					HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxNavi, RxDataNav);
-
-					if (RxNavi.StdId == 0x6C1)
-					{
-						if (RxDataNav[0] == (0xB0 | (0x0F & nav_count)))
-						{
-						  break;
-						}
-					}
-				}
-
-				// 1
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x57;
-				a_nav[2] = 0x0E;
-				a_nav[3] = 0x02;
-				a_nav[4] = 0x00;
-				a_nav[5] = 0x15;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 2
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 3
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x57;
-				a_nav[3] = 0x0E;
-				a_nav[4] = 0x02;
-				a_nav[5] = 0x00;
-				a_nav[6] = 0x1F;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 4
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 5
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x57;
-				a_nav[6] = 0x0E;
-				a_nav[7] = 0x02;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 6
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x00;
-				a_nav[2] = 0x29;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 7
-				a_nav[0] = 0x10 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-				nav = 1;
-
-				while(nav == 1)
-				{
-					HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxNavi, RxDataNav);
-
-					if (RxNavi.StdId == 0x6C1)
-					{
-						if (RxDataNav[0] == (0xB0 | (0x0F & nav_count)))
-						{
-							nav = 0;
-						}
-					}
-				}
 				break;
 			default:
 				break;
@@ -392,7 +235,7 @@ int main(void)
 			tmp[0] = 0;
 			tmp[1] = 1;
 
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxLenkung, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
 		}
 
@@ -436,6 +279,12 @@ int main(void)
 		// Task wird alle 200 Millisekunden ausgefuehrt
 		if (((count % 200) == 0) && (task == 1))
 		{
+			HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);
+			HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);
+			HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);
+			HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);
+			HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
+
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
 			OutData[1] = highcurrent_out.high_out;
@@ -632,11 +481,14 @@ void SystemClock_Config(void)
 // Interrupts
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	HAL_UART_Transmit(&huart2, &UART2_rxBuffer[uart_count], 1, 100);
+//	HAL_UART_Transmit(&huart2, &UART2_rxBuffer[uart_count], 1, 100);
 
 	if (UART2_rxBuffer[uart_count] == 0x7F)
 	{
-		uart_count--;
+		if (uart_count >= 1)
+		{
+			uart_count--;
+		}
 	}
 	else
 	{
@@ -653,10 +505,26 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			HAL_UART_Transmit(&huart2, c, 10, 100);
 			UART2_msg[0] = 1;
 		}
-		else if (UART2_rxBuffer[0] == 'N' && UART2_rxBuffer[1] == 'A' && UART2_rxBuffer[2] == 'V')
+		else if (UART2_rxBuffer[0] == 'O' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'L')
 		{
-			uartTransmit("Display\r\n", 9);
-			UART2_msg[0] = 2;
+			uartTransmit("Display Oel\r\n", 13);
+			leuchten_out.Oeldruck = (1 ^ leuchten_out.Oeldruck);
+			leuchten_out.GreenLed = leuchten_out.Oeldruck;
+		}
+		else if (UART2_rxBuffer[0] == 'W' && UART2_rxBuffer[1] == 'I' && UART2_rxBuffer[2] == 'S')
+		{
+			uartTransmit("Display Wisch\r\n", 15);
+			leuchten_out.Wischwarn = (1 ^ leuchten_out.Wischwarn);
+		}
+		else if (UART2_rxBuffer[0] == 'B' && UART2_rxBuffer[1] == 'R' && UART2_rxBuffer[2] == 'E')
+		{
+			uartTransmit("Display Brems\r\n", 15);
+			leuchten_out.Bremswarn = (1 ^ leuchten_out.Bremswarn);
+		}
+		else if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'U' && UART2_rxBuffer[2] == 'C')
+		{
+			uartTransmit("Display Rueck\r\n", 15);
+			leuchten_out.Ruechwarn = (1 ^ leuchten_out.Ruechwarn);
 		}
 		else
 		{
