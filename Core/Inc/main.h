@@ -268,10 +268,6 @@ void Error_Handler(void);
 #define FAN1_GPIO_Port GPIOG
 #define HEATER2_Pin GPIO_PIN_4
 #define HEATER2_GPIO_Port GPIOB
-#define CAN2_TX_Pin GPIO_PIN_5
-#define CAN2_TX_GPIO_Port GPIOB
-#define CAN2_RX_Pin GPIO_PIN_6
-#define CAN2_RX_GPIO_Port GPIOB
 #define BLUE_LED_Pin GPIO_PIN_7
 #define BLUE_LED_GPIO_Port GPIOB
 #define I2C1_SCL_Pin GPIO_PIN_8

@@ -34,7 +34,7 @@
 #define MOTOR_CAN_GAS								0x488					// Motorsteuergeraet ID MotorSTG6
 #define MOTOR_CAN_FLEXIA							0x580					// Motorsteuergeraet ID MotorFlexia
 //----------------------------------------------------------------------
-// CAN-IDs auf dem BUS Fahrzeug intern
+// CAN-IDs auf dem BUS Fahrzeug intern, Antriebs-CAN
 //----------------------------------------------------------------------
 #define LENKWINKEL_CAN								0x0C2					// CAN ID Lenkwinkelsensor
 #define BEMSE1_CAN									0x1A0
@@ -49,6 +49,10 @@
 #define LENKUNG2_CAN								0x5DE					// Immer aktive, außer im Sleep
 #define x_CAN										0x010					// Einmalig gesendet wenn Schlüssel auf Stufe 2
 #define xy_CAN										0x011					// EInmalig gesendet wenn Schlüssel auf Stufe 2
+//----------------------------------------------------------------------
+// CAN-IDs auf dem BUS Fahrzeug intern, Infotainment-CAN
+//----------------------------------------------------------------------
+#define TELEFON_CAN									0x665					// CAN ID Anmeldung Telefon am CAN Bus
 //----------------------------------------------------------------------
 
 // Definiere CAN Strukturen

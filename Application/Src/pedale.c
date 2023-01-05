@@ -91,15 +91,16 @@ uint16_t readTrottle(void)
 
 // Bremse auswerten
 //----------------------------------------------------------------------
-/*void readBrake(void)
+void readBrake(void)
 {
 	// Variablen anlegen
-	uint16_t ADC_Bremse = 0;
+//	uint16_t ADC_Bremse = 0;
 
 	// Gaspedal auf Plausibilitaet pruefen
 	if ((system_in.BremseNO == 1) && (system_in.BremseNC != 1))				// Bremse nicht getreten
 	{
-
+		// Bremsdruck einlesen
+//		ADC_Bremse = ADC_Bremsdruck();
 	}
 	else if ((system_in.BremseNO != 1) && (system_in.BremseNC == 1))		// Bremse voll getreten
 	{
@@ -108,12 +109,17 @@ uint16_t readTrottle(void)
 	else if ((system_in.BremseNO != 1) && (system_in.BremseNC != 1))		// Bremse teilweise getreten
 	{
 		// Bremsdruck einlesen
-		ADC_Bremse = ADC_Bremsdruck();
+//		ADC_Bremse = ADC_Bremsdruck();
 	}
 	else																	// Falls beide Schalter betaetigt sind
 	{
 		// Bremse invalide
-		software_error(ERROR_BREMSPEDAL);
+#ifndef DEBUG_SDC
+		software_error(ERROR_BREMSPEDAL);									// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
+#else
+#warning Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren.
+//		software_error_debug(ERROR_BREMSPEDAL);								// Errorfunktion stoppt Programm nicht
+#endif
 	}
-}*/
+}
 //----------------------------------------------------------------------

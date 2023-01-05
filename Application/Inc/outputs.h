@@ -65,7 +65,7 @@ typedef union __leuchten_out_tag {
 		uint8_t Ladeleuchte : 1;				// 5
 		uint8_t Wischwarn : 1;					// 6
 		uint8_t Bremswarn : 1;					// 7
-		uint8_t Oelstand : 1;					// 8
+		uint8_t Oeldruck : 1;					// 8
 		uint8_t Reserve : 1;					// 9
 		uint8_t Anhaenger : 1;					// A
 		uint8_t RedLed : 1;						// B

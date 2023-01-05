@@ -7,6 +7,8 @@
 C_SRCS += \
 ../Application/Src/Bamocar.c \
 ../Application/Src/BasicUart.c \
+../Application/Src/DIS_Comms.c \
+../Application/Src/DIS_Draw.c \
 ../Application/Src/SystemInfo.c \
 ../Application/Src/adc_inputs.c \
 ../Application/Src/error.c \
@@ -18,6 +20,8 @@ C_SRCS += \
 OBJS += \
 ./Application/Src/Bamocar.o \
 ./Application/Src/BasicUart.o \
+./Application/Src/DIS_Comms.o \
+./Application/Src/DIS_Draw.o \
 ./Application/Src/SystemInfo.o \
 ./Application/Src/adc_inputs.o \
 ./Application/Src/error.o \
@@ -29,6 +33,8 @@ OBJS += \
 C_DEPS += \
 ./Application/Src/Bamocar.d \
 ./Application/Src/BasicUart.d \
+./Application/Src/DIS_Comms.d \
+./Application/Src/DIS_Draw.d \
 ./Application/Src/SystemInfo.d \
 ./Application/Src/adc_inputs.d \
 ./Application/Src/error.d \
@@ -45,7 +51,7 @@ Application/Src/%.o Application/Src/%.su: ../Application/Src/%.c Application/Src
 clean: clean-Application-2f-Src
 
 clean-Application-2f-Src:
-	-$(RM) ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/Bamocar.su ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/BasicUart.su ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/SystemInfo.su ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/adc_inputs.su ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/error.su ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/inputs.su ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/millis.su ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/outputs.su ./Application/Src/pedale.d ./Application/Src/pedale.o ./Application/Src/pedale.su
+	-$(RM) ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/Bamocar.su ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/BasicUart.su ./Application/Src/DIS_Comms.d ./Application/Src/DIS_Comms.o ./Application/Src/DIS_Comms.su ./Application/Src/DIS_Draw.d ./Application/Src/DIS_Draw.o ./Application/Src/DIS_Draw.su ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/SystemInfo.su ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/adc_inputs.su ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/error.su ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/inputs.su ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/millis.su ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/outputs.su ./Application/Src/pedale.d ./Application/Src/pedale.o ./Application/Src/pedale.su
 
 .PHONY: clean-Application-2f-Src
 

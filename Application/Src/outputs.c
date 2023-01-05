@@ -80,7 +80,7 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(LADELEUCHTE_GPIO_Port, LADELEUCHTE_Pin, leuchten_out.Ladeleuchte);			// ECO LED Kombiinstrument
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Warnung Wischwasser Kombiinstument
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Warnung Bremse Kombiinstrument
-	HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, leuchten_out.Oelstand);			// Warnung Oelstand Kombiinstument
+	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);						// Warnung Oeldruck Kombiinstument
 	HAL_GPIO_WritePin(RESERVE_OUT_GPIO_Port, RESERVE_OUT_Pin, leuchten_out.Reserve);				// Reserve Ausgang 200mA
 	HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, leuchten_out.Anhaenger);					// Anhaenger LED Kombiinstrument
 	HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);							// Rote LED Platine
@@ -188,11 +188,11 @@ void cockpit_default(void)
 	leuchten_out.Ruechwarn = 1;																		// Ruecklichtwarnung setzen
 	leuchten_out.Wischwarn = 1;																		// Wischwasserwarnung setzen
 	leuchten_out.Bremswarn = 1;																		// Bremslichtwarnung setzen
-	leuchten_out.Oelstand = 1;																		// Oelstandwarnung setzen
+	leuchten_out.Oeldruck = 1;																		// Oelstandwarnung setzen
 	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
-	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oelstand);						// Fehlermeldung fuer Oeldruckwarnung einschalten
+	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);						// Fehlermeldung fuer Oeldruckwarnung einschalten
 }
 //----------------------------------------------------------------------
 

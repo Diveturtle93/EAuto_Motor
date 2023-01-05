@@ -93,6 +93,7 @@ void software_error_debug(uint8_t errorcode)
 #define ERRORCODE					"Error Code:\t"							// Ausgabe des Fehlers anhand von Fehlercode
 	uartTransmit(ERRORCODE,sizeof(ERRORCODE));
 	uartTransmitNumber(errorcode, 10);										// Fehlercode ausgeben
+	uartTransmit("\n", 1);
 #endif
 }
 //----------------------------------------------------------------------

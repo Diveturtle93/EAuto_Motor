@@ -37,6 +37,8 @@
 #include "Motorsteuergeraet.h"
 #include "adc_inputs.h"
 #include "pedale.h"
+#include "DIS_Draw.h"
+#include "DIS_Comms.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,14 +62,16 @@
 
 /* USER CODE BEGIN PV */
 int32_t temperature;
-CAN_RxHeaderTypeDef RxMessage;
+CAN_RxHeaderTypeDef RxMessage, RxNav;
 uint8_t UART2_rxBuffer[12] = {0};
 uint8_t UART2_msg[12] = {0};
 uint8_t uart_count = 0;
-uint8_t RxData[8];
+uint8_t RxData[8], RxDataNav[8];
 volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
 motor1_tag motor1;																	// Variable fuer Motor CAN-Nachricht 1 definieren
 motor2_tag motor2;																	// Variable fuer Motor CAN-Nachricht 2 definieren
+uint8_t reset = 0;
+uint8_t paused = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,7 +82,13 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void startComms(void)
+{
+   // Start DIS Comms
+    initDIS();
+    claimScreen();
+    drawFrame();
+}
 /* USER CODE END 0 */
 
 /**
@@ -100,9 +110,10 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
-	uint8_t status, tmp[4], task = 0;
+	uint8_t status, tmp[4], task = 0, TxRadioData[8] = {0};
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
+//  	uint8_t nav = 0, a_nav[8], nav_count = 0;
 
   	// Erstelle Can-Nachrichten
     // Sendenachricht erstellen
@@ -115,10 +126,16 @@ int main(void)
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
   	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
+  	// Sendenachricht Lenkgetriebe an Kombi erstellen, Simulation
+  	CAN_TxHeaderTypeDef TxLenkrad = {0x3D0, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 	// Sendenachricht Motorsteuergeraet analoge Eingaenge erstellen
   	CAN_TxHeaderTypeDef TxAnalog = {MOTOR_CAN_ANALOG_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet Temperatur Eingaenge erstellen
   	CAN_TxHeaderTypeDef TxTemperatur = {MOTOR_CAN_TEMPERATUR, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	// Sendenachricht Navi
+//  	CAN_TxHeaderTypeDef TxNav = {0x6C0, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxRadio = {0x661, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+//  	CAN_TxHeaderTypeDef TxRing = {0x436, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
 
   /* USER CODE END Init */
 
@@ -136,6 +153,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM6_Init();
   MX_CAN1_Init();
+  MX_CAN2_Init();
   /* USER CODE BEGIN 2 */
 
   // ITM HCLK
@@ -170,9 +188,6 @@ int main(void)
 
   	// Alle Fehler Cockpit loeschen
   	cockpit_default();
-  	// Setze LED Green
-  	leuchten_out.GreenLed = 1;
-  	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
 
   	// Lese alle Eingaenge
   	readall_inputs();
@@ -184,6 +199,8 @@ int main(void)
   	// Starte While-Schleife
 #define MAINWHILE				"\nStarte While Schleife\n"
   	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
+
+  	startComms();
 
   /* USER CODE END 2 */
 
@@ -199,176 +216,16 @@ int main(void)
 	  		case 1:
 				HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
 				NVIC_SystemReset();
-				break;
+			break;
 	  		case 2:
 	  			UART2_msg[0] = 0;
-
-				a_nav[0] = 0x10 | (0x0F & nav_count);
-				a_nav[1] = 0x52;
-				a_nav[2] = 0x05;
-				a_nav[3] = 0x82;
-				a_nav[4] = 0x00;
-				a_nav[5] = 0x1B;
-				a_nav[6] = 0x40;
-				a_nav[7] = 0x30;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				while(1)
-				{
-					HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxNavi, RxDataNav);
-
-					if (RxNavi.StdId == 0x6C1)
-					{
-						if (RxDataNav[0] == (0xB0 | (0x0F & nav_count)))
-						{
-						  break;
-						}
-					}
-				}
-
-				// 1
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x57;
-				a_nav[2] = 0x0E;
-				a_nav[3] = 0x02;
-				a_nav[4] = 0x00;
-				a_nav[5] = 0x15;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 2
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 3
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x57;
-				a_nav[3] = 0x0E;
-				a_nav[4] = 0x02;
-				a_nav[5] = 0x00;
-				a_nav[6] = 0x1F;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 4
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 5
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x57;
-				a_nav[6] = 0x0E;
-				a_nav[7] = 0x02;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 6
-				a_nav[0] = 0x20 | (0x0F & nav_count);
-				a_nav[1] = 0x00;
-				a_nav[2] = 0x29;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-				a_nav[7] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-
-				// 7
-				a_nav[0] = 0x10 | (0x0F & nav_count);
-				a_nav[1] = 0x65;
-				a_nav[2] = 0x65;
-				a_nav[3] = 0x65;
-				a_nav[4] = 0x65;
-				a_nav[5] = 0x65;
-				a_nav[6] = 0x65;
-
-				while(HAL_CAN_IsTxMessagePending(&hcan1, CAN_TX_MAILBOX0) == 1)
-				{
-
-				}
-
-				HAL_CAN_AddTxMessage(&hcan1, &TxNav, a_nav, (uint32_t *)CAN_TX_MAILBOX0);
-				nav_count++;
-				nav = 1;
-
-				while(nav == 1)
-				{
-					HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &RxNavi, RxDataNav);
-
-					if (RxNavi.StdId == 0x6C1)
-					{
-						if (RxDataNav[0] == (0xB0 | (0x0F & nav_count)))
-						{
-							nav = 0;
-						}
-					}
-				}
-				break;
+	  			drawFrame();
+			break;
+	  		case 3:
+	  			UART2_msg[0] = 0;
+			break;
 			default:
-				break;
+			break;
 		}
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
@@ -392,8 +249,8 @@ int main(void)
 			tmp[0] = 0;
 			tmp[1] = 1;
 
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			hal_error(status);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxLenkrad, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			//hal_error(status);
 		}
 
 		// Task wird alle 100 Millisekunden ausgefuehrt
@@ -406,7 +263,7 @@ int main(void)
 			readAnlasser();
 
 			// Bremse pruefen
-			//readBrake();
+			readBrake();
 
 			// Gaspedal pruefen
 			gas_adc = readTrottle();
@@ -508,10 +365,22 @@ int main(void)
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX0);
+
+
 		}
 
 		if (((count % 400) == 0) && (task == 1))
 		{
+			TxRadioData[0] = 0x83;
+			TxRadioData[1] = 0x01;
+			TxRadioData[2] = 0x12;
+			TxRadioData[3] = 0xA0;
+
+			// Navi Meldung
+			while (HAL_CAN_IsTxMessagePending(&hcan2, CAN_TX_MAILBOX0) == 1);
+			status = HAL_CAN_AddTxMessage(&hcan2, &TxRadio, TxRadioData, (uint32_t *)CAN_TX_MAILBOX0);
+			//hal_error(status);
+
 			// Variable count auf 0 zuruecksetzen
 			count = 0;
 		}
@@ -655,8 +524,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}
 		else if (UART2_rxBuffer[0] == 'N' && UART2_rxBuffer[1] == 'A' && UART2_rxBuffer[2] == 'V')
 		{
-			uartTransmit("Display\r\n", 9);
+			uartTransmit("Display Nav\r\n", 13);
 			UART2_msg[0] = 2;
+		}
+		else if (UART2_rxBuffer[0] == 'T' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'L')
+		{
+			uartTransmit("Display Tel\r\n", 13);
+			UART2_msg[0] = 3;
 		}
 		else
 		{
