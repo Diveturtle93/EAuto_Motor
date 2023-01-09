@@ -111,7 +111,7 @@ int main(void)
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
 	uint8_t status, tmp[4], task = 0, TxRadioData[8] = {0};
-	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
+	uint16_t count = 0, gas_adc = 0, gas_mean = 0, nav_tmp = 1;
   	uint32_t lastcan = 0, lastsendcan = 0;
 //  	uint8_t nav = 0, a_nav[8], nav_count = 0;
 
@@ -201,6 +201,7 @@ int main(void)
   	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 
   	startComms();
+  	drawFrame();
 
   /* USER CODE END 2 */
 
@@ -219,14 +220,19 @@ int main(void)
 			break;
 	  		case 2:
 	  			UART2_msg[0] = 0;
+	  			nav_tmp = 1;
+	  			startComms();
 	  			drawFrame();
 			break;
 	  		case 3:
 	  			UART2_msg[0] = 0;
+	  			nav_tmp = 0;
 			break;
 			default:
 			break;
 		}
+
+
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
 		{
@@ -288,6 +294,11 @@ int main(void)
 			// Drehmoment an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
+
+			if (nav_tmp == 1)
+			{
+				drawFrame();
+			}
 		}
 
 		// Task wird alle 200 Millisekunden ausgefuehrt
@@ -365,8 +376,6 @@ int main(void)
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX0);
-
-
 		}
 
 		if (((count % 400) == 0) && (task == 1))
@@ -377,8 +386,8 @@ int main(void)
 			TxRadioData[3] = 0xA0;
 
 			// Navi Meldung
-			while (HAL_CAN_IsTxMessagePending(&hcan2, CAN_TX_MAILBOX0) == 1);
-			status = HAL_CAN_AddTxMessage(&hcan2, &TxRadio, TxRadioData, (uint32_t *)CAN_TX_MAILBOX0);
+			//while (HAL_CAN_IsTxMessagePending(&hcan2, CAN_TX_MAILBOX0) == 1);
+			//status = HAL_CAN_AddTxMessage(&hcan2, &TxRadio, TxRadioData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 
 			// Variable count auf 0 zuruecksetzen
@@ -392,8 +401,6 @@ int main(void)
 	  	// Task wird alle 5 Millisekunden ausgefuehrt
 	  	if (millis() - lastcan >= 5)
 		{
-	  		HAL_CAN_GetRxMessage(&hcan3, CAN_RX_FIFO0, &RxMessage, TxData);
-
 			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
 			if (can_change == 1)
 			{
@@ -556,9 +563,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 // Can-Interrupt: Nachricht wartet
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	// Nachricht aus Speicher auslesen
-	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
-	can_change = 1;
+	if (hcan == &hcan2)
+	{
+		// Nachricht aus Speicher auslesen
+		//HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
+		can_change = 1;
+	}
 }
 
 // Can-Interrupt: Fifo0 ist voll

@@ -70,8 +70,6 @@ void readDIS(unsigned long id) 					// read waiting message(s) and send ack
 	}
 }
 
-
-
 uint8_t sendDIS(unsigned long id, uint8_t len, uint8_t *message)
 {
 	uint8_t sendBuf[8]={0};
@@ -92,7 +90,7 @@ uint8_t sendDIS(unsigned long id, uint8_t len, uint8_t *message)
 		{
 			expectedAck = NO_ACK;
 			ack = 1;
-			HAL_Delay(100);  									// don't send multi-line messages too fast
+			HAL_Delay(50);  									// don't send multi-line messages too fast
 		}
 		else
 		{
@@ -160,10 +158,6 @@ uint8_t sendDIS(unsigned long id, uint8_t len, uint8_t *message)
 	return ack;
 }
 
-
-	
-
-
 void waitDIS(unsigned long id, uint8_t *message) 			// wait for message
 {
 	uint8_t messageReceived = 0;
@@ -212,7 +206,6 @@ void waitDIS(unsigned long id, uint8_t *message) 			// wait for message
 		}
 	}
 }
-
 
 uint8_t disCommsOk(void)
 {

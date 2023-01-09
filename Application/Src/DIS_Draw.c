@@ -67,6 +67,7 @@ uint8_t  M2E_REC[] =           {0x10, 0x2E};
 uint8_t  M2F_REC[] =           {0x10, 0x2F};
 uint8_t  M39_REC[] =           {0x10, 0x39};
 uint8_t  M00_02_REC[] =        {0x10, 0x00, 0x02};
+uint8_t  M0B_REC[] = 		   {0x0B, 0x01, 0x00};
 
 /* Ack Types */
 const uint8_t  NORMAL_ACK = 1;
@@ -180,9 +181,9 @@ void drawFrame(void)
 //    sendDIS(DIS_SEND_ID,  sizeof(DRAW_9), DRAW_9);
 //    sendDIS(DIS_SEND_ID,  sizeof(DRAW_10), DRAW_10);
 //    sendDIS(DIS_SEND_ID,  sizeof(DRAW_11), DRAW_11);
-	uint8_t test1[8] = {0x20, 0x57, 0x11, 0x06, 0x01, 0x01, 0x48, 0x41};
-	uint8_t test2[8] = {0x20, 0x4C, 0x4C, 0x4F, 0x65, 0x46, 0x52, 0x45};
-	uint8_t test3[8] = {0x10, 0x44, 0x45, 0x52, 0x49, 0x4B};
+	uint8_t test1[8] = {0x20, 0x57, 0x0F, 0x06, 0x01, 0x01, 0x48, 0x41};
+	uint8_t test2[8] = {0x20, 0x4C, 0x4C, 0x4F, 0x65, 0x50, 0x08, 0x09};
+	uint8_t test3[4] = {0x10, 0x0C, 0x09, 0x10};
 	sendDIS(DIS_SEND_ID,  sizeof(test1), test1);
 	sendDIS(DIS_SEND_ID,  sizeof(test2), test2);
 	sendDIS(DIS_SEND_ID,  sizeof(test3), test3);
@@ -190,6 +191,7 @@ void drawFrame(void)
     sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
     sendDIS(DIS_SEND_ID,  sizeof(M39_SEND), M39_SEND);					// {0x10, 0x39}
     sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
+//    waitDIS(DIS_REC_ID, M0B_REC);										// {0x0B, 0x01, 0x00}
  
 }   
 
