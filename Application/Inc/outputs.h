@@ -61,7 +61,7 @@ typedef union __leuchten_out_tag {
 		uint8_t Rueckfahrlicht : 1;				// 1
 		uint8_t Generator : 1;					// 2
 		uint8_t Buzzer : 1;						// 3
-		uint8_t Ruechwarn : 1;					// 4
+		uint8_t Rueckwarn : 1;					// 4
 		uint8_t Ladeleuchte : 1;				// 5
 		uint8_t Wischwarn : 1;					// 6
 		uint8_t Bremswarn : 1;					// 7

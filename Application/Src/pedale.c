@@ -47,8 +47,7 @@ uint16_t readTrottle(void)
 			if ((system_in.Leerlauf == 1) && (system_in.Kickdown == 1))
 			{
 				// Fehlermeldung auf Uart ausgeben
-#define TROTTLE_INVALID				"Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown und Leerlauf"
-				uartTransmit(TROTTLE_INVALID, sizeof(TROTTLE_INVALID));
+				uartTransmitString("Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown und Leerlauf");
 				// Gaspedal invalide
 				software_error(ERROR_GASPEDAL);
 			}
@@ -59,7 +58,7 @@ uint16_t readTrottle(void)
 				ADC_Gas -= GAS_THRESHOLD;
 			}
 			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Leerlauf aktiv
-			else if ((system_in.Leerlauf == 1) && (ADC_Gas < GAS_THRESHOLD))
+			else if ((system_in.Leerlauf != 1) || ((system_in.Leerlauf == 1) && (ADC_Gas < GAS_THRESHOLD)))
 			{
 				// Wenn der Wert kleine als THRESHOLD ist, dann ADC ignorieren, alle Werte sind 0
 				ADC_Gas = 0;
@@ -75,6 +74,14 @@ uint16_t readTrottle(void)
 			{
 				// Wenn Wert gleich THRESHOLD ist
 				ADC_Gas = GAS_MAX_ADC;
+			}
+			// Wenn Kickdown betaetigt, Gaspedal Error
+			else if (system_in.Kickdown != 1)
+			{
+				// Fehlermeldung ausgeben
+				uartTransmitString("Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown");
+				// Gaspedal invalide
+				software_error(ERROR_GASPEDAL);
 			}
 		}
 		// Wenn Kupplung getreten == 0

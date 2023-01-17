@@ -42,7 +42,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 // TODO: OELDRUCKSCHALTER
-// FIXME: CAN Bus *(CAN-Bus braucht Ablaufprogramm)
+// FIXME: CAN Bus (CAN-Bus braucht Ablaufprogramm)
 // xxx: Schlechte Performance
 /* USER CODE END PTD */
 
@@ -170,8 +170,8 @@ int main(void)
 #endif
 
 	// Leds Testen
-  	testPCB_Leds();
-	testCockpit_Leds();
+//  testPCB_Leds();
+//	testCockpit_Leds();
 
   	// Testen der Versorgungsspannung am Shutdown-Circuit
   	testSDC();
@@ -202,16 +202,80 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		if (UART2_rxBuffer[uart_count-1] == '\r')
+		{
+			HAL_UART_Transmit(&huart2, (uint8_t*)"\nEingabe OK\r\n", 13, 100);
+			if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'S')
+			{
+				uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
+				HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
+				HAL_UART_Transmit(&huart2, c, 10, 100);
+				UART2_msg[0] = 1;
+			}
+			else if (UART2_rxBuffer[0] == 'O' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'L')
+			{
+				uartTransmit("Display Oel\r\n", 13);
+				leuchten_out.Oeldruck = !leuchten_out.Oeldruck;
+				leuchten_out.GreenLed = leuchten_out.Oeldruck;
+			}
+			else if (UART2_rxBuffer[0] == 'W' && UART2_rxBuffer[1] == 'I' && UART2_rxBuffer[2] == 'S')
+			{
+				uartTransmit("Display Wisch\r\n", 15);
+				leuchten_out.Wischwarn = !leuchten_out.Wischwarn;
+			}
+			else if (UART2_rxBuffer[0] == 'B' && UART2_rxBuffer[1] == 'R' && UART2_rxBuffer[2] == 'E')
+			{
+				uartTransmit("Display Brems\r\n", 15);
+				leuchten_out.Bremswarn = !leuchten_out.Bremswarn;
+			}
+			else if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'U' && UART2_rxBuffer[2] == 'C')
+			{
+				uartTransmit("Display Rueck\r\n", 15);
+				leuchten_out.Rueckwarn = !leuchten_out.Rueckwarn;
+			}
+			else if (UART2_rxBuffer[0] == 'B' && UART2_rxBuffer[1] == 'U' && UART2_rxBuffer[2] == 'P')
+			{
+				uartTransmit("BC Up\r\n", 7);
+				UART2_msg[0] = 2;
+			}
+			else if (UART2_rxBuffer[0] == 'B' && UART2_rxBuffer[1] == 'D' && UART2_rxBuffer[2] == 'O')
+			{
+				uartTransmit("BC Down\r\n", 9);
+				UART2_msg[0] = 3;
+			}
+			else
+			{
+				uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
+				HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
+				HAL_UART_Transmit(&huart2, c, 10, 100);
+				uartTransmit("Falsche Eingabe\r\n", 17);
+			}
+			uart_count = 0;
+		}
+
 	  	switch (UART2_msg[0])
 	  	{
 	  		case 1:
 				HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
 				NVIC_SystemReset();
-				break;
+			break;
 	  		case 2:
-				break;
+	  			komfort_out.BC_Up_Out = !komfort_out.BC_Up_Out;
+	  			HAL_GPIO_WritePin(BC_UP_OUT_GPIO_Port, BC_UP_OUT_Pin, komfort_out.BC_Up_Out);
+	  			UART2_msg[0] = 0;
+			break;
+	  		case 3:
+	  			komfort_out.BC_Down_Out = !komfort_out.BC_Down_Out;
+	  			HAL_GPIO_WritePin(BC_DOWN_OUT_GPIO_Port, BC_DOWN_OUT_Pin, komfort_out.BC_Down_Out);
+	  			UART2_msg[0] = 0;
+	  		break;
+	  		case 4:
+	  			komfort_out.BC_Rst_Out = !komfort_out.BC_Rst_Out;
+	  			HAL_GPIO_WritePin(BC_RESET_OUT_GPIO_Port, BC_RESET_OUT_Pin, komfort_out.BC_Rst_Out);
+	  			UART2_msg[0] = 0;
+	  		break;
 			default:
-				break;
+			break;
 		}
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
@@ -281,7 +345,7 @@ int main(void)
 		{
 			HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);
 			HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);
-			HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);
+			HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Rueckwarn);
 			HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);
 			HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
 
@@ -326,11 +390,11 @@ int main(void)
 			AnalogData[0] = ADC_VAL[4];
 			AnalogData[1] = (ADC_VAL[4] >> 8) | (ADC_VAL[0] << 4);
 			AnalogData[2] = (ADC_VAL[0] >> 4);
-			AnalogData[3] = ADC_VAL[6];
-			AnalogData[4] = (ADC_VAL[6] >> 8) | (ADC_VAL[7] << 4);
-			AnalogData[5] = (ADC_VAL[7] >> 4);
-			AnalogData[6] = ADC_VAL[5];
-			AnalogData[7] = (ADC_VAL[5] >> 8);
+			AnalogData[3] = gas_mean;
+			AnalogData[4] = (gas_mean >> 8) | (ADC_VAL[6] << 4);
+			AnalogData[5] = (ADC_VAL[6] >> 4);
+			AnalogData[6] = ADC_VAL[7];
+			AnalogData[7] = (ADC_VAL[7] >> 8);
 
 			// Bamocar Fehler auslesen
 //			tmp[0] = 0x3D;
@@ -351,6 +415,8 @@ int main(void)
 			TempData[3] = ADC_VAL[8];
 			TempData[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
 			TempData[5] = (ADC_VAL[1] >> 4);
+			TempData[6] = ADC_VAL[8];
+			TempData[7] = (ADC_VAL[8] >> 8);
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Befehl Fehler auslesen an Bamocar senden
@@ -493,47 +559,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	else
 	{
 		uart_count++;
-	}
-
-	if (UART2_rxBuffer[uart_count-1] == '\r')
-	{
-		HAL_UART_Transmit(&huart2, (uint8_t*)"\nEingabe OK\r\n", 13, 100);
-		if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'S')
-		{
-			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
-			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
-			HAL_UART_Transmit(&huart2, c, 10, 100);
-			UART2_msg[0] = 1;
-		}
-		else if (UART2_rxBuffer[0] == 'O' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'L')
-		{
-			uartTransmit("Display Oel\r\n", 13);
-			leuchten_out.Oeldruck = (1 ^ leuchten_out.Oeldruck);
-			leuchten_out.GreenLed = leuchten_out.Oeldruck;
-		}
-		else if (UART2_rxBuffer[0] == 'W' && UART2_rxBuffer[1] == 'I' && UART2_rxBuffer[2] == 'S')
-		{
-			uartTransmit("Display Wisch\r\n", 15);
-			leuchten_out.Wischwarn = (1 ^ leuchten_out.Wischwarn);
-		}
-		else if (UART2_rxBuffer[0] == 'B' && UART2_rxBuffer[1] == 'R' && UART2_rxBuffer[2] == 'E')
-		{
-			uartTransmit("Display Brems\r\n", 15);
-			leuchten_out.Bremswarn = (1 ^ leuchten_out.Bremswarn);
-		}
-		else if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'U' && UART2_rxBuffer[2] == 'C')
-		{
-			uartTransmit("Display Rueck\r\n", 15);
-			leuchten_out.Ruechwarn = (1 ^ leuchten_out.Ruechwarn);
-		}
-		else
-		{
-			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
-			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
-			HAL_UART_Transmit(&huart2, c, 10, 100);
-			uartTransmit("Falsche Eingabe\r\n", 17);
-		}
-		uart_count = 0;
 	}
 
 	if (uart_count == 12)

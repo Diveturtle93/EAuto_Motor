@@ -76,7 +76,7 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(RUECKFAHRLICHT_GPIO_Port, RUECKFAHRLICHT_Pin, leuchten_out.Rueckfahrlicht);	// Rueckfahrlichtrelais
 	HAL_GPIO_WritePin(GENERATOR_LED_GPIO_Port, GENERATOR_LED_Pin, leuchten_out.Generator);			// Generator LED Kombiinstrument
 	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, leuchten_out.Buzzer);							// Buzzer
-	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);			// Warnung Rueckfahrlicht Kombiinstrument
+	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Rueckwarn);			// Warnung Rueckfahrlicht Kombiinstrument
 	HAL_GPIO_WritePin(LADELEUCHTE_GPIO_Port, LADELEUCHTE_Pin, leuchten_out.Ladeleuchte);			// ECO LED Kombiinstrument
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Warnung Wischwasser Kombiinstument
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Warnung Bremse Kombiinstrument
@@ -185,11 +185,11 @@ void pwm_oelstand(uint16_t time)
 //----------------------------------------------------------------------
 void cockpit_default(void)
 {
-	leuchten_out.Ruechwarn = 1;																		// Ruecklichtwarnung setzen
+	leuchten_out.Rueckwarn = 1;																		// Ruecklichtwarnung setzen
 	leuchten_out.Wischwarn = 1;																		// Wischwasserwarnung setzen
 	leuchten_out.Bremswarn = 1;																		// Bremslichtwarnung setzen
 	leuchten_out.Oeldruck = 1;																		// Oeldruckwarnung setzen
-	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Ruechwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
+	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Rueckwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
 	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);						// Fehlermeldung fuer Oeldruckwarnung einschalten
