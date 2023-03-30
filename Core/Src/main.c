@@ -569,7 +569,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		HAL_UART_Transmit(&huart2, (uint8_t*) "ltig\r\n", 6, 100);
 		uart_count = 0;
 	}
-    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
+
+	if (UART2_rxBuffer[uart_count-1] == '\r')
+	{
+	    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[0], 1);
+	}
+	else
+	{
+	    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
+	}
 }
 
 // Can-Interrupt: Nachricht wartet

@@ -86,3 +86,7 @@ werden erstmal nicht mit ihren eigentlichen Funktionen belegt und können aktuel
 Debug-Zwecke verwendet werden.
 
 Im weiteren Verlauf bekommen diese Ausgänge ihrer eigentlichen Funktion zugewiesen.
+
+Bremswarn braucht 1s um angezeigt und 2s gelöscht zu werden
+Rücklichtwarnung braucht 2s um angezeigt und gelöscht zu werden
+Wischwarn braucht 20s um angezeigt und gelöscht zu werden
