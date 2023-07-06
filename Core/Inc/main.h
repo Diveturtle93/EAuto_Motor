@@ -40,6 +40,16 @@ extern "C" {
 //#warning "PCB Revision 1.1 definiert"
 //#endif
 
+// Um bestimmte Funktionen vom Auto bei Tischaufbau zu simulieren
+//----------------------------------------------------------------------
+#define TISCHAUFBAU 								 1						// Tischaufbau = 1, Auto = 0
+
+// Warnung ausgeben wenn Tischaufbau aktiviert
+#if TISCHAUFBAU == 1
+#warning "Programm fuer Tischaufbau konfiguriert !!!"
+#endif
+//----------------------------------------------------------------------
+
 // Define Statemaschine Typedefines
 //----------------------------------------------------------------------
 typedef enum MotorsteuergeraeteState

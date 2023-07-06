@@ -100,7 +100,7 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
-	uint8_t status, tmp[4] = {0}, tmp_Lenkung[4] = {0}, task = 0, heizung = 0;
+	uint8_t status, tmp[4] = {0}, task = 0, heizung = 0;
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
   	static Motor_State statemaschine = Start;
@@ -116,12 +116,16 @@ int main(void)
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
   	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
-  	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
-  	CAN_TxHeaderTypeDef TxLenkung = {LENKUNG1_CAN, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 	// Sendenachricht Motorsteuergeraet analoge Eingaenge erstellen
   	CAN_TxHeaderTypeDef TxAnalog = {MOTOR_CAN_ANALOG_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet Temperatur Eingaenge erstellen
   	CAN_TxHeaderTypeDef TxTemperatur = {MOTOR_CAN_TEMPERATUR, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+
+#if TISCHAUFBAU == 1
+  	uint8_t tmp_Lenkung[4] = {0};
+  	// Sendenachricht Lenkung an Kombiinstrument erstellen, Simulation fuer Tischaufbau
+  	CAN_TxHeaderTypeDef TxLenkung = {LENKUNG1_CAN, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
+#endif
 
   /* USER CODE END Init */
 
@@ -313,8 +317,9 @@ int main(void)
 	  	{
 	  		statemaschine = Anlasser;
 	  		leuchten_out.Buzzer = 1;
+	  		HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, leuchten_out.Buzzer);
 	  		uartTransmit("Anlasser\n", 9);
-	  		HAL_Delay(250);
+	  		HAL_Delay(1250);
 	  		leuchten_out.Buzzer = 0;
 	  		leuchten_out.Niveau = 0;
 	  		leuchten_out.Anhaenger = 0;
@@ -398,12 +403,14 @@ int main(void)
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
+
+#if TISCHAUFBAU == 1
 			tmp_Lenkung[0] = 0;
 			tmp_Lenkung[1] = 1;
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxLenkung, tmp_Lenkung, (uint32_t *)CAN_TX_MAILBOX0);
-			hal_error(status);
+			HAL_CAN_AddTxMessage(&hcan3, &TxLenkung, tmp_Lenkung, (uint32_t *)CAN_TX_MAILBOX0);
+#endif
 		}
 
 		if (((count % 220) == 0) && (task == 1))

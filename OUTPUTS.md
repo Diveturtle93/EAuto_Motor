@@ -44,20 +44,20 @@ Nachfolgend ist eine Auflistung aller Ausgangspins vom Mikrocontroller.
 | Fahrzeug | PE1 | Digital 2 | Komfort | No |
 | Fahrzeug | PE2 | Digital 1 | Komfort | No |
 | Fahrzeug | PE7 | Glühkerzenrelais | Komfort | No |
-| Shutdown Circuit | PE15 | Motorsteuergerät | System | No |
+| Shutdown Circuit | PE15 | Motorsteuergerät | System | Ja |
 | Fahrzeug | PF2 | Öldruck | Komfort | No |
-| Board Computer | PF3 | Down Out | Komfort | No |
-| Board Computer | PF4 | Up Out | Komfort | No |
-| Board Computer | PF5 | Reset Out | Komfort | No |
+| Board Computer | PF3 | Down Out | Komfort | Ja |
+| Board Computer | PF4 | Up Out | Komfort | Ja |
+| Board Computer | PF5 | Reset Out | Komfort | Ja |
 | Bamocar | PF12 | Bamo Out 1 | Komfort | No |
 | Bamocar | PF13 | Bamo Out 2 | Komfort | No |
 | Fahrzeug | PF14 | J317 | System | No |
 | DCDC | PF15 | Enable | System | No |
-| Fahrzeug | PG2 | Buzzer | System | No |
+| Fahrzeug | PG2 | Buzzer | System | Ja |
 | Fahrzeug | PG3 | Generator LED | System | No |
 | Fahrzeug | PG9 | Wischwarn | Komfort | Ja |
 | Fahrzeug | PG10 | Bremswarn | Komfort | Ja |
-| Fahrzeug | PG11 | Pumpe Bremse | System | No |
+| Fahrzeug | PG11 | Pumpe Bremse | System | Ja |
 | Fahrzeug | PG13 | Pumpe Kühlung | System | No |
 | Fahrzeug | PG14 | Lüfter 2 | System | No |
 | Fahrzeug | PG15 | Lüfter 1 | System | No |
