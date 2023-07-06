@@ -284,6 +284,14 @@ void Error_Handler(void);
 #define DIGITAL2_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
+// Boolean definieren
+//----------------------------------------------------------------------
+typedef enum
+{
+	false,
+	true
+} bool;
+//----------------------------------------------------------------------
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

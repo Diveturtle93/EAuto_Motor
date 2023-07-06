@@ -1,46 +1,33 @@
 //----------------------------------------------------------------------
-// Titel	:	Git.h
+// Titel	:	rtd_sound.h
 //----------------------------------------------------------------------
 // Sprache	:	C
-// Datum	:	18.08.2021
+// Datum	:	06.07.2023
 // Version	:	1.0
 // Autor	:	Diveturtle93
-// Projekt	:	STM32F767ZI
+// Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
 // Dateiheader definieren
 //----------------------------------------------------------------------
-#ifndef _GIT_H_
-#define _GIT_H_
+#ifndef RTD_SOUND_H_
+#define RTD_SOUND_H_
 //----------------------------------------------------------------------
 
-// Git Commit-Infos definieren
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
-#define GIT_COMMIT					"5ebeaf8"
-#define GIT_BRANCH					"develop"
-#define GIT_HASH					"5ebeaf8920c4912adb3f0da8c9b45250ec62038c"
+#include "main.h"
 //----------------------------------------------------------------------
 
-// Git Tags-Infos definieren
+// Defines definieren
 //----------------------------------------------------------------------
-#define GIT_LAST_TAG				"Init Test-ADC"
-#define GIT_TAG_COMMIT				"9479db42dd979b7924d4cafeae8b914772176469"
-#define GIT_TAG_DIRTY				"Test-ADC-54-g5ebeaf8"
+#define RTDSTIME									2000					// Zeit die der Buzzer beim Starten an ist
 //----------------------------------------------------------------------
 
-// Git Zaehler definieren
+// Funktionen definieren
 //----------------------------------------------------------------------
-#define GIT_TAG_DIRTY_COUNT			"54"
-#define GIT_OVERALL_COMMIT_COUNT	"83"
-#define GIT_BRANCH_COMMIT_COUNT		"82"
-#define GIT_ACTIVE_BRANCHES			"3"
-#define GIT_TAG_COUNT				"28"
+bool playRTDS(void);
 //----------------------------------------------------------------------
 
-// Build Zeit definieren
-//----------------------------------------------------------------------
-#define BUILD_DATE					"2022-11-10"
-#define BUILD_TIME					"08:23:37"
-//----------------------------------------------------------------------
-#endif /* _GIT_H_ */
+#endif /* RTD_SOUND_H_ */
 //----------------------------------------------------------------------

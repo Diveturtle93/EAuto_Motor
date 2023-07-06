@@ -9,6 +9,7 @@ git.h
 *.ko
 *.obj
 *.elf
+*.cyclo
 
 # Linker output
 *.ilk
@@ -53,3 +54,4 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+Application/Inc/git.h
