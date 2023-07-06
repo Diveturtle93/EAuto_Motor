@@ -100,9 +100,10 @@ int main(void)
 
 	// Definiere Variablen fuer Main-Funktion
 	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
-	uint8_t status, tmp[4], task = 0;
+	uint8_t status, tmp[4] = {0}, tmp_Lenkung[4] = {0}, task = 0, heizung = 0;
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
+  	static Motor_State statemaschine = Start;
 
   	// Erstelle Can-Nachrichten
     // Sendenachricht erstellen
@@ -114,7 +115,7 @@ int main(void)
 	// Sendenachricht Motorsteuergeraet Motor1 erstellen
   	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
   	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
-  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
+  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
   	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
   	CAN_TxHeaderTypeDef TxLenkung = {LENKUNG1_CAN, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
 	// Sendenachricht Motorsteuergeraet analoge Eingaenge erstellen
@@ -193,6 +194,16 @@ int main(void)
 #define MAINWHILE				"\nStarte While Schleife\n"
   	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 
+
+  	if (statemaschine == Start)
+  	{
+  		statemaschine = Ready;
+  		uartTransmit("Ready\n", 6);
+
+  		system_out.F18 = 1;
+  		system_out.F54 = 1;
+  	}
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -243,6 +254,11 @@ int main(void)
 				uartTransmit("BC Down\r\n", 9);
 				UART2_msg[0] = 3;
 			}
+			else if (UART2_rxBuffer[0] == 'B' && UART2_rxBuffer[1] == 'R' && UART2_rxBuffer[2] == 'S')
+			{
+				uartTransmit("BC Reset\r\n", 10);
+				UART2_msg[0] = 4;
+			}
 			else
 			{
 				uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
@@ -277,6 +293,95 @@ int main(void)
 			default:
 			break;
 		}
+
+	  	// Statemaschine
+	  	if ((statemaschine == Ready) && (system_in.KL15 != 1))
+	  	{
+	  		statemaschine = KL15;
+	  		leuchten_out.Niveau = 1;
+	  		leuchten_out.Anhaenger = 1;
+	  		uartTransmit("KL15\n", 5);
+	  	}
+
+	  	if ((statemaschine == KL15) && (system_in.KL15 == 1))
+	  	{
+	  		statemaschine = Ausschalten;
+	  		uartTransmit("Ausschalten\n", 12);
+	  	}
+
+	  	if ((statemaschine == KL15) && (system_in.Anlasser != 1))
+	  	{
+	  		statemaschine = Anlasser;
+	  		leuchten_out.Buzzer = 1;
+	  		uartTransmit("Anlasser\n", 9);
+	  		HAL_Delay(250);
+	  		leuchten_out.Buzzer = 0;
+	  		leuchten_out.Niveau = 0;
+	  		leuchten_out.Anhaenger = 0;
+	  	}
+
+	  	if ((statemaschine == Anlasser) && (system_in.KL15 == 1))
+	  	{
+	  		statemaschine = Ausschalten;
+	  		uartTransmit("Ausschalten\n", 12);
+	  	}
+
+	  	if ((statemaschine == Anlasser) && (system_in.BremseNO == 1) && (system_in.BremseNC == 1))
+	  	{
+	  		statemaschine = ReadyToDrive;
+	  		sdc_in.Anlasser = 1;
+	  		uartTransmit("ReadyToDrive\n", 13);
+	  	}
+
+	  	if ((statemaschine == ReadyToDrive) && (system_in.KL15 == 1))
+	  	{
+	  		statemaschine = Ausschalten;
+	  		uartTransmit("Ausschalten\n", 12);
+
+	  		sdc_in.Anlasser = 0;
+	  	}
+
+	  	if (statemaschine == MotorWarning)
+	  	{
+
+	  	}
+
+	  	if (statemaschine == MotorError)
+	  	{
+
+	  	}
+
+	  	if (statemaschine == CriticalError)
+	  	{
+
+	  	}
+
+	  	if (statemaschine == Ausschalten)
+	  	{
+	  		// Alle Ausgaenge auf Null setzen
+	  		system_out.systemoutput = 0;
+	  		highcurrent_out.high_out = 0;
+	  		komfort_out.komfortoutput = 0;
+	  		leuchten_out.ledoutput = 0;
+
+	  		// xxx Loeschen falls es reicht alle Ausgaenge auf einmal auf Null zu setzen
+//	  		system_out.F18 = 0;
+//	  		system_out.F54 = 0;
+//	  		system_out.MotorSDC = 0;
+//	  		sdc_in.SDC12V = 0;
+//	  		komfort_out.BC_Down_Out = 0;
+//	  		komfort_out.BC_Rst_Out = 0;
+//	  		komfort_out.BC_Up_Out = 0;
+//	  		komfort_out.BamoOut1 = 0;
+//	  		komfort_out.BamoOut2 = 0;
+		}
+
+		// PWM Oelstandsensor Kombiinstrument ausgeben
+		pwm_oelstand(count);
+
+		// Ausgaenge setzen
+		writeall_outputs();
+
 	  	// Task wird jede Millisekunde ausgefuehrt
 		if (millisekunden_flag_1 == 1)
 		{
@@ -287,20 +392,31 @@ int main(void)
 			task = 1;
 		}
 
-		// PWM Oelstandsensor Kombiinstrument ausgeben
-		pwm_oelstand(count);
-
 		// Task wird alle 20 Millisekunden ausgefuehrt
 		if (((count % 20) == 0) && (task == 1))
 		{
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht Motor1
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
-			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			tmp[0] = 0;
-			tmp[1] = 1;
+			tmp_Lenkung[0] = 0;
+			tmp_Lenkung[1] = 1;
 
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxLenkung, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxLenkung, tmp_Lenkung, (uint32_t *)CAN_TX_MAILBOX0);
 			hal_error(status);
+		}
+
+		if (((count % 220) == 0) && (task == 1))
+		{
+			// Bamocar Fehler auslesen
+			tmp[0] = 0x3D;
+			tmp[1] = 0x8F;
+			tmp[2] = 0x00;
+
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
+			// Befehl Fehler auslesen an Bamocar senden
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			//hal_error(status);
 		}
 
 		// Task wird alle 100 Millisekunden ausgefuehrt
@@ -315,26 +431,87 @@ int main(void)
 			// Bremse pruefen
 			//readBrake();
 
-			// Gaspedal pruefen
-			gas_adc = readTrottle();
-
-			// Abfrage ob Mittelwertbildung
-			if (gas_adc > 0)															// Wenn Gaspedal Plausible dann Mittelwertbildung
+			if (statemaschine == ReadyToDrive)
 			{
-				// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
-				// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
-				gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+				// Gaspedal pruefen
+				gas_adc = readTrottle();
+
+				// TODO Wenn Kupplung dann auch gas_mean auf 0 setzen
+
+				// Abfrage ob Mittelwertbildung
+				if (gas_adc > 0)															// Wenn Gaspedal Plausible dann Mittelwertbildung
+				{
+					// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+					// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
+					gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+				}
+				else																		// Wenn Gaspedal unplausible oder Kupplung getreten
+				{
+					gas_mean = 0;
+				}
+
+				// Daten in Bamocarformat umwandeln
+				tmp[0] = 0x90;
+				tmp[1] = (gas_mean);
+				tmp[2] = ((gas_mean) >> 8);
 			}
-			else																		// Wenn Gaspedal unplausible oder Kupplung getreten
+
+			if (system_in.Crash != 1)
 			{
-				gas_mean = 0;
+				uartTransmit("Crash ausgeloest!!!\n", 20);
+				statemaschine = CriticalError;
+				system_out.MotorSDC = 0;
+				sdc_in.Anlasser = 0;
+				leuchten_out.RedLed = 1;
+				leuchten_out.GreenLed = 0;
+
+				tmp[0] = 0x90;
+				tmp[1] = 0;
+				tmp[2] = 0;
 			}
 
-			// Daten in Bamocarformat umwandeln
-			tmp[0] = 0x90;
-			tmp[1] = (gas_mean);
-			tmp[2] = ((gas_mean) >> 8);
+			if (sdc_in.BTB_SDC != 1)
+			{
+				uartTransmit("BTB Fehler!!!\n", 14);
+				statemaschine = MotorError;
+				sdc_in.Anlasser = 0;
 
+				leuchten_out.RedLed = 1;
+				leuchten_out.GreenLed = 0;
+		  		highcurrent_out.Pumpe_Bremse = 1;
+			}
+
+			if (sdc_in.EmergencyRun != 1)
+			{
+				uartTransmit("Emergency Run ausgeloest!!!\n", 28);
+				statemaschine = MotorError;
+
+				leuchten_out.RedLed = 1;
+				leuchten_out.GreenLed = 0;
+
+				gas_mean = gas_mean/10;
+
+				tmp[0] = 0x90;
+				tmp[1] = (gas_mean);
+				tmp[2] = ((gas_mean) >> 8);
+			}
+
+			if (sdc_in.Akku1SDC != 1)
+			{
+				uartTransmit("Akku SDC Fehler erkannt!!!\n", 27);
+				statemaschine = MotorWarning;
+
+				leuchten_out.RedLed = 1;
+				leuchten_out.GreenLed = 1;
+
+				gas_mean = gas_mean/10;
+
+				tmp[0] = 0x90;
+				tmp[1] = (gas_mean);
+				tmp[2] = ((gas_mean) >> 8);
+			}
+
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Drehmoment an Bamocar senden
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
@@ -343,12 +520,6 @@ int main(void)
 		// Task wird alle 200 Millisekunden ausgefuehrt
 		if (((count % 200) == 0) && (task == 1))
 		{
-			HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);
-			HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);
-			HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Rueckwarn);
-			HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);
-			HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
-
 			// Daten fuer Ausgaenge zusammenfuehren
 			OutData[0] = system_out.systemoutput;
 			OutData[1] = highcurrent_out.high_out;
@@ -357,6 +528,7 @@ int main(void)
 			OutData[4] = komfort_out.komfortoutput;
 			OutData[5] ++;
 
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht digitale Ausgaenge
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
@@ -396,15 +568,6 @@ int main(void)
 			AnalogData[6] = ADC_VAL[7];
 			AnalogData[7] = (ADC_VAL[7] >> 8);
 
-			// Bamocar Fehler auslesen
-//			tmp[0] = 0x3D;
-//			tmp[1] = 0x8F;
-//			tmp[2] = 0x00;
-
-//			// Befehl Fehler auslesen an Bamocar senden
-//			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-
 			// ADC-Werte einlesen Kuehlwassertemperatur
 			ADC_VAL[8] = ADC_Kuhlwassertemperatur();
 
@@ -415,8 +578,8 @@ int main(void)
 			TempData[3] = ADC_VAL[8];
 			TempData[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
 			TempData[5] = (ADC_VAL[1] >> 4);
-			TempData[6] = ADC_VAL[8];
-			TempData[7] = (ADC_VAL[8] >> 8);
+			TempData[6] = ADC_VAL[5];
+			TempData[7] = (ADC_VAL[5] >> 8);
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Befehl Fehler auslesen an Bamocar senden
@@ -427,6 +590,157 @@ int main(void)
 
 		if (((count % 400) == 0) && (task == 1))
 		{
+			// Return
+			if ((ADC_VAL[7] > 1200) && (ADC_VAL[7] < 2900))
+			{
+				uartTransmit("Return gedrueckt\n", 17);
+			}
+			else if (ADC_VAL[7] < 1000)
+			{
+				uartTransmit("Navi gedrueckt\n", 15);
+			}
+			else
+			{
+
+			}
+
+			// Info
+			if ((ADC_VAL[6] > 1200) && (ADC_VAL[6] < 2900))
+			{
+				uartTransmit("Traffic gedrueckt\n", 18);
+			}
+			else if (ADC_VAL[6] < 1000)
+			{
+				uartTransmit("Info gedrueckt\n", 15);
+			}
+			else
+			{
+
+			}
+
+			// KL15
+			// if (ADC_VAL[4] <= 1150)								// Spannungsteiler fuer 36V (22k || 27k)
+			if (ADC_VAL[4] < 2300)								// Spannungsteiler fuer 12V (10k || 10k)
+			{
+				uartTransmit("Unterspannung erkannt\n", 22);
+			}
+			// else if ADC_VAL[4] >= 4000)						// Spannungsteiler fuer 36V (22k || 27k)
+			else if (ADC_VAL[7] >= 3900)						// Spannungsteiler fuer 12V (10k || 10k)
+			{
+				uartTransmit("Ueberspannung erkannt\n", 22);
+			}
+			else
+			{
+
+			}
+
+			// Bremsdruck
+			if (ADC_VAL[0] < 1000)
+			{
+				uartTransmit("Unterdruck erreicht\n", 20);
+			}
+			else if (ADC_VAL[0] >= 3500)
+			{
+				uartTransmit("Unterdruck verloren\n", 20);
+			}
+			else
+			{
+
+			}
+
+			// STM Temperatur
+			temperature = 45; //(int32_t)((TEMP110 - TEMP30) / ((float)(*TEMP110_CAL_VALUE) - (float)(*TEMP30_CAL_VALUE)) * ((float)(*TEMP30_CAL_VALUE)) + TEMP30);
+			if (temperature > 60)
+			{
+				uartTransmit("STM Temperatur ueber 60°C\n", 27);
+			}
+			else if (temperature < -20)
+			{
+				uartTransmit("STM Temperatur ueber -20°C\n", 28);
+			}
+			else
+			{
+
+			}
+
+			// PCB Temperatur
+			if (ADC_VAL[3] < 800)
+			{
+				uartTransmit("PCB Temperatur ueber 60°C\n", 27);
+			}
+			else if (ADC_VAL[3] >= 3700)
+			{
+				uartTransmit("PCB Temperatur ueber -20°C\n", 28);
+			}
+			else
+			{
+
+			}
+
+			// Bremsdruck Temperatur
+			if (ADC_VAL[3] < 800)
+			{
+				uartTransmit("Bremsdruck Temperatur ueber 60°C\n", 34);
+			}
+			else if (ADC_VAL[3] >= 3700)
+			{
+				uartTransmit("Bremsdruck Temperatur ueber -20°C\n", 35);
+			}
+			else
+			{
+
+			}
+
+			// Klimaflap Temperatur
+			if (ADC_VAL[3] < 800)
+			{
+				uartTransmit("Klimaflap Temperatur ueber 60°C\n", 33);
+			}
+			else if (ADC_VAL[3] >= 3500)
+			{
+				uartTransmit("Klimaflap Temperatur ueber -20°C\n", 34);
+			}
+			else
+			{
+
+			}
+
+			// Kuehlwasser Temperatur
+			if (ADC_VAL[3] < 800)
+			{
+				uartTransmit("Kuehlwasser Temperatur ueber 60°C\n", 35);
+			}
+			else if (ADC_VAL[3] >= 3500)
+			{
+				uartTransmit("Kuehlwasser Temperatur ueber -20°C\n", 36);
+			}
+			else
+			{
+
+			}
+
+			if (system_in.DCDC_Inst == 1)
+			{
+				uartTransmit("DCDC Instruct\n", 14);
+			}
+			else
+			{
+
+			}
+
+			if ((system_in.ECON != 1) && (heizung != 1))
+			{
+				heizung = 1;
+			}
+			else if ((system_in.ECON != 1) && (heizung  == 1))
+			{
+				heizung = 0;
+			}
+			else
+			{
+
+			}
+
 			// Variable count auf 0 zuruecksetzen
 			count = 0;
 		}
@@ -479,11 +793,12 @@ int main(void)
 		// Sende CAN Nachricht auf CAN-Bus / Teste CAN-BUS
 		if (millis() - lastsendcan >= 1000)
 		{
+			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 			lastsendcan = millis();
 
-			HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
+			leuchten_out.BlueLed = !leuchten_out.BlueLed;
 		}
 #endif
   }

@@ -40,6 +40,22 @@ extern "C" {
 //#warning "PCB Revision 1.1 definiert"
 //#endif
 
+// Define Statemaschine Typedefines
+//----------------------------------------------------------------------
+typedef enum MotorsteuergeraeteState
+{
+	Start,																	// Starte Motorsteuergeraet
+	Ready,																	// Motorsteuergeraet gestartet
+	KL15,																	// KL15 aktiv
+	Anlasser,																// Anlasser betaetigt
+	ReadyToDrive,															// Motorsteuergeraet bereit fuer Fahrmodus
+	Ausschalten,															// Motorsteuergeraet ausschalten
+	MotorWarning,															// Warnung im Motorsteuergeraet
+	MotorError,																// Error im Motorsteuergeraet
+	CriticalError,															// Kritischer Fehler am Motorsteuergeraet
+} Motor_State;
+//----------------------------------------------------------------------
+
 // FIXME: BAMOCAR_IN1
 // FIXME: BAMOCAR_IN2
 // FIXME: BAMOCAR_Out1
@@ -282,6 +298,7 @@ void Error_Handler(void);
 #define HEATER1_GPIO_Port GPIOE
 #define DIGITAL2_Pin GPIO_PIN_1
 #define DIGITAL2_GPIO_Port GPIOE
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
