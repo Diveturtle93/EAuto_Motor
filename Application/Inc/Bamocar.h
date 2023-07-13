@@ -460,10 +460,11 @@ extern bamocar_can_read_tag bamocar_data;									// Variable fuer CAN-Daten def
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-void readBAMOReg(uint8_t REG);
-void readBAMORegIntvl(uint8_t REG, uint8_t interval);
-void BAMOCAN_ID(uint8_t* data, uint8_t dlc);
-void BamocarInfo(void);
+void readBamoReg(uint8_t REG);												// Lese einzelnes Register
+void readBamoRegIntvl(uint8_t REG, uint8_t interval);						// Lese einzelnes Register mit Intervall
+void BAMOCAN_ID(uint8_t* data, uint8_t dlc);								// Zuordnung Empfangener Daten
+void BamocarInfo(void);														// Ausgabe Revision
+int8_t convert_IGBT_TEMP(uint16_t num);										// Umrechner der IGBT Temperatur
 //----------------------------------------------------------------------
 
 #endif /* INC_BAMOCAR_H_ */

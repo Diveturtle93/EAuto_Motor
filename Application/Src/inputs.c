@@ -16,7 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "inputs.h"
-#include "error.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Variablen einbinden
@@ -37,8 +37,15 @@ void readall_inputs(void)
 	// Systemeingaenge einlesen
 	system_in.Kickdown = HAL_GPIO_ReadPin(KICKDOWN_GPIO_Port, KICKDOWN_Pin);					// Eingang Gaspedal getreten
 	system_in.Leerlauf = HAL_GPIO_ReadPin(LEERLAUF_GPIO_Port, LEERLAUF_Pin);					// Eingang Gaspedal nicht getreten
+
+#if TISCHAUFBAU == 1
+	system_in.BremseNO = false;																	// Eingang Bremse nicht getreten
+	system_in.BremseNC = true;																	// Eingang Bremse getreten
+#else
 	system_in.BremseNO = HAL_GPIO_ReadPin(BREMSE_NO_GPIO_Port, BREMSE_NO_Pin);					// Eingang Bremse nicht getreten
 	system_in.BremseNC = HAL_GPIO_ReadPin(BREMSE_NC_GPIO_Port, BREMSE_NC_Pin);					// Eingang Bremse getreten
+#endif
+
 	system_in.Kupplung = HAL_GPIO_ReadPin(KUPPLUNG_NO_GPIO_Port, KUPPLUNG_NO_Pin);				// Eingang Kupplung nicht getreten
 	system_in.Recuperation = HAL_GPIO_ReadPin(RECUPERATION_GPIO_Port, RECUPERATION_Pin);		// Eingang Recuperation
 	system_in.ECON = HAL_GPIO_ReadPin(ECON_GPIO_Port, ECON_Pin);								// Eingang Klima

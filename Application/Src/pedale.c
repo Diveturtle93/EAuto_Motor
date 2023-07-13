@@ -20,11 +20,8 @@
 
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "BasicUart.h"
-#include "inputs.h"
-#include "error.h"
-#include "adc_inputs.h"
 #include "pedale.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Gaspedal auswerten
@@ -55,7 +52,7 @@ uint16_t readTrottle(void)
 			else if ((system_in.Leerlauf != 1) && (ADC_Gas >= GAS_THRESHOLD))
 			{
 				// Wenn Wert groesser THRESHOLD ist, dann THRESHOLD vom ADC-Wert abziehen
-				ADC_Gas -= GAS_THRESHOLD;
+				ADC_Gas -= GAS_MIN_ADC;
 			}
 			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Leerlauf aktiv
 			else if ((system_in.Leerlauf == 1) || ((system_in.Leerlauf != 1) && (ADC_Gas < GAS_THRESHOLD)))
@@ -70,7 +67,7 @@ uint16_t readTrottle(void)
 
 			}
 			// Threshold Wert vergleichen / Threshold Wert > THRESHOLD und Kickdown aktiv
-			else if ((system_in.Kickdown == 1) && (ADC_Gas >= (GAS_MAX_ADC - GAS_THRESHOLD)))
+			else if ((system_in.Kickdown == 1) && (ADC_Gas >= (GAS_MAX_ADC - GAS_MIN_ADC)))
 			{
 				// Wenn Wert gleich THRESHOLD ist
 				ADC_Gas = GAS_MAX_ADC;

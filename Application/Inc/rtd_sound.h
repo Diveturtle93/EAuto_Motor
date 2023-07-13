@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
-// Titel	:	pedale.h
+// Titel	:	rtd_sound.h
 //----------------------------------------------------------------------
 // Sprache	:	C
-// Datum	:	03.08.2021
+// Datum	:	06.07.2023
 // Version	:	1.0
 // Autor	:	Diveturtle93
 // Projekt	:	Motorsteuergeraet
@@ -10,35 +10,24 @@
 
 // Dateiheader definieren
 //----------------------------------------------------------------------
-#ifndef INC_PEDALE_H_
-#define INC_PEDALE_H_
+#ifndef RTD_SOUND_H_
+#define RTD_SOUND_H_
 //----------------------------------------------------------------------
 
-// Definiere Debug Symbol
+// Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
-#ifdef DEBUG
-	#define DEBUG_PEDALE
-#endif
+#include "main.h"
 //----------------------------------------------------------------------
 
-// Konstanten definieren
+// Defines definieren
 //----------------------------------------------------------------------
-#define GAS_MIN_ADC							300								// Minimaler ADC-Wert
-#define GAS_MAX_ADC							4095							// Maximaler ADC-Wert
-//----------------------------------------------------------------------
-
-// Fehler definieren
-//----------------------------------------------------------------------
-#define GAS_OK								0								// Minimaler ADC-Wert
-#define GAS_VALUE_TOO_LOW					1								// Maximaler ADC-Wert
-#define GAS_VALUE_TOO_HIGH					2								// Thresholdwert fuer Gaspedal ADC
+#define RTDSTIME									2000					// Zeit die der Buzzer beim Starten an ist
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-uint16_t readTrottle(void);													// Gaspedal auswerten
-void readBrake(void);														// Bremspedal auswerten
+bool playRTDS(void);
 //----------------------------------------------------------------------
 
-#endif /* INC_PEDALE_H_ */
+#endif /* RTD_SOUND_H_ */
 //----------------------------------------------------------------------

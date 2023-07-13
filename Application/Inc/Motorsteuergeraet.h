@@ -14,10 +14,45 @@
 #define INC_MOTORSTEUERGERAET_H_
 //----------------------------------------------------------------------
 
+
 // Programmversion definieren
 //----------------------------------------------------------------------
 #define MAJOR 0																// Motorsteuergeraet Major version Number
 #define MINOR 1																// Motorsteuergeraet Minor version Number
+
+// Include Project Header
+//----------------------------------------------------------------------
+#include "SystemInfo.h"
+#include "BasicUart.h"
+#include "inputs.h"
+#include "outputs.h"
+#include "error.h"
+#include "Bamocar.h"
+#include "millis.h"
+#include "adc_inputs.h"
+#include "pedale.h"
+#include "rtd_sound.h"
+//----------------------------------------------------------------------
+
+// Define Revision of Motorsteuergeraet HW PCB
+//----------------------------------------------------------------------
+//#if REVISION == 255
+//#error "Revision ist nicht definiert"
+//#elif REVISION == 1
+//#warning "PCB Revision 1.0 definiert"
+//#elif REVISION == 2
+//#warning "PCB Revision 1.1 definiert"
+//#endif
+//----------------------------------------------------------------------
+
+// Tischaufbau
+//----------------------------------------------------------------------
+#define TISCHAUFBAU									1						// 0 = Auto, 1 = Tischaufbau
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// TODO:
+
 //----------------------------------------------------------------------
 
 // CAN-IDs definieren
@@ -51,7 +86,7 @@
 #define KOMBI2_CAN									0x420
 #define KOMBI3_CAN									0x520
 #define KLIMA_CAN									0x5E0
-#define LENKUNG1_CAN								0x3D0
+#define LENKUNG1_CAN								0x3D0					// Nachricht unterdrueckt Fehlermeldung Kombiinstrument
 #define LENKUNG2_CAN								0x5DE					// Immer aktive, außer im Sleep
 #define x_CAN										0x010					// Einmalig gesendet wenn Schlüssel auf Stufe 2
 #define xy_CAN										0x011					// EInmalig gesendet wenn Schlüssel auf Stufe 2
@@ -65,37 +100,71 @@ typedef union __motor1_tag {
 		uint8_t Bremse : 1;													// Bit 3 des ersten Bytes
 		uint8_t xx : 2;														// Bit 1 und 2
 		uint8_t Kupplung : 1;												// Bit 0
-		uint8_t leer1;														// Byte 6, Leer Byte
-		uint16_t Drehzahl;													// Byte 5, Drehzahl Low, Byte 4 Drehzahl high, Wert/4=Drehzahl
-		uint8_t leer2;														// Byte 3, Leer Byte
-		uint8_t Winkel_Drosselklape;										// Byte 2, Drosselklappe
-		uint8_t leer3;														// Byte 1, Leer Byte
-		uint8_t Oeldruck;													// Byte 0, Oeldruck, Verbrauch in Liter
+		uint8_t leer1;														// Byte 1, Leer Byte
+		uint16_t Drehzahl;													// Byte 2, Drehzahl Low, Byte 3 Drehzahl high, Wert/4=Drehzahl
+		uint8_t leer2;														// Byte 4, Leer Byte
+		uint8_t Winkel_Drosselklape;										// Byte 5, Drosselklappe
+		uint8_t leer3;														// Byte 6, Leer Byte
+		uint8_t Oeldruck;													// Byte 7, Oeldruck, Verbrauch in Liter
 	};
 
 	uint8_t output[8];														// 8 Byte
-} motor1_tag;
+} motor280_tag;
 //----------------------------------------------------------------------
 typedef union __motor2_tag {
 	struct {
-		uint8_t Sicherheit;													// Byte 7, Vier Werte wiedeholend, je 4 mal, 07, 53, 8F, D9
-		uint8_t xxxx;														// Byte 6, ??
-		uint8_t Bremse;														// Byte 5, Bremsschalter, 13, 10, 02, 00
-		uint8_t leer1;														// Byte 4, Leer Byte
-		uint8_t leer2;														// Byte 3, Leer Byte
-		uint8_t xx;															// Byte 2, Leer Byte
-		uint8_t leer3;														// Byte 1, Leer Byte
-		uint8_t leer4;														// Byte 0, Leer Byte
+		uint8_t Sicherheit;													// Byte 0, Vier Werte wiedeholend, je 4 mal, 07, 53, 8F, D9
+		uint8_t xxxx;														// Byte 1, ??
+		uint8_t Bremse;														// Byte 2, Bremsschalter, 13, 10, 02, 00
+		uint8_t leer1;														// Byte 3, Leer Byte
+		uint8_t leer2;														// Byte 4, Leer Byte
+		uint8_t xx;															// Byte 5, Leer Byte
+		uint8_t leer3;														// Byte 6, Leer Byte
+		uint8_t leer4;														// Byte 7, Leer Byte
 	};
 
 	uint8_t motor2output[8];												// 8 Byte
-} motor2_tag;
+} motor288_tag;
+//----------------------------------------------------------------------
+typedef union __motor3_tag {
+	struct {
+		uint8_t leer1;														// Byte 0, Leer Byte
+		uint8_t leer2;														// Byte 1, Leer Byte
+		uint8_t Gas1;														// Byte 2, Gaspedal
+		uint8_t Gas2;														// Byte 3, Gaspedal
+		uint8_t leer5;														// Byte 4, Leer Byte
+		uint8_t leer6;														// Byte 5, Leer Byte
+		uint8_t leer7;														// Byte 6, Leer Byte
+		uint8_t leer8;														// Byte 7, Leer Byte
+
+	};
+
+	uint8_t motor2output[8];												// 8 Byte
+} motor380_tag;
+//----------------------------------------------------------------------
+typedef union __motor5_tag {
+	struct {
+		uint8_t leer1;														// Byte 0, Leer Byte
+		uint8_t leer21: 2;													// Byte 1, 2 leere Bits
+		uint8_t EPC: 1;														// Byte 1, 2. Bit, EPC Leuchte
+		uint8_t Motor: 1;													// Byte 1, 3. Bit, Motorleuchte
+		uint8_t leer22: 4;													// Byte 1, 4 leere Bits
+		uint8_t leer3;														// Byte 2, Leer Byte
+		uint8_t leer4;														// Byte 3, Leer Byte
+		uint8_t leer5;														// Byte 4, Leer Byte
+		uint8_t leer6;														// Byte 5, Leer Byte
+		uint8_t leer7;														// Byte 6, Leer Byte
+		uint8_t leer8;														// Byte 7, Leer Byte
+	};
+
+	uint8_t motor2output[8];												// 8 Byte
+} motor480_tag;
 //----------------------------------------------------------------------
 
 // Definiere globale Variablen
 //----------------------------------------------------------------------
-extern motor1_tag motor1;													// Variable fuer Motor CAN-Nachricht 1 definieren
-extern motor2_tag motor2;													// Variable fuer Motor CAN-Nachricht 2 definieren
+extern motor280_tag motor280;												// Variable fuer Motor CAN-Nachricht 1 definieren
+extern motor288_tag motor288;												// Variable fuer Motor CAN-Nachricht 2 definieren
 //----------------------------------------------------------------------
 
 #endif /* INC_MOTORSTEUERGERAET_H_ */

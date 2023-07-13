@@ -32,23 +32,6 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#if REVISION == 255
-//#error "Revision ist nicht definiert"
-//#elif REVISION == 1
-//#warning "PCB Revision 1.0 definiert"
-//#elif REVISION == 2
-//#warning "PCB Revision 1.1 definiert"
-//#endif
-
-// Um bestimmte Funktionen vom Auto bei Tischaufbau zu simulieren
-//----------------------------------------------------------------------
-#define TISCHAUFBAU 								 1						// Tischaufbau = 1, Auto = 0
-
-// Warnung ausgeben wenn Tischaufbau aktiviert
-#if TISCHAUFBAU == 1
-#warning "Programm fuer Tischaufbau konfiguriert !!!"
-#endif
-//----------------------------------------------------------------------
 
 // Define Statemaschine Typedefines
 //----------------------------------------------------------------------
@@ -66,21 +49,6 @@ typedef enum MotorsteuergeraeteState
 } Motor_State;
 //----------------------------------------------------------------------
 
-// FIXME: BAMOCAR_IN1
-// FIXME: BAMOCAR_IN2
-// FIXME: BAMOCAR_Out1
-// FIXME: BAMOCAR_Out2
-// FIXME: Anhaenger
-// FIXME: Klima_PWM
-// FIXME: Klima Out
-// FIXME: DCDC_Instruction
-// FIXME: EGas
-// FIXME: Reserve
-// FIXME: DCDC_Fault
-// FIXME: HW_Wake
-// FIXME: BC_Rst_Out
-// FIXME: Niveau
-// FIXME: BC_Rst_Out
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -311,6 +279,15 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+
+// Typedefine Boolean definieren
+//----------------------------------------------------------------------
+typedef enum
+{
+	false,
+	true
+} bool;
+//----------------------------------------------------------------------
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

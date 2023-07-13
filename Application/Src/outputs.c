@@ -16,8 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
-#include "inputs.h"
-#include "error.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Variablen einbinden
@@ -207,7 +206,7 @@ void testSDC(void)
 #ifndef DEBUG_SDC
 		software_error(ERROR_SDC_SPANNUNG);															// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
 #else
-#warning Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren.
+#warning "Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren."
 		software_error_debug(ERROR_SDC_SPANNUNG);													// Errorfunktion stoppt Programm nicht
 #endif
 	}
