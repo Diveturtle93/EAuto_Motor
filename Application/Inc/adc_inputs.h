@@ -21,10 +21,10 @@
 
 // Konstanten definieren
 //----------------------------------------------------------------------
-#define TEMP_SENSOR_AVG_SLOPE_MV_PER_CELSIUS			2.5f
-#define TEMP_SENSOR_VOLTAGE_MV_AT_25					760.0f
-#define ADC_REFERENCE_VOLTAGE_MV						3300.0f
-#define ADC_MAX_OUTPUT_VALUE							4095.0f
+//#define TEMP_SENSOR_AVG_SLOPE_MV_PER_CELSIUS			2.5f
+//#define TEMP_SENSOR_VOLTAGE_MV_AT_25					760.0f
+//#define ADC_REFERENCE_VOLTAGE_MV						3300.0f
+//#define ADC_MAX_OUTPUT_VALUE							4095.0f
 #define TEMP110_CAL_VALUE								((uint16_t*)((uint32_t)0x1FF0F44E))
 #define TEMP30_CAL_VALUE								((uint16_t*)((uint32_t)0x1FF0F44C))
 #define TEMP110											110.0f

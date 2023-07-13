@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------
 void uartTransmit(const char *str, const size_t size);
 void uartTransmitNumber(const uint32_t number, const uint32_t base);
+void uartTransmitString(const char *str);
 void uartReInitBasicPolling(void);
 //----------------------------------------------------------------------
 

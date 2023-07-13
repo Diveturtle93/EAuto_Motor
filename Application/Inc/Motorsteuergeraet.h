@@ -14,6 +14,12 @@
 #define INC_MOTORSTEUERGERAET_H_
 //----------------------------------------------------------------------
 
+
+// Programmversion definieren
+//----------------------------------------------------------------------
+#define MAJOR 0																// Motorsteuergeraet Major version Number
+#define MINOR 1																// Motorsteuergeraet Minor version Number
+
 // Include Project Header
 //----------------------------------------------------------------------
 #include "SystemInfo.h"
@@ -46,6 +52,7 @@
 
 //----------------------------------------------------------------------
 // TODO:
+
 //----------------------------------------------------------------------
 
 // CAN-IDs definieren
@@ -55,7 +62,7 @@
 #define MOTOR_CAN_SAFETY							0x139					// Shutdown Circuit Motorsteuergeraet, Sicherheitsrelevante Daten
 #define MOTOR_CAN_DIGITAL_OUT						0x240					// Digitale Ausgaenge Motorsteuergeraet, Alle digitalen Ausgaenge
 #define MOTOR_CAN_DIGITAL_IN						0x241					// Digitale Eingaenge Motorsteuergeraet, Alle digitalen Eingaenge
-#define MOTOR_CAN_ANALOG_IN							0x242					// Analogwerte Motorsteuergerat, Gaspedal, Bremsdruck, Info, Return, KlimaFlap, KL15
+#define MOTOR_CAN_ANALOG_IN							0x242					// Analogwerte Motorsteuergeraet, Gaspedal, Bremsdruck, Info, Return, KlimaFlap, KL15
 #define MOTOR_CAN_TEMPERATUR						0x539					// Temperatur Motorsteuergeraet, PCB, Bremsdrucktemperatur, Kuehlwassertemperatur
 //----------------------------------------------------------------------
 // Motorsteuergeraet alt

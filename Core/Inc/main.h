@@ -33,6 +33,22 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+// Define Statemaschine Typedefines
+//----------------------------------------------------------------------
+typedef enum MotorsteuergeraeteState
+{
+	Start,																	// Starte Motorsteuergeraet
+	Ready,																	// Motorsteuergeraet gestartet
+	KL15,																	// KL15 aktiv
+	Anlasser,																// Anlasser betaetigt
+	ReadyToDrive,															// Motorsteuergeraet bereit fuer Fahrmodus
+	Ausschalten,															// Motorsteuergeraet ausschalten
+	MotorWarning,															// Warnung im Motorsteuergeraet
+	MotorError,																// Error im Motorsteuergeraet
+	CriticalError,															// Kritischer Fehler am Motorsteuergeraet
+} Motor_State;
+//----------------------------------------------------------------------
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -176,8 +192,8 @@ void Error_Handler(void);
 #define KLIMA_PWM_GPIO_Port GPIOD
 #define ANHAENGER_Pin GPIO_PIN_14
 #define ANHAENGER_GPIO_Port GPIOD
-#define RESERVE_OUT_Pin GPIO_PIN_15
-#define RESERVE_OUT_GPIO_Port GPIOD
+#define NIVEAU_OUT_Pin GPIO_PIN_15
+#define NIVEAU_OUT_GPIO_Port GPIOD
 #define BUZZER_Pin GPIO_PIN_2
 #define BUZZER_GPIO_Port GPIOG
 #define GENERATOR_LED_Pin GPIO_PIN_3
@@ -260,6 +276,7 @@ void Error_Handler(void);
 #define HEATER1_GPIO_Port GPIOE
 #define DIGITAL2_Pin GPIO_PIN_1
 #define DIGITAL2_GPIO_Port GPIOE
+
 /* USER CODE BEGIN Private defines */
 
 

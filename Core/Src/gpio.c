@@ -73,7 +73,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
-                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin, GPIO_PIN_RESET);
+                          |NIVEAU_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, BUZZER_Pin|GENERATOR_LED_Pin|WISCHWARNUNG_Pin|BREMSWARNUNG_Pin
@@ -188,7 +188,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin */
   GPIO_InitStruct.Pin = BREMSLICHT_Pin|RUECKFAHRLICHT_Pin|KLIMA_PWM_Pin|ANHAENGER_Pin
-                          |RESERVE_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin;
+                          |NIVEAU_OUT_Pin|LADELEUCHTE_Pin|RUECKWARNUNG_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

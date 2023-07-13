@@ -45,6 +45,14 @@ void uartTransmitNumber(const uint32_t number, const uint32_t base)
 }
 //----------------------------------------------------------------------
 
+// Uart2 Transmit String Funktion
+//----------------------------------------------------------------------
+void uartTransmitString(const char *str)
+{
+	HAL_UART_Transmit(&huart2, (uint8_t *)str, sizeof(str), 1000);
+}
+//----------------------------------------------------------------------
+
 // Deinitialisieren des Uart2
 //----------------------------------------------------------------------
 void uartReInitBasicPolling(void)
