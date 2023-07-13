@@ -14,7 +14,6 @@
 #define INC_MOTORSTEUERGERAET_H_
 //----------------------------------------------------------------------
 
-
 // Programmversion definieren
 //----------------------------------------------------------------------
 #define MAJOR 0																// Motorsteuergeraet Major version Number
@@ -48,6 +47,13 @@
 // Tischaufbau
 //----------------------------------------------------------------------
 #define TISCHAUFBAU									1						// 0 = Auto, 1 = Tischaufbau
+
+//----------------------------------------------------------------------
+#if TISCHAUFBAU == 1
+#warning "Programm ist fuer Tischaufbau kompiliert!!"
+#elif
+#warning "Programm ist fuer AUto kompiliert!!"
+#endif
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
@@ -92,10 +98,30 @@
 #define xy_CAN										0x011					// EInmalig gesendet wenn Schlüssel auf Stufe 2
 //----------------------------------------------------------------------
 
+// Define Statemaschine Typedefines
+//----------------------------------------------------------------------
+typedef enum
+{
+	Start,																	// Starte Motorsteuergeraet
+	Ready,																	// Motorsteuergeraet gestartet
+	KL15,																	// KL15 aktiv
+	Anlasser,																// Anlasser betaetigt
+	ReadyToDrive,															// Motorsteuergeraet bereit fuer Fahrmodus
+	Drive,																	// Fahrzeug im Fahrmodus
+	Standby,																// Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
+	Ausschalten,															// Motorsteuergeraet ausschalten
+	MotorWarning = 0x20,													// Warnung im Motorsteuergeraet
+	MotorError = 0x40,														// Error im Motorsteuergeraet
+	CriticalError = 0x80,													// Kritischer Fehler am Motorsteuergeraet
+} Motor_State;
+//----------------------------------------------------------------------
+
 // Definiere CAN Strukturen
 //----------------------------------------------------------------------
-typedef union __motor1_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t xxxx : 4;													// Ersten 4 Bit
 		uint8_t Bremse : 1;													// Bit 3 des ersten Bytes
 		uint8_t xx : 2;														// Bit 1 und 2
@@ -111,8 +137,10 @@ typedef union __motor1_tag {
 	uint8_t output[8];														// 8 Byte
 } motor280_tag;
 //----------------------------------------------------------------------
-typedef union __motor2_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Sicherheit;													// Byte 0, Vier Werte wiedeholend, je 4 mal, 07, 53, 8F, D9
 		uint8_t xxxx;														// Byte 1, ??
 		uint8_t Bremse;														// Byte 2, Bremsschalter, 13, 10, 02, 00
@@ -126,8 +154,10 @@ typedef union __motor2_tag {
 	uint8_t motor2output[8];												// 8 Byte
 } motor288_tag;
 //----------------------------------------------------------------------
-typedef union __motor3_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t leer1;														// Byte 0, Leer Byte
 		uint8_t leer2;														// Byte 1, Leer Byte
 		uint8_t Gas1;														// Byte 2, Gaspedal
@@ -142,8 +172,10 @@ typedef union __motor3_tag {
 	uint8_t motor2output[8];												// 8 Byte
 } motor380_tag;
 //----------------------------------------------------------------------
-typedef union __motor5_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t leer1;														// Byte 0, Leer Byte
 		uint8_t leer21: 2;													// Byte 1, 2 leere Bits
 		uint8_t EPC: 1;														// Byte 1, 2. Bit, EPC Leuchte

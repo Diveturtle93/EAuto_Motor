@@ -49,19 +49,19 @@ uint16_t readTrottle(void)
 				software_error(ERROR_GASPEDAL);
 			}
 			// Threshold Wert vergleichen / Threshold Wert >= THRESHOLD und Leerlauf nicht aktiv
-			else if ((system_in.Leerlauf != 1) && (ADC_Gas >= GAS_THRESHOLD))
+			else if ((system_in.Leerlauf != 1) && (ADC_Gas >= GAS_MIN_ADC))
 			{
 				// Wenn Wert groesser THRESHOLD ist, dann THRESHOLD vom ADC-Wert abziehen
 				ADC_Gas -= GAS_MIN_ADC;
 			}
 			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Leerlauf aktiv
-			else if ((system_in.Leerlauf == 1) || ((system_in.Leerlauf != 1) && (ADC_Gas < GAS_THRESHOLD)))
+			else if ((system_in.Leerlauf == 1) || ((system_in.Leerlauf != 1) && (ADC_Gas < GAS_MIN_ADC)))
 			{
 				// Wenn der Wert kleine als THRESHOLD ist, dann ADC ignorieren, alle Werte sind 0
 				ADC_Gas = 0;
 			}
 			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Kickdown  nicht aktiv
-			else if ((system_in.Kickdown != 1) && (ADC_Gas < (GAS_MAX_ADC - GAS_THRESHOLD)))
+			else if ((system_in.Kickdown != 1) && (ADC_Gas < (GAS_MAX_ADC - GAS_MIN_ADC)))
 			{
 				// Wenn Wert kleiner THRESHOLD ist
 

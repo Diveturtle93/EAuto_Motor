@@ -33,22 +33,6 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-// Define Statemaschine Typedefines
-//----------------------------------------------------------------------
-typedef enum MotorsteuergeraeteState
-{
-	Start,																	// Starte Motorsteuergeraet
-	Ready,																	// Motorsteuergeraet gestartet
-	KL15,																	// KL15 aktiv
-	Anlasser,																// Anlasser betaetigt
-	ReadyToDrive,															// Motorsteuergeraet bereit fuer Fahrmodus
-	Ausschalten,															// Motorsteuergeraet ausschalten
-	MotorWarning,															// Warnung im Motorsteuergeraet
-	MotorError,																// Error im Motorsteuergeraet
-	CriticalError,															// Kritischer Fehler am Motorsteuergeraet
-} Motor_State;
-//----------------------------------------------------------------------
-
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
