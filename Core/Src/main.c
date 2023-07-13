@@ -27,17 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "SystemInfo.h"
-#include "BasicUart.h"
-#include "inputs.h"
-#include "outputs.h"
-#include "error.h"
-#include "Bamocar.h"
-#include "millis.h"
 #include "Motorsteuergeraet.h"
-#include "adc_inputs.h"
-#include "pedale.h"
-#include "rtd_sound.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,8 +57,8 @@ uint8_t UART2_msg[12] = {0};
 uint8_t uart_count = 0;
 uint8_t RxData[8];
 volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
-motor1_tag motor1;																	// Variable fuer Motor CAN-Nachricht 1 definieren
-motor2_tag motor2;																	// Variable fuer Motor CAN-Nachricht 2 definieren
+motor280_tag motor280;																// Variable fuer Motor CAN-Nachricht 1 definieren
+motor288_tag motor288;																// Variable fuer Motor CAN-Nachricht 2 definieren
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -146,6 +136,7 @@ int main(void)
   ITM_SendChar('l');
   ITM_SendChar('o');
   ITM_SendChar(' ');
+
   	// Start Timer 6 Interrupt
   	HAL_TIM_Base_Start_IT(&htim6);
   	HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
@@ -224,7 +215,7 @@ int main(void)
 		if (((count % 20) == 0) && (task == 1))
 		{
 			// Sende Nachricht Motor1
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
+			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor280.output, (uint32_t *)CAN_TX_MAILBOX0);
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			tmp[0] = 0;
 			tmp[1] = 1;
@@ -389,8 +380,8 @@ int main(void)
 				}
 
 				// Drehzahl ausgeben
-				TxData[2] = motor1.output[2];
-				TxData[3] = motor1.output[3];
+				TxData[2] = motor280.output[2];
+				TxData[3] = motor280.output[3];
 				lastcan = millis();
 
 				can_change = 0;

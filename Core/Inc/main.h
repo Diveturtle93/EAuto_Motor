@@ -32,29 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#if REVISION == 255
-//#error "Revision ist nicht definiert"
-//#elif REVISION == 1
-//#warning "PCB Revision 1.0 definiert"
-//#elif REVISION == 2
-//#warning "PCB Revision 1.1 definiert"
-//#endif
 
-// FIXME: BAMOCAR_IN1
-// FIXME: BAMOCAR_IN2
-// FIXME: BAMOCAR_Out1
-// FIXME: BAMOCAR_Out2
-// FIXME: Anhaenger
-// FIXME: Klima_PWM
-// FIXME: Klima Out
-// FIXME: DCDC_Instruction
-// FIXME: EGas
-// FIXME: Reserve
-// FIXME: DCDC_Fault
-// FIXME: HW_Wake
-// FIXME: BC_Rst_Out
-// FIXME: Niveau
-// FIXME: BC_Rst_Out
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -284,7 +262,8 @@ void Error_Handler(void);
 #define DIGITAL2_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
-// Boolean definieren
+
+// Typedefine Boolean definieren
 //----------------------------------------------------------------------
 typedef enum
 {

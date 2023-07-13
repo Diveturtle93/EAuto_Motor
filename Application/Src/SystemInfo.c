@@ -10,11 +10,12 @@
 
 // Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
-#include "stdbool.h"
+
 //----------------------------------------------------------------------
 
 // Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
+#include "main.h"
 #include "git.h"
 #include "SystemInfo.h"
 #include "BasicUart.h"

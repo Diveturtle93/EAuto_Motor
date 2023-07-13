@@ -20,11 +20,8 @@
 
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "BasicUart.h"
-#include "inputs.h"
-#include "error.h"
-#include "adc_inputs.h"
 #include "pedale.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Gaspedal auswerten

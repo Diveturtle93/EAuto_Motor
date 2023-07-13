@@ -16,8 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "outputs.h"
-#include "inputs.h"
-#include "error.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Variablen einbinden
@@ -80,7 +79,7 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(LADELEUCHTE_GPIO_Port, LADELEUCHTE_Pin, leuchten_out.Ladeleuchte);			// ECO LED Kombiinstrument
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Warnung Wischwasser Kombiinstument
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Warnung Bremse Kombiinstrument
-	HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, leuchten_out.Oelstand);			// Warnung Oelstand Kombiinstument
+	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oelstand);						// Warnung Oeldruck Kombiinstument
 	HAL_GPIO_WritePin(RESERVE_OUT_GPIO_Port, RESERVE_OUT_Pin, leuchten_out.Reserve);				// Reserve Ausgang 200mA
 	HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, leuchten_out.Anhaenger);					// Anhaenger LED Kombiinstrument
 	HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, leuchten_out.RedLed);							// Rote LED Platine
@@ -207,7 +206,7 @@ void testSDC(void)
 #ifndef DEBUG_SDC
 		software_error(ERROR_SDC_SPANNUNG);															// Sollte Sicherung kaputt oder Kurzschluss, dann Fehlerausgeben
 #else
-#warning Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren.
+#warning "Das Abschalten des Softwarefehlers kann unter Umstaenden zu Beschaedigung der HW fuehren."
 		software_error_debug(ERROR_SDC_SPANNUNG);													// Errorfunktion stoppt Programm nicht
 #endif
 	}

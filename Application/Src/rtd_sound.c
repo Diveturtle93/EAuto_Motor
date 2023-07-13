@@ -21,10 +21,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "rtd_sound.h"
-#include "inputs.h"
-#include "outputs.h"
-#include "BasicUart.h"
-#include "millis.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 
