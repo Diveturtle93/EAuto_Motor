@@ -21,16 +21,18 @@
 
 // Include Project Header
 //----------------------------------------------------------------------
-#include "SystemInfo.h"
 #include "BasicUart.h"
-#include "inputs.h"
-#include "outputs.h"
+#include "adc_inputs.h"
+#include "app_info.h"
+#include "Bamocar.h"
 #include "error.h"
+#include "inputs.h"
 #include "Bamocar.h"
 #include "millis.h"
-#include "adc_inputs.h"
+#include "outputs.h"
 #include "pedale.h"
 #include "rtd_sound.h"
+#include "SystemInfo.h"
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB
@@ -52,7 +54,7 @@
 #if TISCHAUFBAU == 1
 #warning "Programm ist fuer Tischaufbau kompiliert!!"
 #elif
-#warning "Programm ist fuer AUto kompiliert!!"
+#warning "Programm ist fuer Auto kompiliert!!"
 #endif
 //----------------------------------------------------------------------
 
@@ -122,75 +124,154 @@ typedef union
 {
 	struct
 	{
-		uint8_t xxxx : 4;													// Ersten 4 Bit
-		uint8_t Bremse : 1;													// Bit 3 des ersten Bytes
-		uint8_t xx : 2;														// Bit 1 und 2
-		uint8_t Kupplung : 1;												// Bit 0
-		uint8_t leer1;														// Byte 1, Leer Byte
+		uint8_t Leerlauf : 1;												// Byte 0, Bit 0
+		uint8_t FehlerPWG : 1;												// Byte 0, Bit 1, ???
+		uint8_t Kickdown : 1;												// Byte 0, Bit 2
+		uint8_t Kupplung : 1;												// Byte 0, Bit 3
+		uint8_t QuitASR : 1;												// Byte 0, Bit 4, ???
+		uint8_t MomeingriffBremse : 1;										// Byte 0, Bit 5, ???
+		uint8_t MomeingriffGetrieb : 1;										// Byte 0, Bit 6, ???
+		uint8_t Momentungenau : 1;											// Byte 0, Bit 7, ???
+		uint8_t MomMotor;													// Byte 1, ???
 		uint16_t Drehzahl;													// Byte 2, Drehzahl Low, Byte 3 Drehzahl high, Wert/4=Drehzahl
-		uint8_t leer2;														// Byte 4, Leer Byte
-		uint8_t Winkel_Drosselklape;										// Byte 5, Drosselklappe
-		uint8_t leer3;														// Byte 6, Leer Byte
-		uint8_t Oeldruck;													// Byte 7, Oeldruck, Verbrauch in Liter
+		uint8_t MomMotorKorrigiert;											// Byte 4, ???
+		uint8_t Fahrpedalstellung;											// Byte 5, Drosselklappe
+		uint8_t MomVerlust;													// Byte 6, ???
+		uint8_t MomFahrerwunsch;											// Byte 7, ???
 	};
 
-	uint8_t output[8];														// 8 Byte
+	uint8_t motor280output[8];												// 8 Byte
 } motor280_tag;
 //----------------------------------------------------------------------
 typedef union
 {
 	struct
 	{
-		uint8_t Sicherheit;													// Byte 0, Vier Werte wiedeholend, je 4 mal, 07, 53, 8F, D9
-		uint8_t xxxx;														// Byte 1, ??
-		uint8_t Bremse;														// Byte 2, Bremsschalter, 13, 10, 02, 00
-		uint8_t leer1;														// Byte 3, Leer Byte
-		uint8_t leer2;														// Byte 4, Leer Byte
-		uint8_t xx;															// Byte 5, Leer Byte
-		uint8_t leer3;														// Byte 6, Leer Byte
-		uint8_t leer4;														// Byte 7, Leer Byte
+		uint8_t MuxInfo : 6;												// Byte 0, Bit 0 bis 5, 07, 53, 8F, D9
+		uint8_t MuxCode : 2;												// Byte 0, Bit 6 und 7, 07, 53, 8F, D9
+		uint8_t KuehlTemp;													// Byte 1, Kuehlmitteltemperatur
+		uint8_t BremseNO : 1;												// Byte 2, Bit 0, Bremsschalter, 13, 10, 02, 00
+		uint8_t BremseRedundant : 1;										// Byte 2, Bit 1, Redundanter Bremsschalter NO ?
+		uint8_t FehlerWTF : 1;												// Byte 2, Bit 2, ???
+		uint8_t KlimaStelle : 1;											// Byte 2, Bit 3, ???
+		uint8_t Normalbetrieb : 1;											// Byte 2, Bit 4, ???
+		uint8_t OBD2 : 1;													// Byte 2, Bit 5, ???
+		uint8_t GRA_Status : 2;												// Byte 2, Bit 6 und 7, 00 = aus, 01 = ein, 10 = uebersteuert, 11 = frei
+		uint8_t FahrzeugGeschwindigkeit;									// Byte 3, Fahrzeuggeschwindigkeit
+		uint8_t GRA_Geschwindigkeit;										// Byte 4, Sollgeschwindigkeit GRA
+		uint8_t LeerlaufDrehzahl;											// Byte 5, ???
+		uint8_t MomBegrenzung;												// Byte 6, ???
+		uint8_t frei;														// Byte 7, Leer Byte
 	};
 
-	uint8_t motor2output[8];												// 8 Byte
+	uint8_t motor288output[8];												// 8 Byte
 } motor288_tag;
 //----------------------------------------------------------------------
 typedef union
 {
 	struct
 	{
-		uint8_t leer1;														// Byte 0, Leer Byte
-		uint8_t leer2;														// Byte 1, Leer Byte
-		uint8_t Gas1;														// Byte 2, Gaspedal
-		uint8_t Gas2;														// Byte 3, Gaspedal
-		uint8_t leer5;														// Byte 4, Leer Byte
-		uint8_t leer6;														// Byte 5, Leer Byte
-		uint8_t leer7;														// Byte 6, Leer Byte
-		uint8_t leer8;														// Byte 7, Leer Byte
+		uint8_t Vorgluehen : 1;												// Byte 0, Bit 0, ???
+		uint8_t DSP : 1;													// Byte 0, Bit 1, ???
+		uint8_t leer1 : 1;													// Byte 0, Bit 2, ???
+		uint8_t frei1 : 1;													// Byte 0, Bit 3
+		uint8_t FahrpedalUngenau : 1;										// Byte 0, Bit 4, ???
+		uint8_t leer2 : 1;													// Byte 0, Bit 5, ???
+		uint8_t MotorGesperrt : 1;											// Byte 0, Bit 6, ???
+		uint8_t frei2 : 1;													// Byte 0, Bit 7
+		uint8_t LuftTemp;													// Byte 1, ???
+		uint8_t Gaspedal;													// Byte 2, Gaspedal, ???
+		uint16_t MomRad : 12;												// Byte 3, 12 Bit, Radwunschmoment, ???
+		uint16_t VorMomRad : 1;												// Byte 4, Bit 4, Radwunschmoment Vorzeichen, ???
+		uint16_t frei3 : 1;													// Byte 4, Bit 5
+		uint16_t EGAS : 1;													// Byte 4, Bit 6, ???
+		uint16_t ECO : 1;													// Byte 4, Bit 7, ???
+		uint8_t MotordrehBeeinflussung;										// Byte 5, ???
+		uint8_t MotorDrehzahl;												// Byte 6, Wunschmoment Motor, ???
+		uint8_t leer3;														// Byte 7, ???
 
 	};
 
-	uint8_t motor2output[8];												// 8 Byte
+	uint8_t motor380output[8];												// 8 Byte
 } motor380_tag;
 //----------------------------------------------------------------------
 typedef union
 {
 	struct
 	{
-		uint8_t leer1;														// Byte 0, Leer Byte
-		uint8_t leer21: 2;													// Byte 1, 2 leere Bits
-		uint8_t EPC: 1;														// Byte 1, 2. Bit, EPC Leuchte
-		uint8_t Motor: 1;													// Byte 1, 3. Bit, Motorleuchte
-		uint8_t leer22: 4;													// Byte 1, 4 leere Bits
-		uint8_t leer3;														// Byte 2, Leer Byte
-		uint8_t leer4;														// Byte 3, Leer Byte
-		uint8_t leer5;														// Byte 4, Leer Byte
-		uint8_t leer6;														// Byte 5, Leer Byte
-		uint8_t leer7;														// Byte 6, Leer Byte
-		uint8_t leer8;														// Byte 7, Leer Byte
+		uint8_t Counter;													// Byte 0, Zaehler
+		uint8_t Hauptschalter : 1;											// Byte 1, Bit 0, ???
+		uint8_t TipAus : 1;													// Byte 1, Bit 1, ???
+		uint8_t TipSet : 1;													// Byte 1, Bit 2, ???
+		uint8_t TipBeschleunigen : 1;										// Byte 1, Bit 3, ???
+		uint8_t Beschleunigen : 1;											// Byte 1, Bit 4, ???
+		uint8_t Verzoegern : 1;												// Byte 1, Bit 5, ???
+		uint8_t Bedienfehler : 1;											// Byte 1, Bit 6, ???
+		uint8_t frei : 1;													// Byte 1, Bit 7
+		uint8_t Checksum;													// Byte 2
+
 	};
 
-	uint8_t motor2output[8];												// 8 Byte
+	uint8_t motor388output[3];												// 3 Byte
+} motor388_tag;
+//----------------------------------------------------------------------
+typedef union
+{
+	struct
+	{
+		uint8_t MuxInfo : 6;												// Byte 0, Bit 0 bis 5, 14, 56, A3, C0
+		uint8_t MuxCode : 2;												// Byte 0, Bit 6 und 7, 14, 56, A3, C0
+		uint8_t leer1 : 1;													// Byte 1, Bit 0, ???
+		uint8_t VorgluehenLED : 1;											// Byte 1, Bit 1, Vorgluehen LED
+		uint8_t leer2 : 1;													// Byte 1, Bit 2, EPC Leuchte, Nicht Verwendbar
+		uint8_t MotorLED : 1;												// Byte 1, Bit 3, Motorelektronik LED
+		uint8_t leer3 : 1;													// Byte 1, Bit 4, ???
+		uint8_t KlimaAus : 1;												// Byte 1, Bit 5, ???
+		uint8_t KennfeldKuehlung : 1;										// Byte 1, Bit 6, ???
+		uint8_t leer4 : 1;													// Byte 1, Bit 7, ???
+		int16_t Verbrauch;													// Byte 2, Verbrauch seit KL15 an
+		uint8_t Kuehlluefter;												// Byte 4, ???
+		uint8_t KaeltemittelDruck;											// Byte 5, ???
+		uint8_t frei1 : 2;													// Byte 6, Bit 0 und 1
+		uint8_t GRALED : 1;													// Byte 6, Bit 2, ???
+		uint8_t frei2 : 1;													// Byte 6, Bit 3
+		uint8_t MotorText : 4;												// Byte 6, Bit 4 bis 7, ???
+		uint8_t frei3;														// Byte 7
+	};
+
+	uint8_t motor480output[8];												// 8 Byte
 } motor480_tag;
+//----------------------------------------------------------------------
+typedef union
+{
+	struct
+	{
+		uint8_t Checksum;													// Byte 0
+		uint8_t SollMom;													// Byte 1, ???
+		uint8_t IstMom;														// Byte 2, ???
+		int16_t HoehenInfo;													// Byte 3, ???
+		uint8_t GRASollBeschleunigung;										// Byte 4, ???
+		uint8_t frei1;														// Byte 5
+		uint8_t frei2;														// Byte 6
+		uint8_t frei3 : 4;													// Byte 7, Bit 0 bis 3
+		uint8_t Counter : 4;												// Byte 7, Bit 4 bis 7, Zaehler
+	};
+
+	uint8_t motor488output[8];												// 8 Byte
+} motor488_tag;
+//----------------------------------------------------------------------
+typedef union
+{
+	struct
+	{
+		uint8_t Counter : 4;												// Byte 0, Bit 0 bis 3
+		uint8_t frei1 : 4;													// Byte 0, Bit 4 bis 7
+		uint8_t Russ;														// Byte 1, ???
+		uint8_t Verschleiss;												// Byte 2, ???
+	};
+
+	uint8_t motor580output[3];												// 3 Byte
+} motor580_tag;
 //----------------------------------------------------------------------
 
 // Definiere globale Variablen

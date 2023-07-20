@@ -156,14 +156,14 @@ void testCockpit_Leds(void)
 
 // PWM fuer Oelstandsensor am Kombiinstrument
 //----------------------------------------------------------------------
-void pwm_oelstand(uint16_t time)
+void pwm_oelstand(void)
 {
+	// Static Variable definieren
+	static uint32_t time = 0;
+
 	// Auswahl wie viele Sekunden vergangen
-	switch (time)																					// Zeit wird uebergeben
+	switch (millis() - time)																		// Zeit wird uebergeben
 	{
-		case 0: // 0ms
-			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 0ms Oelstandsensor Ausgang low
-			break;
 		case 15: // 1x15 ms = 15 ms
 			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 15ms Oelstandsensor Ausgang high
 			break;
@@ -172,6 +172,10 @@ void pwm_oelstand(uint16_t time)
 			break;
 		case 75: // 5x15 ms = 75 ms
 			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 75ms Oelstandsensor Ausgang high
+			break;
+		case 400: // 400ms
+			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 400ms Oelstandsensor Ausgang low
+			time = millis();																		// Zeit abspeichern
 			break;
 		default:
 			break;
@@ -188,10 +192,12 @@ void cockpit_default(void)
 	leuchten_out.Wischwarn = 1;																		// Wischwasserwarnung setzen
 	leuchten_out.Bremswarn = 1;																		// Bremslichtwarnung setzen
 	leuchten_out.Oeldruck = 1;																		// Oeldruckwarnung setzen
+	leuchten_out.Generator = 1;																		// Ladekontrolle setzen, invertiert
 	HAL_GPIO_WritePin(RUECKWARNUNG_GPIO_Port, RUECKWARNUNG_Pin, leuchten_out.Rueckwarn);			// Fehlermeldung fuer Ruecklichtwarnung einschalten
 	HAL_GPIO_WritePin(WISCHWARNUNG_GPIO_Port, WISCHWARNUNG_Pin, leuchten_out.Wischwarn);			// Fehlermeldung fuer Wischwasserwarnung einschalten
 	HAL_GPIO_WritePin(BREMSWARNUNG_GPIO_Port, BREMSWARNUNG_Pin, leuchten_out.Bremswarn);			// Fehlermeldung fuer Bremslichtwarnung einschalten
 	HAL_GPIO_WritePin(OELDRUCK_GPIO_Port, OELDRUCK_Pin, leuchten_out.Oeldruck);						// Fehlermeldung fuer Oeldruckwarnung einschalten
+	HAL_GPIO_WritePin(GENERATOR_LED_GPIO_Port, GENERATOR_LED_Pin, leuchten_out.Generator);			// Fehlermeldung fuer Ladekontrolle ausschalten, invertiert
 }
 //----------------------------------------------------------------------
 
@@ -199,7 +205,7 @@ void cockpit_default(void)
 //----------------------------------------------------------------------
 void testSDC(void)
 {
-	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_SET);					// Einschalten von Shutdown-Circuit zum testen
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_SET);					// Einschalten des Shutdown-Circuit zum testen
 	HAL_Delay(100);																					// Wartezeit zum setzen
 	if (HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin) == 1)								// Einlesen von SDC0 Eingang
 	{
@@ -215,6 +221,6 @@ void testSDC(void)
 	  	sdc_in.SDC12V = 1;																			// SDC Spannungsversorgung OK
 	}
 	HAL_Delay(100);																					// Wartezeit zum setzen
-	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_RESET);					// Auschalten von Shutdown-Circuit
+	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, GPIO_PIN_RESET);					// Ausschalten des Shutdown-Circuit zum testen
 }
 //----------------------------------------------------------------------

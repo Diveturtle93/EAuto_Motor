@@ -21,7 +21,6 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -79,6 +78,8 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	// Definiere Variablen fuer Main-Funktion
+	static Motor_State statemaschine = Start;
 	uint16_t ADC_VAL[10] = {0};
   /* USER CODE END 1 */
 
@@ -89,12 +90,11 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-	// Definiere Variablen fuer Main-Funktion
+
 	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
-	uint8_t status, tmp[4] = {0}, task = 0, heizung = 0;
+	uint8_t tmp[4] = {0}, task = 0, heizung = 0;
 	uint16_t count = 0, gas_adc = 0, gas_mean = 0;
   	uint32_t lastcan = 0, lastsendcan = 0;
-  	static Motor_State statemaschine = Start;
 
   	// Erstelle Can-Nachrichten
     // Sendenachricht erstellen
@@ -124,28 +124,22 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  MX_USART2_UART_Init();
 
+#ifdef DEBUG
+	app_info();
+	HAL_Delay(3000);
+#endif
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
   MX_CAN3_Init();
   MX_ADC1_Init();
-  MX_TIM6_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
 
-  // ITM HCLK
-  ITM_SendChar('H');
-  ITM_SendChar('a');
-  ITM_SendChar('l');
-  ITM_SendChar('l');
-  ITM_SendChar('o');
-  ITM_SendChar(' ');
-
   	// Start Timer 6 Interrupt
-  	HAL_TIM_Base_Start_IT(&htim6);
   	HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
 
   	// Schreibe Resetquelle auf die Konsole
@@ -175,6 +169,7 @@ int main(void)
 
   	// Alle Fehler Cockpit loeschen
   	cockpit_default();
+
   	// Setze LED Green
   	leuchten_out.GreenLed = 1;
   	HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, leuchten_out.GreenLed);
@@ -261,6 +256,7 @@ int main(void)
 				HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
 				HAL_UART_Transmit(&huart2, c, 10, 100);
 				uartTransmit("Falsche Eingabe\r\n", 17);
+				uartTransmit((char*)UART2_rxBuffer, uart_count);
 			}
 			uart_count = 0;
 		}
@@ -301,8 +297,8 @@ int main(void)
 
 	  	if ((statemaschine == KL15) && (system_in.KL15 == 1))
 	  	{
-	  		statemaschine = Ausschalten;
-	  		uartTransmit("Ausschalten\n", 12);
+	  		statemaschine = Standby;
+	  		uartTransmit("Standby\n", 12);
 	  	}
 
 	  	if ((statemaschine == KL15) && (system_in.Anlasser != 1))
@@ -319,8 +315,8 @@ int main(void)
 
 	  	if ((statemaschine == Anlasser) && (system_in.KL15 == 1))
 	  	{
-	  		statemaschine = Ausschalten;
-	  		uartTransmit("Ausschalten\n", 12);
+	  		statemaschine = Standby;
+	  		uartTransmit("Standby\n", 12);
 	  	}
 
 	  	if ((statemaschine == Anlasser) && (system_in.BremseNO == 1) && (system_in.BremseNC == 1))
@@ -332,8 +328,8 @@ int main(void)
 
 	  	if ((statemaschine == ReadyToDrive) && (system_in.KL15 == 1))
 	  	{
-	  		statemaschine = Ausschalten;
-	  		uartTransmit("Ausschalten\n", 12);
+	  		statemaschine = Standby;
+	  		uartTransmit("Standby\n", 12);
 
 	  		sdc_in.Anlasser = 0;
 	  	}
@@ -374,7 +370,7 @@ int main(void)
 		}
 
 		// PWM Oelstandsensor Kombiinstrument ausgeben
-		pwm_oelstand(count);
+		pwm_oelstand();
 
 		// Ausgaenge setzen
 		writeall_outputs();
@@ -394,12 +390,12 @@ int main(void)
 		{
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht Motor1
+			HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor280.motor280output, (uint32_t *)CAN_TX_MAILBOX0);
 
 #if TISCHAUFBAU == 1
 			tmp_Lenkung[0] = 0;
 			tmp_Lenkung[1] = 1;
 
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor280.output, (uint32_t *)CAN_TX_MAILBOX0);
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			HAL_CAN_AddTxMessage(&hcan3, &TxLenkung, tmp_Lenkung, (uint32_t *)CAN_TX_MAILBOX0);
 #endif
@@ -414,7 +410,7 @@ int main(void)
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Befehl Fehler auslesen an Bamocar senden
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 		}
 
@@ -512,7 +508,7 @@ int main(void)
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Drehmoment an Bamocar senden
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 		}
 
@@ -529,7 +525,7 @@ int main(void)
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht digitale Ausgaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 
 			// ADC-Werte einlesen Bremse und Temperaturen
@@ -548,7 +544,7 @@ int main(void)
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Sende Nachricht digitale Eingaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 
 			// ADC-Werte einlesen Navi, Klima, KL15
@@ -582,9 +578,9 @@ int main(void)
 
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
 			// Befehl Fehler auslesen an Bamocar senden
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX0);
 		}
 
 		if (((count % 400) == 0) && (task == 1))
@@ -780,8 +776,8 @@ int main(void)
 				}
 
 				// Drehzahl ausgeben
-				TxData[2] = motor280.output[2];
-				TxData[3] = motor280.output[3];
+				TxData[2] = motor280.motor280output[2];
+				TxData[3] = motor280.motor280output[3];
 				lastcan = millis();
 
 				can_change = 0;
@@ -793,7 +789,7 @@ int main(void)
 		if (millis() - lastsendcan >= 1000)
 		{
 			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
+			HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
 			//hal_error(status);
 			lastsendcan = millis();
 
@@ -911,15 +907,15 @@ void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
 	Error_Handler();
 }
 
-// Timer-Interrupt: Timer ist uebergelaufen
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
-	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
-	{
-		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
-	}
-}
+//// Timer-Interrupt: Timer ist uebergelaufen
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
+//	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
+//	{
+//		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
+//	}
+//}
 /* USER CODE END 4 */
 
 /**

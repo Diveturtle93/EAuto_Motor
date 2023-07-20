@@ -22,8 +22,10 @@
 
 // Strukturen definieren
 //----------------------------------------------------------------------
-typedef union __system_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t J317 : 1;						// 0
 		uint8_t F54 : 1;						// 1
 		uint8_t F18 : 1;						// 2
@@ -39,8 +41,10 @@ typedef union __system_out_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __highcurrent_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Digital1 : 1;					// 0
 		uint8_t Digital2 : 1;					// 1
 		uint8_t Pumpe_Bremse : 1;				// 2
@@ -56,8 +60,10 @@ typedef union __highcurrent_out_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __leuchten_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Bremslicht : 1;					// 0
 		uint8_t Rueckfahrlicht : 1;				// 1
 		uint8_t Generator : 1;					// 2
@@ -80,8 +86,10 @@ typedef union __leuchten_out_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __komfort_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t BC_Rst_Out : 1;					// 0
 		uint8_t BC_Up_Out : 1;					// 1
 		uint8_t BC_Down_Out : 1;				// 2
@@ -116,7 +124,7 @@ void writeall_outputs(void);												// Schreibe alle Ausgaenge
 void writeled_outputs(void);												// Schreibe alle LED-Ausgaenge
 void testPCB_Leds(void);													// Teste PCB LEDs fuer je 1s
 void testCockpit_Leds(void);												// Teste Cockpit LEDs fuer je 1s
-void pwm_oelstand(uint16_t time);											// Oelstandsensor simulieren, Fehler in Cockpit unterdruecken
+void pwm_oelstand(void);													// Oelstandsensor simulieren, Fehler in Cockpit unterdruecken
 void cockpit_default(void);													// Fehler am Cockpit deaktivieren
 void testSDC(void);															// Teste SDC Spannung
 //----------------------------------------------------------------------

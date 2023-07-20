@@ -9,6 +9,7 @@ C_SRCS += \
 ../Application/Src/BasicUart.c \
 ../Application/Src/SystemInfo.c \
 ../Application/Src/adc_inputs.c \
+../Application/Src/app_info.c \
 ../Application/Src/error.c \
 ../Application/Src/inputs.c \
 ../Application/Src/millis.c \
@@ -21,6 +22,7 @@ OBJS += \
 ./Application/Src/BasicUart.o \
 ./Application/Src/SystemInfo.o \
 ./Application/Src/adc_inputs.o \
+./Application/Src/app_info.o \
 ./Application/Src/error.o \
 ./Application/Src/inputs.o \
 ./Application/Src/millis.o \
@@ -33,6 +35,7 @@ C_DEPS += \
 ./Application/Src/BasicUart.d \
 ./Application/Src/SystemInfo.d \
 ./Application/Src/adc_inputs.d \
+./Application/Src/app_info.d \
 ./Application/Src/error.d \
 ./Application/Src/inputs.d \
 ./Application/Src/millis.d \
@@ -48,7 +51,7 @@ Application/Src/%.o Application/Src/%.su Application/Src/%.cyclo: ../Application
 clean: clean-Application-2f-Src
 
 clean-Application-2f-Src:
-	-$(RM) ./Application/Src/Bamocar.cyclo ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/Bamocar.su ./Application/Src/BasicUart.cyclo ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/BasicUart.su ./Application/Src/SystemInfo.cyclo ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/SystemInfo.su ./Application/Src/adc_inputs.cyclo ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/adc_inputs.su ./Application/Src/error.cyclo ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/error.su ./Application/Src/inputs.cyclo ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/inputs.su ./Application/Src/millis.cyclo ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/millis.su ./Application/Src/outputs.cyclo ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/outputs.su ./Application/Src/pedale.cyclo ./Application/Src/pedale.d ./Application/Src/pedale.o ./Application/Src/pedale.su ./Application/Src/rtd_sound.cyclo ./Application/Src/rtd_sound.d ./Application/Src/rtd_sound.o ./Application/Src/rtd_sound.su
+	-$(RM) ./Application/Src/Bamocar.cyclo ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/Bamocar.su ./Application/Src/BasicUart.cyclo ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/BasicUart.su ./Application/Src/SystemInfo.cyclo ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/SystemInfo.su ./Application/Src/adc_inputs.cyclo ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/adc_inputs.su ./Application/Src/app_info.cyclo ./Application/Src/app_info.d ./Application/Src/app_info.o ./Application/Src/app_info.su ./Application/Src/error.cyclo ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/error.su ./Application/Src/inputs.cyclo ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/inputs.su ./Application/Src/millis.cyclo ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/millis.su ./Application/Src/outputs.cyclo ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/outputs.su ./Application/Src/pedale.cyclo ./Application/Src/pedale.d ./Application/Src/pedale.o ./Application/Src/pedale.su ./Application/Src/rtd_sound.cyclo ./Application/Src/rtd_sound.d ./Application/Src/rtd_sound.o ./Application/Src/rtd_sound.su
 
 .PHONY: clean-Application-2f-Src
 

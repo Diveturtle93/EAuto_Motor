@@ -21,8 +21,10 @@
 
 // Eingangsstrukturen definieren
 //----------------------------------------------------------------------
-typedef union __system_input_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Kickdown : 1;					// 0						// Schalter Kickdown, Gaspedal
 		uint8_t Leerlauf : 1;					// 1						// Schalter Leerlauf, Gaspedal
 		uint8_t BremseNO : 1;					// 2						// Schalter Bremse normal Offen, Bremspedal
@@ -46,8 +48,10 @@ typedef union __system_input_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __sdc_in_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t EmergencyRun : 1;				// 0						// Signal Emergency Run
 		uint8_t SDC0 : 1;						// 1						// Signal Sicherung, Shutdown-Circuit
 		uint8_t Akku1SDC : 1;					// 2						// Signal Akku Ok, Shutdown-Circuit
@@ -62,8 +66,10 @@ typedef union __sdc_in_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __komfort_in_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t ASR1 : 1;						// 0						// Schalter ASR1, Mittelkonsole
 		uint8_t ASR2 : 1;						// 1						// Schalter ASR2, Mittelkonsole
 		uint8_t ECO : 1;						// 2						// Schalter ECO, Mittelkonsole

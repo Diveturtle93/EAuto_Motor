@@ -294,7 +294,7 @@ void printResetSource(reset_reason reset_flags)
 	uartTransmit("\r\r\r\r\r\r", 6);
 
 
-	if (reset_flags == STARTUP)											// Regulärer Start
+	if (reset_flags == STARTUP)												// Regulaerer Start
 	{
 		uartTransmit("Regular Start\r\n", 15);
 	}
@@ -314,6 +314,7 @@ void printResetSource(reset_reason reset_flags)
 		{
 			uartTransmit("CPU Reset\n", 10);
 		}
+
 		if (reset_flags & BORST1)											// Brown out Reset
 		{
 			uartTransmit("Brown Out Reset\n", 16);
