@@ -33,6 +33,7 @@
 #include "pedale.h"
 #include "rtd_sound.h"
 #include "SystemInfo.h"
+#include "statemaschine.h"
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB
@@ -104,17 +105,19 @@
 //----------------------------------------------------------------------
 typedef enum
 {
-	Start,																	// Starte Motorsteuergeraet
-	Ready,																	// Motorsteuergeraet gestartet
-	KL15,																	// KL15 aktiv
-	Anlasser,																// Anlasser betaetigt
-	ReadyToDrive,															// Motorsteuergeraet bereit fuer Fahrmodus
-	Drive,																	// Fahrzeug im Fahrmodus
-	Standby,																// Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
-	Ausschalten,															// Motorsteuergeraet ausschalten
+	Start,																	// 0 Starte Motorsteuergeraet
+	Ready,																	// 1 Motorsteuergeraet gestartet
+	KL15,																	// 2 KL15 aktiv
+	Anlassen,																// 3 Anlasser betaetigt
+	Precharge,																// 4 Precharge Fahrzeug
+	ReadyToDrive,															// 5 Motorsteuergeraet bereit fuer Fahrmodus
+	Drive,																	// 6 Fahrzeug im Fahrmodus
+	Standby,																// 7 Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
+	Ausschalten,															// 8 Motorsteuergeraet ausschalten
+	MotorNormal = 0x10,														// Keine Fehler oder Warnungen am Motorsteuergeraet
 	MotorWarning = 0x20,													// Warnung im Motorsteuergeraet
 	MotorError = 0x40,														// Error im Motorsteuergeraet
-	CriticalError = 0x80,													// Kritischer Fehler am Motorsteuergeraet
+	MotorCriticalError = 0x80,												// Kritischer Fehler am Motorsteuergeraet
 } Motor_State;
 //----------------------------------------------------------------------
 

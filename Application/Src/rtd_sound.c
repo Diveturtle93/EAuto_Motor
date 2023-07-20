@@ -54,11 +54,11 @@ bool playRTDS(void)
 
 	if (abort == false)
 	{
-		leuchten_out.Buzzer = 1;
+		leuchten_out.Anhaenger = 1;
 	}
 	else
 	{
-		leuchten_out.Buzzer = 0;
+		leuchten_out.Anhaenger = 0;
 	}
 
 	return abort;

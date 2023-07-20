@@ -62,7 +62,7 @@ void readall_inputs(void)
 	// SDC-Eingaenge einlesen
 	sdc_in.EmergencyRun = HAL_GPIO_ReadPin(EMERGENCY_RUN_GPIO_Port, EMERGENCY_RUN_Pin);			// Emergency Run, Akku
 	sdc_in.SDC0 = HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin);						// Shutdown-Circuit, OK
-	sdc_in.Akku1SDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
+	sdc_in.AkkuSDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
 	sdc_in.BTB_SDC = HAL_GPIO_ReadPin(SENSE_SDC_BTB_GPIO_Port, SENSE_SDC_BTB_Pin);				// Shutdown-Circuit Bamocar, OK
 	sdc_in.DCDC_Fault = HAL_GPIO_ReadPin(DCDC_FAULT_GPIO_Port, DCDC_FAULT_Pin);					// DCDC Wandler funktioniert nicht richtig
 
