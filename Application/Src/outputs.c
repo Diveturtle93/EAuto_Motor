@@ -156,13 +156,10 @@ void testCockpit_Leds(void)
 
 // PWM fuer Oelstandsensor am Kombiinstrument
 //----------------------------------------------------------------------
-void pwm_oelstand(void)
+void pwm_oelstand(uint16_t time)
 {
-	// Static Variable definieren
-	static uint32_t time = 0;
-
 	// Auswahl wie viele Sekunden vergangen
-	switch (millis() - time)																		// Zeit wird uebergeben
+	switch (time)																					// Zeit wird uebergeben
 	{
 		case 15: // 1x15 ms = 15 ms
 			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_SET);			// Bei 15ms Oelstandsensor Ausgang high
@@ -175,7 +172,6 @@ void pwm_oelstand(void)
 			break;
 		case 400: // 400ms
 			HAL_GPIO_WritePin(OELSTAND_TEMP_GPIO_Port, OELSTAND_TEMP_Pin, GPIO_PIN_RESET);			// Bei 400ms Oelstandsensor Ausgang low
-			time = millis();																		// Zeit abspeichern
 			break;
 		default:
 			break;

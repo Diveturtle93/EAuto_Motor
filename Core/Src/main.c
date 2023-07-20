@@ -21,6 +21,7 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -137,9 +138,13 @@ int main(void)
   MX_CAN3_Init();
   MX_ADC1_Init();
   MX_CAN1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
-  	// Start Timer 6 Interrupt
+  	// Starte Timer 6 Interrupt
+	HAL_TIM_Base_Start_IT(&htim6);
+
+	// Starte UART Receive Interrupt
   	HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
 
   	// Schreibe Resetquelle auf die Konsole
@@ -370,7 +375,7 @@ int main(void)
 		}
 
 		// PWM Oelstandsensor Kombiinstrument ausgeben
-		pwm_oelstand();
+		pwm_oelstand(count);
 
 		// Ausgaenge setzen
 		writeall_outputs();
@@ -905,6 +910,16 @@ void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
 	uartTransmit("Fifo0 von CAN3 ist voll\n", 24);
 
 	Error_Handler();
+}
+
+// Timer-Interrupt: Timer ist uebergelaufen
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
+	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
+	{
+		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
+	}
 }
 
 //// Timer-Interrupt: Timer ist uebergelaufen
