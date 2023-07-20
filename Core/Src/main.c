@@ -118,6 +118,7 @@ int main(void)
 	uartTransmit("Ready\n", 6);
 #endif
 
+//	CAN_config();
 	mStrg_state = Ready;
   /* USER CODE END 2 */
 
@@ -136,6 +137,12 @@ int main(void)
 
 	  // Shutdown-Circuit checken
 	  // checkSDC;
+
+	  if (mStrg_state != Standby)
+	  {
+		  // TODO: CAN-BUS write Funktion ausfuehren
+//		  CANwork();
+	  }
 
 	  if (mStrg_state & MotorNormal)
 	  {
@@ -180,7 +187,7 @@ int main(void)
 
 			  // Testen der Versorgungsspannung am Shutdown Circuit
 			  uartTransmit("Testen der SDC-Sicherung\n", 25);
-			  testSDC();
+			  //testSDC();
 
 			  // Alle Fehler am Cockpit loeschen
 			  uartTransmit("Cockpit LEDs standardmaessig ausschalten\n", 41);
@@ -326,11 +333,6 @@ int main(void)
 
 			  break;
 		  }
-	  }
-
-	  if (mStrg_state != Standby)
-	  {
-		  // TODO: CAN-BUS write Funktion ausfuehren
 	  }
 
 	  // Alle Ausgaenge schreiben
