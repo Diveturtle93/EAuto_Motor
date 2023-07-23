@@ -175,7 +175,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* CAN3 interrupt Init */
-    HAL_NVIC_SetPriority(CAN3_TX_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(CAN3_TX_IRQn, 15, 0);
     HAL_NVIC_EnableIRQ(CAN3_TX_IRQn);
     HAL_NVIC_SetPriority(CAN3_RX0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN3_RX0_IRQn);

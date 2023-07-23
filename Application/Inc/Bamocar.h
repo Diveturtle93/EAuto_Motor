@@ -21,8 +21,8 @@
 
 // Definiere CAN-IDs
 //----------------------------------------------------------------------
-#define BAMOCAR_RX_ID							0x181						// Empfangs-Adresse kann zwischen 0x181 und 0x1FF liegen
-#define BAMOCAR_TX_ID							0x210						// Sende-Adresse kann zwischen 0x201 und 0x27F liegen
+#define BAMOCAR_CAN_RX							0x181						// Empfangs-Adresse kann zwischen 0x181 und 0x1FF liegen
+#define BAMOCAR_CAN_TX							0x210						// Sende-Adresse kann zwischen 0x201 und 0x27F liegen
 //----------------------------------------------------------------------
 
 // Definiere RegIDs

@@ -101,6 +101,12 @@
 #define x_CAN										0x010					// Einmalig gesendet wenn Schlüssel auf Stufe 2
 #define xy_CAN										0x011					// EInmalig gesendet wenn Schlüssel auf Stufe 2
 //----------------------------------------------------------------------
+// Eigene CAN IDs auf dem BUS
+//----------------------------------------------------------------------
+#define BMS_CAN_SDC									0x505					// Batteriemanagement-System
+//----------------------------------------------------------------------
+
+#define CAN_TIMEOUT									3000					// Zeit bis CAN Timeout auftritt
 
 // Define Statemaschine Typedefines
 //----------------------------------------------------------------------
@@ -115,11 +121,16 @@ typedef enum
 	Drive,																	// 6 Fahrzeug im Fahrmodus
 	Standby,																// 7 Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
 	Ausschalten,															// 8 Motorsteuergeraet ausschalten
-	MotorNormal = 0x10,														// Keine Fehler oder Warnungen am Motorsteuergeraet
-	MotorWarning = 0x20,													// Warnung im Motorsteuergeraet
-	MotorError = 0x40,														// Error im Motorsteuergeraet
-	MotorCriticalError = 0x80,												// Kritischer Fehler am Motorsteuergeraet
-} Motor_State;
+} states;
+//----------------------------------------------------------------------
+typedef struct
+{
+	uint8_t States : 4;														// State der Statemaschine
+	uint8_t Normal : 1;														// Statemaschine normal
+	uint8_t Warning : 1;													// Statemaschine warning
+	uint8_t Error : 1;														// Statemaschine error
+	uint8_t CriticalError : 1;												// Statemaschine kritscher error
+} Motor_state;
 //----------------------------------------------------------------------
 
 // Definiere CAN Strukturen

@@ -50,7 +50,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+volatile uint8_t millisekunden_flag = 0;											// Flag fuer Millisekungen Timer Task
+motor280_tag motor280;																// Daten der CAN-Nachricht 280
+motor288_tag motor288;																// Daten der CAN-Nachricht 288
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,9 +73,16 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	Motor_State mStrg_state = Start;
+	Motor_state mStrg_state = {Start, true, false, false, false};
 
+	uint8_t task = 0;
+	uint16_t count = 0;
 	uint32_t timeStandby = 0, timeError = 0;
+
+	uint8_t  can_online = 0;
+	uint32_t timeBAMO = 0, timeBMS = 0;
+
+	CAN_message_t RxMessage;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -106,10 +115,15 @@ int main(void)
   MX_CAN1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-	leuchten_out.Anhaenger = 1;
-	leuchten_out.Niveau = 1;
+	// Starte Timer 6 Interrupt
+	HAL_TIM_Base_Start_IT(&htim6);
+
+	leuchten_out.Anhaenger = true;
+	leuchten_out.Niveau = true;
+	leuchten_out.Ladeleuchte = false;
 	HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, leuchten_out.Anhaenger);
 	HAL_GPIO_WritePin(NIVEAU_OUT_GPIO_Port, NIVEAU_OUT_Pin, leuchten_out.Niveau);
+	HAL_GPIO_WritePin(LADELEUCHTE_GPIO_Port, LADELEUCHTE_Pin, leuchten_out.Ladeleuchte);
 
 #ifdef DEBUG
 	#define MAINWHILE			"\nStarte While Schleife\n"
@@ -118,8 +132,20 @@ int main(void)
 	uartTransmit("Ready\n", 6);
 #endif
 
+//	CANinit(RX_SIZE_16, TX_SIZE_16);
 //	CAN_config();
-	mStrg_state = Ready;
+	mStrg_state.States = Ready;
+
+	for (uint8_t j = 0; j < 7; j++)
+	{
+	//	CAN_Output_PaketListe[0].msg.buf[j] = 0;
+	//	CAN_Output_PaketListe[1].msg.buf[j] = 0;
+	//	CAN_Output_PaketListe[2].msg.buf[j] = 0;
+	//	CAN_Output_PaketListe[3].msg.buf[j] = 0;
+	//	CAN_Output_PaketListe[4].msg.buf[j] = 0;
+	//	CAN_Output_PaketListe[5].msg.buf[j] = 0;
+	//	CAN_Output_PaketListe[6].msg.buf[j] = 0;
+	}
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -138,46 +164,113 @@ int main(void)
 	  // Shutdown-Circuit checken
 	  // checkSDC;
 
-	  if (mStrg_state != Standby)
+	  /*if (CAN_available() >= 1)
 	  {
-		  // TODO: CAN-BUS write Funktion ausfuehren
+		  CANread(&RxMessage);
+
+		  switch (RxMessage.id)
+		  {
+			  case BAMOCAR_CAN_RX:
+			  {
+				  can_online |= (1 << 0);
+				  timeBAMO = millis();
+				  BAMOCAN_ID(&RxMessage.buf[0], RxMessage.len);
+				  break;
+			  }
+
+			  case BMS_CAN_SDC:
+			  {
+				  timeBMS = millis();
+				  can_online |= (1 << 1);
+			  }
+		  }
+	  }*/
+
+	  if (millis() > (timeBAMO + CAN_TIMEOUT))
+	  {
+		  can_online &= ~(1 << 0);
+	  }
+	  if (millis() > (timeBMS + CAN_TIMEOUT))
+	  {
+		  can_online &= ~(1 << 1);
+	  }
+
+	  // PWM Oelstandsensor Kombiinstrument ausgeben
+	  pwm_oelstand(count);
+
+	  // Task wird jede Millisekunde ausgefuehrt
+	  if (millisekunden_flag == 1)
+	  {
+		  count++;																	// Zaehler count hochzaehlen
+		  millisekunden_flag = 0;													// Setze Millisekunden-Flag zurueck
+
+		  // Setze Flag start, nur wenn millisekunden Flag gesetzt war
+		  task = 1;
+	  }
+
+	  // Zuruecksetzen der Countervariable fuer pwm_Oelstand
+	  if (((count % 400) == 0) && (task == 1))
+	  {
+		  // Variable count auf 0 zuruecksetzen
+		  count = 0;
+	  }
+
+	  // Crash Ausgeloest
+	  if (system_in.Crash != 1)
+	  {
+		  mStrg_state.CriticalError = true;
+	  }
+
+	  // Wenn Statemaschine nicht im Standby ist
+	  if (mStrg_state.States != Standby)
+	  {
+		  // Schreibe alle CAN-NAchrichten auf BUS, wenn nicht im Standby
 //		  CANwork();
 	  }
 
-	  if (mStrg_state & MotorNormal)
+	  // Statemaschine keine Fehler
+	  if (mStrg_state.Normal)
 	  {
-		  leuchten_out.RedLed = 0;
-		  leuchten_out.GreenLed = 1;
+		  leuchten_out.RedLed = false;
+		  leuchten_out.GreenLed = true;
 	  }
 
-	  if (mStrg_state & MotorWarning)
+	  // Statemaschine hat Warnungen
+	  if (mStrg_state.Warning)
 	  {
 		  if (millis() - timeError > 1000)
 		  {
 			  leuchten_out.RedLed = !leuchten_out.RedLed;
+			  timeError = millis();
 		  }
 
-		  leuchten_out.GreenLed = 1;
+		  leuchten_out.GreenLed = true;
 	  }
 
-	  if (mStrg_state & MotorError)
+	  // Statemaschine hat Fehler
+	  if (mStrg_state.Error)
 	  {
 		  if (millis() - timeError > 1000)
 		  {
 			  leuchten_out.RedLed = !leuchten_out.RedLed;
+			  timeError = millis();
 		  }
 
-		  leuchten_out.GreenLed = 0;
+		  leuchten_out.GreenLed = false;
 	  }
 
-	  if (mStrg_state & MotorCriticalError)
+	  // Statemaschine hat Kritische Fehler
+	  if (mStrg_state.CriticalError)
 	  {
-		  leuchten_out.RedLed = 1;
-		  leuchten_out.GreenLed = 0;
+		  leuchten_out.RedLed = true;
+		  leuchten_out.Ladeleuchte = false;
+		  leuchten_out.GreenLed = false;
 	  }
 
-	  switch (mStrg_state)
+	  // Statemaschine von Motorsteuergeraet
+	  switch (mStrg_state.States)
 	  {
+		  // State Ready, Vorbereiten des Motorsteuergeraetes
 		  case Ready:
 		  {
 			  // LEDs testen
@@ -194,21 +287,23 @@ int main(void)
 			  cockpit_default();
 
 			  uartTransmit("KL15\n", 5);
-			  mStrg_state = KL15;
+			  mStrg_state.States = KL15;
 
 			  break;
 		  }
 
+		  // State KL15, wenn Schluessel auf Position 2, KL15 einschalten
 		  case KL15:
 		  {
 			  if (system_in.Anlasser != 1)
 			  {
-				  if (!(mStrg_state & MotorCriticalError))
+				  if (!(mStrg_state.CriticalError))
 				  {
 					  uartTransmit("Anlassen\n", 9);
-					  mStrg_state = Anlassen;
+					  mStrg_state.States = Anlassen;
+					  sdc_in.Anlasser = true;
 
-					  system_out.MotorSDC = 1;
+					  system_out.MotorSDC = true;;
 				  }
 
 				  // Pumpe, Vakuumpumpe, Bamocar einschalten
@@ -218,102 +313,112 @@ int main(void)
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
-				  mStrg_state = Standby;
+				  mStrg_state.States = Standby;
 				  timeStandby = millis();
 			  }
 
 			  break;
 		  }
 
+		  // State Anlassen, wenn Schluessel auf Position 3 und keine kritischen Fehler, Anlasser einschalten
 		  case Anlassen:
 		  {
 			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
 			  {
 				  uartTransmit("Precharge\n", 10);
-				  mStrg_state = Precharge;
+				  mStrg_state.States = Precharge;
 			  }
 
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
-				  mStrg_state = Standby;
+				  mStrg_state.States = Standby;
 				  timeStandby = millis();
 			  }
 
 			  break;
 		  }
 
+		  // State Precharge, wenn Bremse beim Anlassen oder danach getreten ist
 		  case Precharge:
 		  {
 			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC == 1) && (sdc_in.EmergencyRun == 1))
 			  {
-				  uartTransmit("ReadyToDrive\n", 13);
-				  mStrg_state = ReadyToDrive;
+				  if (playRTDS() == true)
+				  {
+					  uartTransmit("ReadyToDrive\n", 13);
+					  mStrg_state.States = ReadyToDrive;
+				  }
 			  }
 
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
-				  mStrg_state = Standby;
+				  mStrg_state.States = Standby;
+				  mStrg_state.Warning = true;
 				  timeStandby = millis();
 			  }
 
 			  break;
 		  }
 
+		  // State ReadyToDrive, wenn SDC Ok ist
 		  case ReadyToDrive:
 		  {
-			  if (system_in.Button2 != 1)
+			  if (komfort_in.Enter == 1)
 			  {
 				  uartTransmit("Drive\n", 6);
-				  mStrg_state = Drive;
+				  mStrg_state.States = Drive;
 			  }
 
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
-				  mStrg_state = Standby;
+				  mStrg_state.States = Standby;
 				  timeStandby = millis();
 			  }
 
 			  break;
 		  }
 
+		  // State Drive, wenn Fahrmodus manuel aktiviert wird
 		  case Drive:
 		  {
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
-				  mStrg_state = Standby;
+				  mStrg_state.States = Standby;
 				  timeStandby = millis();
 			  }
 
 			  break;
 		  }
 
+		  // State Standby, wenn Schluessel gezogen wird, KL15 ausschalten
 		  case Standby:
 		  {
-			  if ((highcurrent_out.Pumpe_Kuhlung == 1) && (millis() - timeStandby > PUMPTIME))
+			  if ((highcurrent_out.Pumpe_Kuhlung == true) && (millis() - timeStandby > PUMPTIME))
 			  {
-				  highcurrent_out.Pumpe_Kuhlung = 0;
+				  highcurrent_out.Pumpe_Kuhlung = false;
 				  HAL_Delay(10);
-				  system_out.Gluehkerzen = 0;
+				  system_out.Gluehkerzen = false;
 			  }
 
 			  if (millis() - timeStandby > MOTORTIME)
 			  {
 				  uartTransmit("Ausschalten\n", 12);
-				  mStrg_state = Ausschalten;
+				  mStrg_state.States = Ausschalten;
 			  }
 			  else if (system_in.KL15 != 1)
 			  {
 				  uartTransmit("Ready\n", 6);
-				  mStrg_state = Ready;
+				  mStrg_state.States = Ready;
 			  }
 
 			  break;
 		  }
 
+		  // State Ausschalten, wenn Standby State laenger als 5min dauert
 		  case Ausschalten:
 		  {
 			  // Alle Ausgaenge ausschalten
@@ -326,10 +431,11 @@ int main(void)
 			  break;
 		  }
 
+		  // Falls kein State zutrifft, dann Kritischer Fehler
 		  default:
 		  {
 			  uartTransmit("Motor Kritischer Fehler\n", 24);
-			  mStrg_state = MotorCriticalError;
+			  mStrg_state.CriticalError = true;
 
 			  break;
 		  }
@@ -395,7 +501,15 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+// Timer-Interrupt: Timer ist uebergelaufen
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
+	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
+	{
+		millisekunden_flag = 1;															// Setze Millisekunden Flag
+	}
+}
 /* USER CODE END 4 */
 
 /**

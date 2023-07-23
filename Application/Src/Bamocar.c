@@ -41,7 +41,7 @@ void readBamoReg(uint8_t REG)
 	uint8_t BamoTxData[3], status;
 
 	// Sendenachricht erstellen
-	BamoTxMsg.StdId = BAMOCAR_TX_ID;
+	BamoTxMsg.StdId = BAMOCAR_CAN_TX;
 	BamoTxMsg.ExtId = 0;
 	BamoTxMsg.RTR = CAN_RTR_DATA;
 	BamoTxMsg.IDE = CAN_ID_STD;
@@ -67,7 +67,7 @@ void readBamoRegIntvl(uint8_t REG, uint8_t interval)
 	uint8_t BamoTxData[3], status;
 
 	// Sendenachricht erstellen
-	BamoTxMsg.StdId = BAMOCAR_TX_ID;
+	BamoTxMsg.StdId = BAMOCAR_CAN_TX;
 	BamoTxMsg.ExtId = 0;
 	BamoTxMsg.RTR = CAN_RTR_DATA;
 	BamoTxMsg.IDE = CAN_ID_STD;
@@ -98,7 +98,7 @@ void BAMOCAN_ID(uint8_t* data, uint8_t dlc)
 		// Drehzahl vom Bamocar bekommen
 		case BAMOCAR_REG_N_ACT_FILTER:
 			speed = ((data[2]<<8) + data[1]);
-			motor280.Drehzahl = speed;
+			motor280.Drehzahl = (speed / 4);
 // Uart Ausgabe
 #ifdef DEBUG_BAMOCAR
 			uartTransmit("Motordrehzahl\n", 14);

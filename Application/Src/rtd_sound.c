@@ -29,20 +29,21 @@
 //----------------------------------------------------------------------
 bool playRTDS(void)
 {
-	uartTransmit("* playing RTD Sound *\n", 22);
+	uartTransmit("Spiele RTDS !!!\n", 16);
 
-	bool abort = false;
-//	bool rtdsActive = true;
+	bool abort = true;
 	leuchten_out.Buzzer = 1;
+	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, leuchten_out.Buzzer);
 
-	unsigned long starttime = millis();
-	unsigned long checktime = 0;
+	uint32_t starttime = millis();
+	uint32_t checktime = 0;
 
 	while (checktime < RTDSTIME)
 	{
-		if (sdc_in.EmergencyRun == 1)
+		if (sdc_in.EmergencyRun != 1)
 		{
-			abort = true;
+			uartTransmit("Abbruch RTDS !!!\n", 17);
+			abort = false;
 			break;
 		}
 
@@ -50,9 +51,9 @@ bool playRTDS(void)
 	}
 
 	leuchten_out.Buzzer = 0;
-//	rtdsActive = false;
+	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, leuchten_out.Buzzer);
 
-	if (abort == false)
+	if (abort == true)
 	{
 		leuchten_out.Anhaenger = 1;
 	}
