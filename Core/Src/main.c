@@ -52,11 +52,18 @@
 /* USER CODE BEGIN PV */
 volatile uint8_t millisekunden_flag = 0;											// Flag fuer Millisekungen Timer Task
 motor280_tag motor280;																// Daten der CAN-Nachricht 280
-motor288_tag motor288;																// Daten der CAN-Nachricht 288
+//motor288_tag motor288;																// Daten der CAN-Nachricht 288
+//motor380_tag motor380;																// Daten der CAN-Nachricht 380
+//motor388_tag motor388;																// Daten der CAN-Nachricht 388
+motor480_tag motor480;																// Daten der CAN-Nachricht 480
+//motor488_tag motor488;																// Daten der CAN-Nachricht 488
+//motor580_tag motor580;																// Daten der CAN-Nachricht 580
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void checkSDC(void);
+void sortCAN(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -73,15 +80,21 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	// Motorsteuergeraet Statevariable
 	Motor_state mStrg_state = {Start, true, false, false, false};
 
-	uint8_t task = 0;
-	uint16_t count = 0;
+	// Motorsteuergeraet Statemaschine Zeitvariablen
 	uint32_t timeStandby = 0, timeError = 0;
 
+	// Timer Task Variablen (PWM)
+	uint8_t task = 0;
+	uint16_t count = 0;
+
+	// Motorsteuergeraet CAN-Bus Zeitvariable, Errorvariable
 	uint8_t  can_online = 0;
 	uint32_t timeBAMO = 0, timeBMS = 0;
 
+	// CAN-Bus Receive Message
 	CAN_message_t RxMessage;
   /* USER CODE END 1 */
 
@@ -120,10 +133,8 @@ int main(void)
 
 	leuchten_out.Anhaenger = true;
 	leuchten_out.Niveau = true;
-	leuchten_out.Ladeleuchte = false;
 	HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, leuchten_out.Anhaenger);
 	HAL_GPIO_WritePin(NIVEAU_OUT_GPIO_Port, NIVEAU_OUT_Pin, leuchten_out.Niveau);
-	HAL_GPIO_WritePin(LADELEUCHTE_GPIO_Port, LADELEUCHTE_Pin, leuchten_out.Ladeleuchte);
 
 #ifdef DEBUG
 	#define MAINWHILE			"\nStarte While Schleife\n"
@@ -132,19 +143,19 @@ int main(void)
 	uartTransmit("Ready\n", 6);
 #endif
 
-//	CANinit(RX_SIZE_16, TX_SIZE_16);
-//	CAN_config();
+	CANinit(RX_SIZE_16, TX_SIZE_16);
+	CAN_config();
 	mStrg_state.States = Ready;
 
-	for (uint8_t j = 0; j < 7; j++)
+	for (uint8_t j = 0; j < ANZAHL_OUTPUT_PAKETE; j++)
 	{
-	//	CAN_Output_PaketListe[0].msg.buf[j] = 0;
-	//	CAN_Output_PaketListe[1].msg.buf[j] = 0;
-	//	CAN_Output_PaketListe[2].msg.buf[j] = 0;
-	//	CAN_Output_PaketListe[3].msg.buf[j] = 0;
-	//	CAN_Output_PaketListe[4].msg.buf[j] = 0;
-	//	CAN_Output_PaketListe[5].msg.buf[j] = 0;
-	//	CAN_Output_PaketListe[6].msg.buf[j] = 0;
+		CAN_Output_PaketListe[0].msg.buf[j] = 0;
+		CAN_Output_PaketListe[1].msg.buf[j] = 0;
+		CAN_Output_PaketListe[2].msg.buf[j] = 0;
+		CAN_Output_PaketListe[3].msg.buf[j] = 0;
+		CAN_Output_PaketListe[4].msg.buf[j] = 0;
+		CAN_Output_PaketListe[5].msg.buf[j] = 0;
+		CAN_Output_PaketListe[6].msg.buf[j] = 0;
 	}
   /* USER CODE END 2 */
 
@@ -162,9 +173,12 @@ int main(void)
 	  // TODO: ADCs
 
 	  // Shutdown-Circuit checken
-	  // checkSDC;
+	  checkSDC();
 
-	  /*if (CAN_available() >= 1)
+	  // Sortiere CAN-Daten auf CAN-Buffer
+	  sortCAN();
+
+	  if (CAN_available() >= 1)
 	  {
 		  CANread(&RxMessage);
 
@@ -184,7 +198,7 @@ int main(void)
 				  can_online |= (1 << 1);
 			  }
 		  }
-	  }*/
+	  }
 
 	  if (millis() > (timeBAMO + CAN_TIMEOUT))
 	  {
@@ -219,13 +233,14 @@ int main(void)
 	  if (system_in.Crash != 1)
 	  {
 		  mStrg_state.CriticalError = true;
+		  mStrg_state.Normal = false;
 	  }
 
 	  // Wenn Statemaschine nicht im Standby ist
 	  if (mStrg_state.States != Standby)
 	  {
 		  // Schreibe alle CAN-NAchrichten auf BUS, wenn nicht im Standby
-//		  CANwork();
+		  CANwork();
 	  }
 
 	  // Statemaschine keine Fehler
@@ -346,6 +361,7 @@ int main(void)
 			  {
 				  if (playRTDS() == true)
 				  {
+
 					  uartTransmit("ReadyToDrive\n", 13);
 					  mStrg_state.States = ReadyToDrive;
 				  }
@@ -501,6 +517,87 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// Checke Shutdown-Circuit
+void checkSDC(void)
+{
+	sdc_in.SDC_OK = true;
+
+	if (sdc_in.SDC0 != 1)
+	{
+		sdc_in.SDC_OK = false;
+	}
+
+	if (sdc_in.BTB_SDC != 1)
+	{
+		sdc_in.SDC_OK = false;
+	}
+
+	if (sdc_in.AkkuSDC != 1)
+	{
+		sdc_in.SDC_OK = false;
+	}
+}
+
+// Sortiere CAN Daten
+void sortCAN(void)
+{
+	// Digital-Ausgaenge
+	CAN_Output_PaketListe[1].msg.buf[0] = system_out.systemoutput;
+	CAN_Output_PaketListe[1].msg.buf[1] = highcurrent_out.high_out;
+	CAN_Output_PaketListe[1].msg.buf[2] = (leuchten_out.ledoutput >> 8);
+	CAN_Output_PaketListe[1].msg.buf[3] = leuchten_out.ledoutput;
+	CAN_Output_PaketListe[1].msg.buf[4] = komfort_out.komfortoutput;
+	CAN_Output_PaketListe[1].msg.buf[5] = 0;
+
+	// Digital-Eingaenge
+	CAN_Output_PaketListe[2].msg.buf[0] = 0;
+	CAN_Output_PaketListe[2].msg.buf[1] = (system_in.systeminput >> 8);
+	CAN_Output_PaketListe[2].msg.buf[2] = system_in.systeminput;
+	CAN_Output_PaketListe[2].msg.buf[3] = sdc_in.sdcinput;
+	CAN_Output_PaketListe[2].msg.buf[4] = (komfort_in.komfortinput >> 8);
+	CAN_Output_PaketListe[2].msg.buf[5] = komfort_in.komfortinput;
+
+	// Analogeingaenge
+	CAN_Output_PaketListe[3].msg.buf[0] = 0;
+	CAN_Output_PaketListe[3].msg.buf[1] = 0;
+	CAN_Output_PaketListe[3].msg.buf[2] = 0;
+	CAN_Output_PaketListe[3].msg.buf[3] = 0;
+	CAN_Output_PaketListe[3].msg.buf[4] = 0;
+	CAN_Output_PaketListe[3].msg.buf[5] = 0;
+	CAN_Output_PaketListe[3].msg.buf[6] = 0;
+	CAN_Output_PaketListe[3].msg.buf[7] = 0;
+
+	// Motor 280
+	CAN_Output_PaketListe[4].msg.buf[0] = motor280.motor280output[0];
+	CAN_Output_PaketListe[4].msg.buf[1] = motor280.motor280output[1];
+	CAN_Output_PaketListe[4].msg.buf[2] = motor280.motor280output[2];
+	CAN_Output_PaketListe[4].msg.buf[3] = motor280.motor280output[3];
+	CAN_Output_PaketListe[4].msg.buf[4] = motor280.motor280output[4];
+	CAN_Output_PaketListe[4].msg.buf[5] = motor280.motor280output[5];
+	CAN_Output_PaketListe[4].msg.buf[6] = motor280.motor280output[6];
+	CAN_Output_PaketListe[4].msg.buf[7] = motor280.motor280output[7];
+
+	// Motor 480
+	CAN_Output_PaketListe[5].msg.buf[0] = motor480.motor480output[0];
+	CAN_Output_PaketListe[5].msg.buf[1] = motor480.motor480output[1];
+	CAN_Output_PaketListe[5].msg.buf[2] = motor480.motor480output[2];
+	CAN_Output_PaketListe[5].msg.buf[3] = motor480.motor480output[3];
+	CAN_Output_PaketListe[5].msg.buf[4] = motor480.motor480output[4];
+	CAN_Output_PaketListe[5].msg.buf[5] = motor480.motor480output[5];
+	CAN_Output_PaketListe[5].msg.buf[6] = motor480.motor480output[6];
+	CAN_Output_PaketListe[5].msg.buf[7] = motor480.motor480output[7];
+
+	// Temperatureingaenge
+	CAN_Output_PaketListe[6].msg.buf[0] = 0;
+	CAN_Output_PaketListe[6].msg.buf[1] = 0;
+	CAN_Output_PaketListe[6].msg.buf[2] = 0;
+	CAN_Output_PaketListe[6].msg.buf[3] = 0;
+	CAN_Output_PaketListe[6].msg.buf[4] = 0;
+	CAN_Output_PaketListe[6].msg.buf[5] = 0;
+	CAN_Output_PaketListe[6].msg.buf[6] = 0;
+	CAN_Output_PaketListe[6].msg.buf[7] = 0;
+}
+
 // Timer-Interrupt: Timer ist uebergelaufen
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {

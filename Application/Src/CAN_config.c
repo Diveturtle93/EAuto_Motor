@@ -5,7 +5,7 @@
 // Datum	:	Aug 25, 2022
 // Version	:	1.0
 // Autor	:	Diveturtle93
-// Projekt	:	STM32F767ZI
+// Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
 // Einfuegen der standard Include-Dateien

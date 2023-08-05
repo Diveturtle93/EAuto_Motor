@@ -34,7 +34,7 @@
 #include "rtd_sound.h"
 #include "SystemInfo.h"
 #include "statemaschine.h"
-//#include "CAN_Bus.h"
+#include "CAN_Bus.h"
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB
@@ -292,7 +292,12 @@ typedef union
 // Definiere globale Variablen
 //----------------------------------------------------------------------
 extern motor280_tag motor280;												// Variable fuer Motor CAN-Nachricht 1 definieren
-extern motor288_tag motor288;												// Variable fuer Motor CAN-Nachricht 2 definieren
+//extern motor288_tag motor288;												// Variable fuer Motor CAN-Nachricht 2 definieren
+//extern motor380_tag motor380;												// Variable fuer Motor CAN-Nachricht 3 definieren
+//extern motor388_tag motor388;												// Variable fuer Motor CAN-Nachricht 4 definieren
+extern motor480_tag motor480;												// Variable fuer Motor CAN-Nachricht 5 definieren
+//extern motor488_tag motor488;												// Variable fuer Motor CAN-Nachricht 6 definieren
+//extern motor580_tag motor580;												// Variable fuer Motor CAN-Nachricht 7 definieren
 //----------------------------------------------------------------------
 
 #endif /* INC_MOTORSTEUERGERAET_H_ */

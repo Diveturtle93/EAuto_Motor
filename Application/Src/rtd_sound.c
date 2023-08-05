@@ -47,6 +47,8 @@ bool playRTDS(void)
 			break;
 		}
 
+		CANwork();
+
 		checktime = millis() - starttime;
 	}
 
