@@ -50,7 +50,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+// Millisekunden Flag fuer PWM Task
 volatile uint8_t millisekunden_flag = 0;											// Flag fuer Millisekungen Timer Task
+
+// Motor CAN Variablen
 motor280_tag motor280;																// Daten der CAN-Nachricht 280
 //motor288_tag motor288;																// Daten der CAN-Nachricht 288
 //motor380_tag motor380;																// Daten der CAN-Nachricht 380
@@ -58,14 +61,19 @@ motor280_tag motor280;																// Daten der CAN-Nachricht 280
 motor480_tag motor480;																// Daten der CAN-Nachricht 480
 //motor488_tag motor488;																// Daten der CAN-Nachricht 488
 //motor580_tag motor580;																// Daten der CAN-Nachricht 580
+
+// ADC Array
+uint16_t ADC_VAL[10] = {0};
+
+// Mittelwert Gaspedal
+uint16_t gas_mean = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
 void checkSDC(void);
 void sortCAN(void);
-/* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -96,6 +104,9 @@ int main(void)
 
 	// CAN-Bus Receive Message
 	CAN_message_t RxMessage;
+
+	// ADC Wert Gaspedal
+	uint16_t gas_adc = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -170,7 +181,15 @@ int main(void)
 	  readall_inputs();
 
 	  // Alle ADC einlesen
-	  // TODO: ADCs
+	  ADC_VAL[0] = ADC_Bremsdruck();
+	  ADC_VAL[1] = ADC_Bremsdrucktemperatur();
+	  ADC_VAL[2] = ADC_STMTemperatur();
+	  ADC_VAL[3] = ADC_PCBTemperatur();
+	  ADC_VAL[4] = ADC_KL15();
+	  ADC_VAL[5] = ADC_Klimaflap();
+	  ADC_VAL[6] = ADC_Info();
+	  ADC_VAL[7] = ADC_Return();
+	  ADC_VAL[8] = ADC_Kuhlwassertemperatur();
 
 	  // Shutdown-Circuit checken
 	  checkSDC();
@@ -310,6 +329,13 @@ int main(void)
 		  // State KL15, wenn Schluessel auf Position 2, KL15 einschalten
 		  case KL15:
 		  {
+			  if (system_in.KL15 == 1)
+			  {
+				  uartTransmit("Standby\n", 8);
+				  mStrg_state.States = Standby;
+				  timeStandby = millis();
+			  }
+
 			  if (system_in.Anlasser != 1)
 			  {
 				  if (!(mStrg_state.CriticalError))
@@ -325,30 +351,23 @@ int main(void)
 				  // system_out.Gluehkerzen = 1;
 			  }
 
-			  if (system_in.KL15 == 1)
-			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.States = Standby;
-				  timeStandby = millis();
-			  }
-
 			  break;
 		  }
 
 		  // State Anlassen, wenn Schluessel auf Position 3 und keine kritischen Fehler, Anlasser einschalten
 		  case Anlassen:
 		  {
-			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
-			  {
-				  uartTransmit("Precharge\n", 10);
-				  mStrg_state.States = Precharge;
-			  }
-
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
 				  timeStandby = millis();
+			  }
+
+			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
+			  {
+				  uartTransmit("Precharge\n", 10);
+				  mStrg_state.States = Precharge;
 			  }
 
 			  break;
@@ -357,6 +376,14 @@ int main(void)
 		  // State Precharge, wenn Bremse beim Anlassen oder danach getreten ist
 		  case Precharge:
 		  {
+			  if (system_in.KL15 == 1)
+			  {
+				  uartTransmit("Standby\n", 8);
+				  mStrg_state.States = Standby;
+				  mStrg_state.Warning = true;
+				  timeStandby = millis();
+			  }
+
 			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC == 1) && (sdc_in.EmergencyRun == 1))
 			  {
 				  if (playRTDS() == true)
@@ -367,31 +394,23 @@ int main(void)
 				  }
 			  }
 
+			  break;
+		  }
+
+		  // State ReadyToDrive, wenn SDC Ok ist und Vorgeladen wurde
+		  case ReadyToDrive:
+		  {
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
-				  mStrg_state.Warning = true;
 				  timeStandby = millis();
 			  }
 
-			  break;
-		  }
-
-		  // State ReadyToDrive, wenn SDC Ok ist
-		  case ReadyToDrive:
-		  {
 			  if (komfort_in.Enter == 1)
 			  {
 				  uartTransmit("Drive\n", 6);
 				  mStrg_state.States = Drive;
-			  }
-
-			  if (system_in.KL15 == 1)
-			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.States = Standby;
-				  timeStandby = millis();
 			  }
 
 			  break;
@@ -405,6 +424,20 @@ int main(void)
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
 				  timeStandby = millis();
+			  }
+
+			  gas_adc = readTrottle();
+
+			  // Abfrage ob Mittelwertbildung
+			  if (gas_adc > 0)														// Wenn Gaspedal Plausible dann Mittelwertbildung
+			  {
+				  // Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+				  // Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
+				  gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+			  }
+			  else																	// Wenn Gaspedal unplausible oder Kupplung getreten
+			  {
+				  gas_mean = 0;
 			  }
 
 			  break;
@@ -558,14 +591,14 @@ void sortCAN(void)
 	CAN_Output_PaketListe[2].msg.buf[5] = komfort_in.komfortinput;
 
 	// Analogeingaenge
-	CAN_Output_PaketListe[3].msg.buf[0] = 0;
-	CAN_Output_PaketListe[3].msg.buf[1] = 0;
-	CAN_Output_PaketListe[3].msg.buf[2] = 0;
-	CAN_Output_PaketListe[3].msg.buf[3] = 0;
-	CAN_Output_PaketListe[3].msg.buf[4] = 0;
-	CAN_Output_PaketListe[3].msg.buf[5] = 0;
-	CAN_Output_PaketListe[3].msg.buf[6] = 0;
-	CAN_Output_PaketListe[3].msg.buf[7] = 0;
+	CAN_Output_PaketListe[3].msg.buf[0] = ADC_VAL[4];
+	CAN_Output_PaketListe[3].msg.buf[1] = (ADC_VAL[4] >> 8) | (ADC_VAL[0] << 4);
+	CAN_Output_PaketListe[3].msg.buf[2] = (ADC_VAL[0] >> 4);
+	CAN_Output_PaketListe[3].msg.buf[3] = gas_mean;
+	CAN_Output_PaketListe[3].msg.buf[4] = (gas_mean >> 8) | (ADC_VAL[6] << 4);
+	CAN_Output_PaketListe[3].msg.buf[5] = (ADC_VAL[6] >> 4);
+	CAN_Output_PaketListe[3].msg.buf[6] = ADC_VAL[7];
+	CAN_Output_PaketListe[3].msg.buf[7] = (ADC_VAL[7] >> 8);
 
 	// Motor 280
 	CAN_Output_PaketListe[4].msg.buf[0] = motor280.motor280output[0];
@@ -588,14 +621,14 @@ void sortCAN(void)
 	CAN_Output_PaketListe[5].msg.buf[7] = motor480.motor480output[7];
 
 	// Temperatureingaenge
-	CAN_Output_PaketListe[6].msg.buf[0] = 0;
-	CAN_Output_PaketListe[6].msg.buf[1] = 0;
-	CAN_Output_PaketListe[6].msg.buf[2] = 0;
-	CAN_Output_PaketListe[6].msg.buf[3] = 0;
-	CAN_Output_PaketListe[6].msg.buf[4] = 0;
-	CAN_Output_PaketListe[6].msg.buf[5] = 0;
-	CAN_Output_PaketListe[6].msg.buf[6] = 0;
-	CAN_Output_PaketListe[6].msg.buf[7] = 0;
+	CAN_Output_PaketListe[6].msg.buf[0] = ADC_VAL[2];
+	CAN_Output_PaketListe[6].msg.buf[1] = (ADC_VAL[2] >> 8) | (ADC_VAL[3] << 4);
+	CAN_Output_PaketListe[6].msg.buf[2] = (ADC_VAL[3] >> 4);
+	CAN_Output_PaketListe[6].msg.buf[3] = ADC_VAL[8];
+	CAN_Output_PaketListe[6].msg.buf[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
+	CAN_Output_PaketListe[6].msg.buf[5] = (ADC_VAL[1] >> 4);
+	CAN_Output_PaketListe[6].msg.buf[6] = ADC_VAL[5];
+	CAN_Output_PaketListe[6].msg.buf[7] = (ADC_VAL[5] >> 8);
 }
 
 // Timer-Interrupt: Timer ist uebergelaufen
