@@ -50,6 +50,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+// Motorsteuergeraet Statevariable
+Motor_state mStrg_state = {{Start, true, false, false, false}};
+
 // Millisekunden Flag fuer PWM Task
 volatile uint8_t millisekunden_flag = 0;											// Flag fuer Millisekungen Timer Task
 
@@ -88,9 +91,6 @@ void sortCAN(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	// Motorsteuergeraet Statevariable
-	Motor_state mStrg_state = {Start, true, false, false, false};
-
 	// Motorsteuergeraet Statemaschine Zeitvariablen
 	uint32_t timeStandby = 0, timeError = 0;
 
@@ -190,6 +190,7 @@ int main(void)
 	  ADC_VAL[6] = ADC_Info();
 	  ADC_VAL[7] = ADC_Return();
 	  ADC_VAL[8] = ADC_Kuhlwassertemperatur();
+	  ADC_VAL[9] = ADC_Gaspedal();
 
 	  // Shutdown-Circuit checken
 	  checkSDC();
@@ -203,6 +204,7 @@ int main(void)
 
 		  switch (RxMessage.id)
 		  {
+			  // Bamocar ID
 			  case BAMOCAR_CAN_RX:
 			  {
 				  can_online |= (1 << 0);
@@ -211,10 +213,18 @@ int main(void)
 				  break;
 			  }
 
-			  case BMS_CAN_SDC:
+			  // Batteriemanagement Status ID
+			  case BMS_CAN_STATUS:
 			  {
 				  timeBMS = millis();
 				  can_online |= (1 << 1);
+				  break;
+			  }
+
+			  //
+			  default:
+			  {
+				  break;
 			  }
 		  }
 	  }
@@ -329,13 +339,6 @@ int main(void)
 		  // State KL15, wenn Schluessel auf Position 2, KL15 einschalten
 		  case KL15:
 		  {
-			  if (system_in.KL15 == 1)
-			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.States = Standby;
-				  timeStandby = millis();
-			  }
-
 			  if (system_in.Anlasser != 1)
 			  {
 				  if (!(mStrg_state.CriticalError))
@@ -351,12 +354,6 @@ int main(void)
 				  // system_out.Gluehkerzen = 1;
 			  }
 
-			  break;
-		  }
-
-		  // State Anlassen, wenn Schluessel auf Position 3 und keine kritischen Fehler, Anlasser einschalten
-		  case Anlassen:
-		  {
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
@@ -364,10 +361,23 @@ int main(void)
 				  timeStandby = millis();
 			  }
 
+			  break;
+		  }
+
+		  // State Anlassen, wenn Schluessel auf Position 3 und keine kritischen Fehler, Anlasser einschalten
+		  case Anlassen:
+		  {
 			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
 			  {
 				  uartTransmit("Precharge\n", 10);
 				  mStrg_state.States = Precharge;
+			  }
+
+			  if (system_in.KL15 == 1)
+			  {
+				  uartTransmit("Standby\n", 8);
+				  mStrg_state.States = Standby;
+				  timeStandby = millis();
 			  }
 
 			  break;
@@ -376,15 +386,7 @@ int main(void)
 		  // State Precharge, wenn Bremse beim Anlassen oder danach getreten ist
 		  case Precharge:
 		  {
-			  if (system_in.KL15 == 1)
-			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.States = Standby;
-				  mStrg_state.Warning = true;
-				  timeStandby = millis();
-			  }
-
-			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC == 1) && (sdc_in.EmergencyRun == 1))
+			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC != 1) && (sdc_in.EmergencyRun != 1))
 			  {
 				  if (playRTDS() == true)
 				  {
@@ -394,23 +396,31 @@ int main(void)
 				  }
 			  }
 
+			  if (system_in.KL15 == 1)
+			  {
+				  uartTransmit("Standby\n", 8);
+				  mStrg_state.States = Standby;
+				  mStrg_state.Warning = true;
+				  timeStandby = millis();
+			  }
+
 			  break;
 		  }
 
 		  // State ReadyToDrive, wenn SDC Ok ist und Vorgeladen wurde
 		  case ReadyToDrive:
 		  {
+			  if (komfort_in.Enter == 1)
+			  {
+				  uartTransmit("Drive\n", 6);
+				  mStrg_state.States = Drive;
+			  }
+
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
 				  timeStandby = millis();
-			  }
-
-			  if (komfort_in.Enter == 1)
-			  {
-				  uartTransmit("Drive\n", 6);
-				  mStrg_state.States = Drive;
 			  }
 
 			  break;
@@ -419,14 +429,7 @@ int main(void)
 		  // State Drive, wenn Fahrmodus manuel aktiviert wird
 		  case Drive:
 		  {
-			  if (system_in.KL15 == 1)
-			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.States = Standby;
-				  timeStandby = millis();
-			  }
-
-			  gas_adc = readTrottle();
+			   gas_adc = readTrottle(ADC_VAL[9]);
 
 			  // Abfrage ob Mittelwertbildung
 			  if (gas_adc > 0)														// Wenn Gaspedal Plausible dann Mittelwertbildung
@@ -438,6 +441,13 @@ int main(void)
 			  else																	// Wenn Gaspedal unplausible oder Kupplung getreten
 			  {
 				  gas_mean = 0;
+			  }
+
+			  if (system_in.KL15 == 1)
+			  {
+				  uartTransmit("Standby\n", 8);
+				  mStrg_state.States = Standby;
+				  timeStandby = millis();
 			  }
 
 			  break;
@@ -629,6 +639,9 @@ void sortCAN(void)
 	CAN_Output_PaketListe[6].msg.buf[5] = (ADC_VAL[1] >> 4);
 	CAN_Output_PaketListe[6].msg.buf[6] = ADC_VAL[5];
 	CAN_Output_PaketListe[6].msg.buf[7] = (ADC_VAL[5] >> 8);
+
+	// Motor Status
+	CAN_Output_PaketListe[7].msg.buf[0] = mStrg_state.status;
 }
 
 // Timer-Interrupt: Timer ist uebergelaufen

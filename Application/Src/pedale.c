@@ -26,17 +26,11 @@
 
 // Gaspedal auswerten
 //----------------------------------------------------------------------
-uint16_t readTrottle(void)
+uint16_t readTrottle(uint16_t ADC_Gas)
 {
-	// Variablen anlegen
-	uint16_t ADC_Gas = 0;
-
 	// Pruefen ob Variable Anlasser aktiv ist
 	if (sdc_in.Anlasser == 1)												// Nur aktiv, wenn KL15 an und Anlasser einmal betaetigt.
 	{
-		// Gaspedal einlesen
-		ADC_Gas = ADC_Gaspedal();
-
 		// Pruefen ob Kupplung getreten wurde
 		if (system_in.Kupplung == 1)										// Wenn Kupplung nicht getreten wurde == 1
 		{

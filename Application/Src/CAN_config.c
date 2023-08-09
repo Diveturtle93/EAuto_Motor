@@ -35,5 +35,6 @@ void CAN_config(void)
 	CAN_Output_PaketListe[4] = CAN_Nachricht(MOTOR_CAN_DREHZAHL, 8, 20, 32);
 	CAN_Output_PaketListe[5] = CAN_Nachricht(MOTOR_CAN_LEUCHTEN, 8, 200, 65);
 	CAN_Output_PaketListe[6] = CAN_Nachricht(MOTOR_CAN_TEMPERATUR, 8, 500, 24);
+	CAN_Output_PaketListe[7] = CAN_Nachricht(MOTOR_CAN_STATUS, 1, 200, 5);
 }
 //----------------------------------------------------------------------

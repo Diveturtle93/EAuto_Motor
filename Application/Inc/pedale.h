@@ -36,7 +36,7 @@
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-uint16_t readTrottle(void);													// Gaspedal auswerten
+uint16_t readTrottle(uint16_t ADC_Gas);										// Gaspedal auswerten
 void readBrake(void);														// Bremspedal auswerten
 //----------------------------------------------------------------------
 
