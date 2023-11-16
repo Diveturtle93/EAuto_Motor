@@ -277,6 +277,8 @@ int main(void)
 	  {
 		  leuchten_out.RedLed = false;
 		  leuchten_out.GreenLed = true;
+
+		  motor480.MotorLED = false;
 	  }
 
 	  // Statemaschine hat Warnungen
@@ -285,6 +287,8 @@ int main(void)
 		  if (millis() - timeError > 1000)
 		  {
 			  leuchten_out.RedLed = !leuchten_out.RedLed;
+
+			  motor480.MotorLED = !motor480.MotorLED;
 			  timeError = millis();
 		  }
 
@@ -301,6 +305,8 @@ int main(void)
 		  }
 
 		  leuchten_out.GreenLed = false;
+
+		  motor480.MotorLED = true;
 	  }
 
 	  // Statemaschine hat Kritische Fehler
@@ -309,6 +315,8 @@ int main(void)
 		  leuchten_out.RedLed = true;
 		  leuchten_out.Ladeleuchte = false;
 		  leuchten_out.GreenLed = false;
+
+		  motor480.MotorLED = true;
 	  }
 
 	  // Statemaschine von Motorsteuergeraet
@@ -346,6 +354,7 @@ int main(void)
 					  uartTransmit("Anlassen\n", 9);
 					  mStrg_state.States = Anlassen;
 					  sdc_in.Anlasser = true;
+					  motor480.VorgluehenLED = true;
 
 					  system_out.MotorSDC = true;;
 				  }
@@ -358,6 +367,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
+				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
 
@@ -377,6 +387,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
+				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
 
@@ -393,6 +404,8 @@ int main(void)
 
 					  uartTransmit("ReadyToDrive\n", 13);
 					  mStrg_state.States = ReadyToDrive;
+
+					  motor480.VorgluehenLED = false;
 				  }
 			  }
 
@@ -400,6 +413,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
+				  sdc_in.Anlasser = false;
 				  mStrg_state.Warning = true;
 				  timeStandby = millis();
 			  }
@@ -420,6 +434,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
+				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
 
@@ -447,6 +462,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
+				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
 

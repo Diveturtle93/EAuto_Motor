@@ -108,9 +108,9 @@ void MX_CAN3_Init(void)
 	sFilterConfig.FilterBank = 0;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	sFilterConfig.FilterIdHigh = 0x0111 << 5;
+	sFilterConfig.FilterIdHigh = 0x0;
 	sFilterConfig.FilterIdLow = 0x0;
-	sFilterConfig.FilterMaskIdHigh = 0x0111 << 5;
+	sFilterConfig.FilterMaskIdHigh = 0x0;
 	sFilterConfig.FilterMaskIdLow = 0x0;
 	sFilterConfig.FilterFIFOAssignment = 0;
 	sFilterConfig.FilterActivation = ENABLE;
