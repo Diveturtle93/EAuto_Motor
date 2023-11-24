@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
-// Titel	:	pedale.h
+// Titel	:	statemaschine.h
 //----------------------------------------------------------------------
 // Sprache	:	C
-// Datum	:	03.08.2021
+// Datum	:	Jul 20, 2023
 // Version	:	1.0
 // Autor	:	Diveturtle93
 // Projekt	:	Motorsteuergeraet
@@ -10,35 +10,25 @@
 
 // Dateiheader definieren
 //----------------------------------------------------------------------
-#ifndef INC_PEDALE_H_
-#define INC_PEDALE_H_
-//----------------------------------------------------------------------
-
-// Definiere Debug Symbol
-//----------------------------------------------------------------------
-#ifdef DEBUG
-	#define DEBUG_PEDALE
-#endif
+#ifndef INC_STATEMASCHINE_H_
+#define INC_STATEMASCHINE_H_
 //----------------------------------------------------------------------
 
 // Konstanten definieren
 //----------------------------------------------------------------------
-#define GAS_MIN_ADC							300								// Minimaler ADC-Wert
-#define GAS_MAX_ADC							4095							// Maximaler ADC-Wert
+#define MOTORTIME								300000						// Standby Zeit nach ausschalten KL15, 5min
+#define PUMPTIME								60000						// Pumpennachlauf, 1min
 //----------------------------------------------------------------------
 
-// Fehler definieren
+// ... definieren
 //----------------------------------------------------------------------
-#define GAS_OK								0								// Minimaler ADC-Wert
-#define GAS_VALUE_TOO_LOW					1								// Maximaler ADC-Wert
-#define GAS_VALUE_TOO_HIGH					2								// Thresholdwert fuer Gaspedal ADC
+
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-uint16_t readTrottle(uint16_t ADC_Gas);										// Gaspedal auswerten
-void readBrake(void);														// Bremspedal auswerten
+
 //----------------------------------------------------------------------
 
-#endif /* INC_PEDALE_H_ */
+#endif /* INC_STATEMASCHINE_H_ */
 //----------------------------------------------------------------------

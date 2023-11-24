@@ -33,6 +33,8 @@
 #include "pedale.h"
 #include "rtd_sound.h"
 #include "SystemInfo.h"
+#include "statemaschine.h"
+#include "CAN_Bus.h"
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB
@@ -68,10 +70,11 @@
 // Motorsteuergeraet neu
 //----------------------------------------------------------------------
 #define MOTOR_CAN_SAFETY							0x139					// Shutdown Circuit Motorsteuergeraet, Sicherheitsrelevante Daten
-#define MOTOR_CAN_DIGITAL_OUT						0x240					// Digitale Ausgaenge Motorsteuergeraet, Alle digitalen Ausgaenge
-#define MOTOR_CAN_DIGITAL_IN						0x241					// Digitale Eingaenge Motorsteuergeraet, Alle digitalen Eingaenge
-#define MOTOR_CAN_ANALOG_IN							0x242					// Analogwerte Motorsteuergeraet, Gaspedal, Bremsdruck, Info, Return, KlimaFlap, KL15
-#define MOTOR_CAN_TEMPERATUR						0x539					// Temperatur Motorsteuergeraet, PCB, Bremsdrucktemperatur, Kuehlwassertemperatur
+#define MOTOR_CAN_STATUS							0x505					// Motorsteuergeraet Status
+#define MOTOR_CAN_DIGITAL_OUT						0x581					// Digitale Ausgaenge Motorsteuergeraet, Alle digitalen Ausgaenge
+#define MOTOR_CAN_DIGITAL_IN						0x582					// Digitale Eingaenge Motorsteuergeraet, Alle digitalen Eingaenge
+#define MOTOR_CAN_ANALOG_IN							0x583					// Analogwerte Motorsteuergeraet, Gaspedal, Bremsdruck, Info, Return, KlimaFlap, KL15
+#define MOTOR_CAN_TEMPERATUR						0x584					// Temperatur Motorsteuergeraet, PCB, Bremsdrucktemperatur, Kuehlwassertemperatur
 //----------------------------------------------------------------------
 // Motorsteuergeraet alt
 //----------------------------------------------------------------------
@@ -99,23 +102,62 @@
 #define x_CAN										0x010					// Einmalig gesendet wenn Schlüssel auf Stufe 2
 #define xy_CAN										0x011					// EInmalig gesendet wenn Schlüssel auf Stufe 2
 //----------------------------------------------------------------------
+// Batteriemanagement-System neu
+//----------------------------------------------------------------------
+#define BMS_CAN_SAFETY								0x138					// Shutdown Circuit Batteriemanagement, Sicherheitsrelevante Daten
+#define BMS_CAN_DIGITAL_OUT							0x237					// Digitale Ausgaenge Batteriemanagement, Alle digitalen Ausgaenge
+#define BMS_CAN_DIGITAL_IN							0x238					// Digitale Eingaenge Batteriemanagement, Alle digitalen Eingaenge
+#define BMS_CAN_ANALOG_IN							0x239					// Analogwerte Batteriemanagement, Spannung Relais, PCB
+#define BMS_CAN_TEMPERATUR							0x538					// Temperatur Batteriemanagement, Temperatursensor 1 bis 4
+#define BMS_CAN_STATUS								0x560					// Status BMS
+#define BMS_CAN_IMD									0x565					// Status IMD
+#define BMS_CAN_Zellen11							0x640					// Batterie-Zellen 1-4 Modul 1
+#define BMS_CAN_Zellen12							0x641					// Batterie-Zellen 5-8 Modul 1
+#define BMS_CAN_Zellen13							0x642					// Batterie-Zellen 9-12 Modul 1
+#define BMS_CAN_Zellen21							0x643					// Batterie-Zellen 1-4 Modul 2
+#define BMS_CAN_Zellen22							0x644					// Batterie-Zellen 5-8 Modul 2
+#define BMS_CAN_Zellen23							0x645					// Batterie-Zellen 9-12 Modul 2
+#define BMS_CAN_Temperatur11						0x740					// Batterie-Temperatur 1-4 Modul 1
+#define BMS_CAN_Temperatur12						0x741					// Batterie-Temperatur 5-8 Modul 1
+#define BMS_CAN_Temperatur13						0x742					// Batterie-Temperatur 9-12 Modul 1
+#define BMS_CAN_Temperatur21						0x743					// Batterie-Temperatur 1-4 Modul 2
+#define BMS_CAN_Temperatur22						0x744					// Batterie-Temperatur 5-8 Modul 2
+#define BMS_CAN_Temperatur23						0x745					// Batterie-Temperatur 9-12 Modul 2
+//----------------------------------------------------------------------
+
+//
+//----------------------------------------------------------------------
+#define CAN_TIMEOUT									3000					// Zeit bis CAN Timeout auftritt
+//----------------------------------------------------------------------
 
 // Define Statemaschine Typedefines
 //----------------------------------------------------------------------
 typedef enum
 {
-	Start,																	// Starte Motorsteuergeraet
-	Ready,																	// Motorsteuergeraet gestartet
-	KL15,																	// KL15 aktiv
-	Anlasser,																// Anlasser betaetigt
-	ReadyToDrive,															// Motorsteuergeraet bereit fuer Fahrmodus
-	Drive,																	// Fahrzeug im Fahrmodus
-	Standby,																// Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
-	Ausschalten,															// Motorsteuergeraet ausschalten
-	MotorWarning = 0x20,													// Warnung im Motorsteuergeraet
-	MotorError = 0x40,														// Error im Motorsteuergeraet
-	CriticalError = 0x80,													// Kritischer Fehler am Motorsteuergeraet
-} Motor_State;
+	Start,																	// 0 Starte Motorsteuergeraet
+	Ready,																	// 1 Motorsteuergeraet gestartet
+	KL15,																	// 2 KL15 aktiv
+	Anlassen,																// 3 Anlasser betaetigt
+	Precharge,																// 4 Precharge Fahrzeug
+	ReadyToDrive,															// 5 Motorsteuergeraet bereit fuer Fahrmodus
+	Drive,																	// 6 Fahrzeug im Fahrmodus
+	Standby,																// 7 Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
+	Ausschalten,															// 8 Motorsteuergeraet ausschalten
+} states;
+//----------------------------------------------------------------------
+typedef union
+{
+	struct
+	{
+		uint8_t States : 4;													// State der Statemaschine
+		uint8_t Normal : 1;													// Statemaschine normal
+		uint8_t Warning : 1;												// Statemaschine warning
+		uint8_t Error : 1;													// Statemaschine error
+		uint8_t CriticalError : 1;											// Statemaschine kritscher error
+	};
+
+	uint8_t status;									// 1 Byte
+} Motor_state;
 //----------------------------------------------------------------------
 
 // Definiere CAN Strukturen
@@ -277,7 +319,12 @@ typedef union
 // Definiere globale Variablen
 //----------------------------------------------------------------------
 extern motor280_tag motor280;												// Variable fuer Motor CAN-Nachricht 1 definieren
-extern motor288_tag motor288;												// Variable fuer Motor CAN-Nachricht 2 definieren
+//extern motor288_tag motor288;												// Variable fuer Motor CAN-Nachricht 2 definieren
+//extern motor380_tag motor380;												// Variable fuer Motor CAN-Nachricht 3 definieren
+//extern motor388_tag motor388;												// Variable fuer Motor CAN-Nachricht 4 definieren
+extern motor480_tag motor480;												// Variable fuer Motor CAN-Nachricht 5 definieren
+//extern motor488_tag motor488;												// Variable fuer Motor CAN-Nachricht 6 definieren
+//extern motor580_tag motor580;												// Variable fuer Motor CAN-Nachricht 7 definieren
 //----------------------------------------------------------------------
 
 #endif /* INC_MOTORSTEUERGERAET_H_ */

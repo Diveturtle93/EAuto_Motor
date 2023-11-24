@@ -54,11 +54,12 @@ typedef union
 	{
 		uint8_t EmergencyRun : 1;				// 0						// Signal Emergency Run
 		uint8_t SDC0 : 1;						// 1						// Signal Sicherung, Shutdown-Circuit
-		uint8_t Akku1SDC : 1;					// 2						// Signal Akku Ok, Shutdown-Circuit
+		uint8_t AkkuSDC : 1;					// 2						// Signal Akku Ok, Shutdown-Circuit
 		uint8_t BTB_SDC : 1;					// 3						// Signal BTB, Bamocar
 		uint8_t DCDC_Fault : 1;					// 4						// Signal DCDC Wandler OK
 		uint8_t SDC12V : 1;						// 5						// Sicherung von Shutdown-Circuit
 		uint8_t Anlasser : 1;					// 6						// Abspeichern von Anlasser Signal
+		uint8_t SDC_OK : 1;						// 7						// Shutdown-Circuit OK
 	};
 
 	uint8_t sdcinput;							// 1 Byte

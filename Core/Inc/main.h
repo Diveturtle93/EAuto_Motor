@@ -262,7 +262,10 @@ void Error_Handler(void);
 #define DIGITAL2_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
-
+// Anzahl der CAN Output Pakete definieren
+//----------------------------------------------------------------------
+#define ANZAHL_OUTPUT_PAKETE			8									// Anzahl Sende Nachrichten
+//----------------------------------------------------------------------
 
 // Typedefine Boolean definieren
 //----------------------------------------------------------------------

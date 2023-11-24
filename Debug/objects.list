@@ -1,5 +1,7 @@
 "./Application/Src/Bamocar.o"
 "./Application/Src/BasicUart.o"
+"./Application/Src/CAN_Bus.o"
+"./Application/Src/CAN_config.o"
 "./Application/Src/SystemInfo.o"
 "./Application/Src/adc_inputs.o"
 "./Application/Src/app_info.o"

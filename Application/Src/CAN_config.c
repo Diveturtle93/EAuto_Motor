@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
-// Titel	:	rtd_sound.c
+// Titel	:	CAN_config.c
 //----------------------------------------------------------------------
 // Sprache	:	C
-// Datum	:	06.07.2023
+// Datum	:	Aug 25, 2022
 // Version	:	1.0
 // Autor	:	Diveturtle93
 // Projekt	:	Motorsteuergeraet
@@ -20,51 +20,21 @@
 
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "rtd_sound.h"
+#include "CAN_Bus.h"
 #include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
-
-// Aktiviere Ready To Drive Sound
+// Konfiguriere CAN Nachrichten
 //----------------------------------------------------------------------
-bool playRTDS(void)
+void CAN_config(void)
 {
-	uartTransmit("Spiele RTDS !!!\n", 16);
-
-	bool abort = true;
-	leuchten_out.Buzzer = 1;
-	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, leuchten_out.Buzzer);
-
-	uint32_t starttime = millis();
-	uint32_t checktime = 0;
-
-	while (checktime < RTDSTIME)
-	{
-		readall_inputs();
-
-		if (sdc_in.EmergencyRun == 1)
-		{
-			uartTransmit("Abbruch RTDS !!!\n", 17);
-			abort = false;
-			break;
-		}
-
-		CANwork();
-
-		checktime = millis() - starttime;
-	}
-
-	leuchten_out.Buzzer = 0;
-	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, leuchten_out.Buzzer);
-
-	if (abort == true)
-	{
-		leuchten_out.Anhaenger = 1;
-	}
-	else
-	{
-		leuchten_out.Anhaenger = 0;
-	}
-
-	return abort;
+	CAN_Output_PaketListe[0] = CAN_Nachricht(MOTOR_CAN_SAFETY, 6, 100, 17);
+	CAN_Output_PaketListe[1] = CAN_Nachricht(MOTOR_CAN_DIGITAL_OUT, 6, 200, 13);
+	CAN_Output_PaketListe[2] = CAN_Nachricht(MOTOR_CAN_DIGITAL_IN, 6, 200, 14);
+	CAN_Output_PaketListe[3] = CAN_Nachricht(MOTOR_CAN_ANALOG_IN, 8, 500, 7);
+	CAN_Output_PaketListe[4] = CAN_Nachricht(MOTOR_CAN_DREHZAHL, 8, 20, 32);
+	CAN_Output_PaketListe[5] = CAN_Nachricht(MOTOR_CAN_LEUCHTEN, 8, 200, 65);
+	CAN_Output_PaketListe[6] = CAN_Nachricht(MOTOR_CAN_TEMPERATUR, 8, 500, 24);
+	CAN_Output_PaketListe[7] = CAN_Nachricht(MOTOR_CAN_STATUS, 1, 200, 5);
 }
+//----------------------------------------------------------------------

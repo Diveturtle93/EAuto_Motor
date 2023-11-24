@@ -1,12 +1,14 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (11.3.rel1)
+# Toolchain: GNU Tools for STM32 (10.3-2021.10)
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Application/Src/Bamocar.c \
 ../Application/Src/BasicUart.c \
+../Application/Src/CAN_Bus.c \
+../Application/Src/CAN_config.c \
 ../Application/Src/SystemInfo.c \
 ../Application/Src/adc_inputs.c \
 ../Application/Src/app_info.c \
@@ -20,6 +22,8 @@ C_SRCS += \
 OBJS += \
 ./Application/Src/Bamocar.o \
 ./Application/Src/BasicUart.o \
+./Application/Src/CAN_Bus.o \
+./Application/Src/CAN_config.o \
 ./Application/Src/SystemInfo.o \
 ./Application/Src/adc_inputs.o \
 ./Application/Src/app_info.o \
@@ -33,6 +37,8 @@ OBJS += \
 C_DEPS += \
 ./Application/Src/Bamocar.d \
 ./Application/Src/BasicUart.d \
+./Application/Src/CAN_Bus.d \
+./Application/Src/CAN_config.d \
 ./Application/Src/SystemInfo.d \
 ./Application/Src/adc_inputs.d \
 ./Application/Src/app_info.d \
@@ -46,12 +52,12 @@ C_DEPS += \
 
 # Each subdirectory must supply rules for building sources it contributes
 Application/Src/%.o Application/Src/%.su Application/Src/%.cyclo: ../Application/Src/%.c Application/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F767xx -DDEBUG '-DREVISION=$(or $(SAMPLE),$(SAMPLE),255)' -c -I../Application/Inc -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m7 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F767xx -DDEBUG '-DREVISION=$(or $(SAMPLE),$(SAMPLE),255)' -c -I../Application/Inc -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O1 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "$@"
 
 clean: clean-Application-2f-Src
 
 clean-Application-2f-Src:
-	-$(RM) ./Application/Src/Bamocar.cyclo ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/Bamocar.su ./Application/Src/BasicUart.cyclo ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/BasicUart.su ./Application/Src/SystemInfo.cyclo ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/SystemInfo.su ./Application/Src/adc_inputs.cyclo ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/adc_inputs.su ./Application/Src/app_info.cyclo ./Application/Src/app_info.d ./Application/Src/app_info.o ./Application/Src/app_info.su ./Application/Src/error.cyclo ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/error.su ./Application/Src/inputs.cyclo ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/inputs.su ./Application/Src/millis.cyclo ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/millis.su ./Application/Src/outputs.cyclo ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/outputs.su ./Application/Src/pedale.cyclo ./Application/Src/pedale.d ./Application/Src/pedale.o ./Application/Src/pedale.su ./Application/Src/rtd_sound.cyclo ./Application/Src/rtd_sound.d ./Application/Src/rtd_sound.o ./Application/Src/rtd_sound.su
+	-$(RM) ./Application/Src/Bamocar.cyclo ./Application/Src/Bamocar.d ./Application/Src/Bamocar.o ./Application/Src/Bamocar.su ./Application/Src/BasicUart.cyclo ./Application/Src/BasicUart.d ./Application/Src/BasicUart.o ./Application/Src/BasicUart.su ./Application/Src/CAN_Bus.cyclo ./Application/Src/CAN_Bus.d ./Application/Src/CAN_Bus.o ./Application/Src/CAN_Bus.su ./Application/Src/CAN_config.cyclo ./Application/Src/CAN_config.d ./Application/Src/CAN_config.o ./Application/Src/CAN_config.su ./Application/Src/SystemInfo.cyclo ./Application/Src/SystemInfo.d ./Application/Src/SystemInfo.o ./Application/Src/SystemInfo.su ./Application/Src/adc_inputs.cyclo ./Application/Src/adc_inputs.d ./Application/Src/adc_inputs.o ./Application/Src/adc_inputs.su ./Application/Src/app_info.cyclo ./Application/Src/app_info.d ./Application/Src/app_info.o ./Application/Src/app_info.su ./Application/Src/error.cyclo ./Application/Src/error.d ./Application/Src/error.o ./Application/Src/error.su ./Application/Src/inputs.cyclo ./Application/Src/inputs.d ./Application/Src/inputs.o ./Application/Src/inputs.su ./Application/Src/millis.cyclo ./Application/Src/millis.d ./Application/Src/millis.o ./Application/Src/millis.su ./Application/Src/outputs.cyclo ./Application/Src/outputs.d ./Application/Src/outputs.o ./Application/Src/outputs.su ./Application/Src/pedale.cyclo ./Application/Src/pedale.d ./Application/Src/pedale.o ./Application/Src/pedale.su ./Application/Src/rtd_sound.cyclo ./Application/Src/rtd_sound.d ./Application/Src/rtd_sound.o ./Application/Src/rtd_sound.su
 
 .PHONY: clean-Application-2f-Src
 

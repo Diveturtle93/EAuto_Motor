@@ -81,7 +81,7 @@ void MX_CAN3_Init(void)
   hcan3.Init.TimeTriggeredMode = DISABLE;
   hcan3.Init.AutoBusOff = DISABLE;
   hcan3.Init.AutoWakeUp = DISABLE;
-  hcan3.Init.AutoRetransmission = DISABLE;
+  hcan3.Init.AutoRetransmission = ENABLE;
   hcan3.Init.ReceiveFifoLocked = DISABLE;
   hcan3.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan3) != HAL_OK)
@@ -108,9 +108,9 @@ void MX_CAN3_Init(void)
 	sFilterConfig.FilterBank = 0;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	sFilterConfig.FilterIdHigh = 0x0111 << 5;
+	sFilterConfig.FilterIdHigh = 0x0;
 	sFilterConfig.FilterIdLow = 0x0;
-	sFilterConfig.FilterMaskIdHigh = 0x0111 << 5;
+	sFilterConfig.FilterMaskIdHigh = 0x0;
 	sFilterConfig.FilterMaskIdLow = 0x0;
 	sFilterConfig.FilterFIFOAssignment = 0;
 	sFilterConfig.FilterActivation = ENABLE;
@@ -175,6 +175,8 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* CAN3 interrupt Init */
+    HAL_NVIC_SetPriority(CAN3_TX_IRQn, 15, 0);
+    HAL_NVIC_EnableIRQ(CAN3_TX_IRQn);
     HAL_NVIC_SetPriority(CAN3_RX0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN3_RX0_IRQn);
   /* USER CODE BEGIN CAN3_MspInit 1 */
@@ -219,6 +221,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_DeInit(GPIOA, ACAN_RX_Pin|ACAN_TX_Pin);
 
     /* CAN3 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(CAN3_TX_IRQn);
     HAL_NVIC_DisableIRQ(CAN3_RX0_IRQn);
   /* USER CODE BEGIN CAN3_MspDeInit 1 */
 
