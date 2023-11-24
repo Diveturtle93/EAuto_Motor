@@ -40,6 +40,8 @@ bool playRTDS(void)
 
 	while (checktime < RTDSTIME)
 	{
+		readall_inputs();
+
 		if (sdc_in.EmergencyRun == 1)
 		{
 			uartTransmit("Abbruch RTDS !!!\n", 17);

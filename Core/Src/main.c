@@ -414,7 +414,6 @@ int main(void)
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.States = Standby;
 				  sdc_in.Anlasser = false;
-				  mStrg_state.Warning = true;
 				  timeStandby = millis();
 			  }
 
