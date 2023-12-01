@@ -35,6 +35,7 @@
 #include "SystemInfo.h"
 #include "statemaschine.h"
 #include "CAN_Bus.h"
+#include "WS2812.h"
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB
