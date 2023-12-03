@@ -123,26 +123,30 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  MX_USART2_UART_Init();
 
-	uartTransmit("Start\n", 6);
-
-#ifdef DEBUG
-	app_info();
-	HAL_Delay(3000);
-#endif
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_CAN3_Init();
   MX_ADC1_Init();
   MX_CAN1_Init();
   MX_TIM6_Init();
   MX_TIM3_Init();
+  MX_CAN3_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
+	uartTransmit("Start\n", 6);
+	Set_LED(MAX_LED, 0, 0, 0);
+	Set_LED(0, 0, 0, 255);
+	WS2812_Send();
+
+#ifdef DEBUG
+	app_info();
+	HAL_Delay(3000);
+#endif
+
 	// Starte Timer 6 Interrupt
 	HAL_TIM_Base_Start_IT(&htim6);
 
@@ -154,9 +158,33 @@ int main(void)
 #ifdef DEBUG
 	#define MAINWHILE			"\nStarte While Schleife\n"
 	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
+#endif
 
 	uartTransmit("Ready\n", 6);
-#endif
+	Set_LED(0, 0, 0, 0);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 255, 0, 0);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 0, 255, 0);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 0, 0, 255);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 255, 255, 0);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 0, 255, 255);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 0, 0, 255);
+	WS2812_Send();
+	HAL_Delay(1000);
+	Set_LED(0, 255, 255, 255);
+	WS2812_Send();
+	HAL_Delay(1000);
 
 	CANinit(RX_SIZE_16, TX_SIZE_16);
 	CAN_config();

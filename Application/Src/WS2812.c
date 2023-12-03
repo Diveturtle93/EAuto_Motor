@@ -31,14 +31,13 @@ uint16_t pwmData[(24*MAX_LED)+50];
 uint8_t datasentflag = 0;
 //----------------------------------------------------------------------
 
-// Setze Farbe
+// Setze LEDs
 //----------------------------------------------------------------------
-void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue)
+void Set_LED (uint8_t LED_Num, uint8_t green, uint8_t red, uint8_t blue)
 {
-	LED_Data[LED_Num][0] = LED_Num;
-	LED_Data[LED_Num][1] = green;
-	LED_Data[LED_Num][2] = red;
-	LED_Data[LED_Num][3] = blue;
+	LED_Data[LED_Num][0] = green;
+	LED_Data[LED_Num][1] = red;
+	LED_Data[LED_Num][2] = blue;
 }
 //----------------------------------------------------------------------
 
@@ -74,36 +73,48 @@ void WS2812_Send (void)
 	uint32_t color;
 
 
-	for (int i= 0; i<MAX_LED; i++)
+	for (int i = 0; i < MAX_LED; i++)
 	{
-#if USE_BRIGHTNESS
-		color = ((LED_Mod[i][1]<<16) | (LED_Mod[i][2]<<8) | (LED_Mod[i][3]));
-#else
-		color = ((LED_Data[i][1]<<16) | (LED_Data[i][2]<<8) | (LED_Data[i][3]));
-#endif
+/*#if USE_BRIGHTNESS
+		color = ((LED_Mod[i][0]<<16) | (LED_Mod[i][1]<<8) | (LED_Mod[i][2]));
+#else*/
+		color = ((LED_Data[i][0]<<16) | (LED_Data[i][1]<<8) | (LED_Data[i][2]));
+//#endif
 
-		for (int i=23; i>=0; i--)
+		for (int i = 23; i >= 0; i--)
 		{
-			if (color&(1<<i))
+			if (color & (1 << i))
 			{
-				pwmData[indx] = 90;  // 2/3 of 135
+				pwmData[indx] = 45;  // 2/3 of 135
 			}
 
-			else pwmData[indx] = 45;  // 1/3 of 135
+			else pwmData[indx] = 90;  // 1/3 of 135
 
 			indx++;
 		}
 
 	}
 
-	for (int i=0; i<50; i++)
+	for (int i = 0; i < 50; i++)
 	{
-		pwmData[indx] = 0;
+		pwmData[indx] = 255;
 		indx++;
 	}
 
 	HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_2, (uint32_t *)pwmData, indx);
 	while (!datasentflag){};
 	datasentflag = 0;
+}
+//----------------------------------------------------------------------
+
+// Timer Callback fuer DMA
+//----------------------------------------------------------------------
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim == &htim3)
+	{
+		HAL_TIM_PWM_Stop_DMA(&htim3, TIM_CHANNEL_2);
+		datasentflag = 1;
+	}
 }
 //----------------------------------------------------------------------

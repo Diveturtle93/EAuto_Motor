@@ -16,14 +16,14 @@
 
 // Konstanten definieren
 //----------------------------------------------------------------------
-#define MAX_LED 1
-#define USE_BRIGHTNESS 1
-#define PI 3.14159265
+#define MAX_LED					1
+#define USE_BRIGHTNESS 			0
+#define PI 						3.14159265
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue);
+void Set_LED (uint8_t LED_Num, uint8_t green, uint8_t red, uint8_t blue);
 void Set_Brightness (uint8_t brightness);
 void WS2812_Send (void);
 //----------------------------------------------------------------------
