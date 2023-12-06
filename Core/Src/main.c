@@ -139,7 +139,7 @@ int main(void)
 
 	uartTransmit("Start\n", 6);
 	Set_LED(MAX_LED, 0, 0, 0);
-	Set_LED(0, 0, 0, 255);
+	Set_LED(0, 125, 164, 4);
 	WS2812_Send();
 
 #ifdef DEBUG
@@ -164,27 +164,14 @@ int main(void)
 	Set_LED(0, 0, 0, 0);
 	WS2812_Send();
 	HAL_Delay(1000);
-	Set_LED(0, 255, 0, 0);
+	Set_LED(0, 0, 0, 255);
 	WS2812_Send();
 	HAL_Delay(1000);
 	Set_LED(0, 0, 255, 0);
 	WS2812_Send();
 	HAL_Delay(1000);
-	Set_LED(0, 0, 0, 255);
+	Set_LED(0, 255, 0, 0);
 	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 255, 255, 0);
-	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 0, 255, 255);
-	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 0, 0, 255);
-	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 255, 255, 255);
-	WS2812_Send();
-	HAL_Delay(1000);
 
 	CANinit(RX_SIZE_16, TX_SIZE_16);
 	CAN_config();

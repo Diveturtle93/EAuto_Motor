@@ -23,7 +23,7 @@
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-void Set_LED (uint8_t LED_Num, uint8_t green, uint8_t red, uint8_t blue);
+void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue);
 void Set_Brightness (uint8_t brightness);
 void WS2812_Send (void);
 //----------------------------------------------------------------------
