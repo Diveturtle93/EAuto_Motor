@@ -179,13 +179,14 @@ int main(void)
 
 	for (uint8_t j = 0; j < ANZAHL_OUTPUT_PAKETE; j++)
 	{
-		CAN_Output_PaketListe[0].msg.buf[j] = 0;
-		CAN_Output_PaketListe[1].msg.buf[j] = 0;
-		CAN_Output_PaketListe[2].msg.buf[j] = 0;
-		CAN_Output_PaketListe[3].msg.buf[j] = 0;
-		CAN_Output_PaketListe[4].msg.buf[j] = 0;
-		CAN_Output_PaketListe[5].msg.buf[j] = 0;
-		CAN_Output_PaketListe[6].msg.buf[j] = 0;
+		CAN_Output_PaketListe[j].msg.buf[0] = 0;
+		CAN_Output_PaketListe[j].msg.buf[1] = 0;
+		CAN_Output_PaketListe[j].msg.buf[2] = 0;
+		CAN_Output_PaketListe[j].msg.buf[3] = 0;
+		CAN_Output_PaketListe[j].msg.buf[4] = 0;
+		CAN_Output_PaketListe[j].msg.buf[5] = 0;
+		CAN_Output_PaketListe[j].msg.buf[6] = 0;
+		CAN_Output_PaketListe[j].msg.buf[7] = 0;
 	}
   /* USER CODE END 2 */
 
