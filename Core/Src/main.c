@@ -367,22 +367,30 @@ int main(void)
 		  // State KL15, wenn Schluessel auf Position 2, KL15 einschalten
 		  case KL15:
 		  {
+			  // Wenn Schluessel auf Position 3 geschaltet wird, nur einmal moeglich
 			  if (system_in.Anlasser != 1)
 			  {
+				  // Solange kein kritischer Fehler auftritt
 				  if (!(mStrg_state.CriticalError))
 				  {
 					  uartTransmit("Anlassen\n", 9);
 					  mStrg_state.States = Anlassen;
+
+					  // Anlasser Zustand abspeichern
 					  sdc_in.Anlasser = true;
+
+					  // LED in Cockpit aktivieren
 					  motor480.VorgluehenLED = true;
 
-					  system_out.MotorSDC = true;;
+					  // Motor Shutdown-Circuit aktivieren, wenn OK
+					  system_out.MotorSDC = true;
 				  }
 
 				  // Pumpe, Vakuumpumpe, Bamocar einschalten
 				  // system_out.Gluehkerzen = 1;
 			  }
 
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
@@ -397,12 +405,14 @@ int main(void)
 		  // State Anlassen, wenn Schluessel auf Position 3 und keine kritischen Fehler, Anlasser einschalten
 		  case Anlassen:
 		  {
+			  // Kupplung und Bremse getreten
 			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
 			  {
 				  uartTransmit("Precharge\n", 10);
 				  mStrg_state.States = Precharge;
 			  }
 
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
@@ -417,8 +427,10 @@ int main(void)
 		  // State Precharge, wenn Bremse beim Anlassen oder danach getreten ist
 		  case Precharge:
 		  {
+			  // Abfrage Shutdown-Circuit
 			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC != 1) && (sdc_in.EmergencyRun != 1))
 			  {
+				  // ReadyToDrive Sound abspielen und warten, ob abgeschlossen werden kann
 				  if (playRTDS() == true)
 				  {
 
@@ -429,6 +441,7 @@ int main(void)
 				  }
 			  }
 
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
@@ -443,12 +456,14 @@ int main(void)
 		  // State ReadyToDrive, wenn SDC Ok ist und Vorgeladen wurde
 		  case ReadyToDrive:
 		  {
+			  // Bei Tasterbetaetigung umschalten in Drive Modus
 			  if (komfort_in.Enter == 1)
 			  {
 				  uartTransmit("Drive\n", 6);
 				  mStrg_state.States = Drive;
 			  }
 
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
@@ -477,6 +492,7 @@ int main(void)
 				  gas_mean = 0;
 			  }
 
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
 				  uartTransmit("Standby\n", 8);
@@ -491,18 +507,25 @@ int main(void)
 		  // State Standby, wenn Schluessel gezogen wird, KL15 ausschalten
 		  case Standby:
 		  {
-			  if ((highcurrent_out.Pumpe_Kuhlung == true) && (millis() - timeStandby > PUMPTIME))
+			  // Gluehkerzenrelais nach 1min abschalten, erst nach der Pumpe moeglich
+			  if ((highcurrent_out.Pumpe_Kuhlung == false) && (millis() > (timeStandby + PUMPTIME)))
 			  {
-				  highcurrent_out.Pumpe_Kuhlung = false;
-				  HAL_Delay(10);
 				  system_out.Gluehkerzen = false;
 			  }
 
-			  if (millis() - timeStandby > MOTORTIME)
+			  // Pumpe nach 1min abschalten
+			  if ((highcurrent_out.Pumpe_Kuhlung == true) && (millis() > (timeStandby + PUMPTIME)))
+			  {
+				  highcurrent_out.Pumpe_Kuhlung = false;
+			  }
+
+			  // Fuer 5min warten und BMS weiterhin aktiv halten
+			  if (millis() > (timeStandby + MOTORTIME))
 			  {
 				  uartTransmit("Ausschalten\n", 12);
 				  mStrg_state.States = Ausschalten;
 			  }
+			  // Falls innerhalb der 5min die KL15 wieder aktiviert wird
 			  else if (system_in.KL15 != 1)
 			  {
 				  uartTransmit("Ready\n", 6);
