@@ -146,7 +146,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	Set_LED(MAX_LED, 0, 0, 0);
-	Set_LED(0, 125, 164, 4);
+	Set_LED(0, 255, 0, 0);
 	WS2812_Send();
 
 	// Starte Timer 6 Interrupt
@@ -161,19 +161,6 @@ int main(void)
 	#define MAINWHILE			"\nStarte While Schleife\n"
 	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 #endif
-
-	uartTransmit("Ready\n", 6);
-	Set_LED(0, 0, 0, 0);
-	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 0, 0, 255);
-	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 0, 255, 0);
-	WS2812_Send();
-	HAL_Delay(1000);
-	Set_LED(0, 255, 0, 0);
-	WS2812_Send();
 
 	CANinit(RX_SIZE_16, TX_SIZE_16);
 	CAN_config();
@@ -408,7 +395,7 @@ int main(void)
 		  case KL15:
 		  {
 			  // Wenn Schluessel auf Position 3 geschaltet wird, nur einmal moeglich
-			  if (system_in.Anlasser != 1)
+			  if ((system_in.Anlasser != 1) || ((sdc_in.Anlasser == 1) && (komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000))))
 			  {
 				  // Solange kein kritischer Fehler auftritt
 				  if (!(mStrg_state.CriticalError))
@@ -478,10 +465,11 @@ int main(void)
 					  mStrg_state.State = ReadyToDrive;
 
 					  motor480.VorgluehenLED = false;
+					  timeStandby = millis();
 				  }
 				  else
 				  {
-					  mStrg_state.States = KL15;
+					  mStrg_state.State = KL15;
 					  sdc_in.Anlasser = false;
 				  }
 			  }
@@ -502,10 +490,14 @@ int main(void)
 		  case ReadyToDrive:
 		  {
 			  // Bei Tasterbetaetigung umschalten in Drive Modus
-			  if (komfort_in.ASR1 == 1)
+			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
 			  {
 				  uartTransmit("Drive\n", 6);
 				  mStrg_state.State = Drive;
+
+				  Set_LED(0, 0, 255, 0);
+
+				  timeStandby = millis();
 			  }
 
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
@@ -537,10 +529,14 @@ int main(void)
 				  gas_mean = 0;
 			  }
 
-			  if (komfort_in.ASR1 == 1)
+			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
 			  {
 				  uartTransmit("KL15\n", 5);
-				  mStrg_state.States = KL15;
+				  mStrg_state.State = KL15;
+
+				  Set_LED(0, 255, 0, 0);
+
+				  timeStandby = millis();
 			  }
 
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
@@ -549,6 +545,9 @@ int main(void)
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.State = Standby;
 				  sdc_in.Anlasser = false;
+
+				  Set_LED(0, 255, 0, 0);
+
 				  timeStandby = millis();
 			  }
 
@@ -674,23 +673,27 @@ void checkSDC(void)
 {
 	sdc_in.SDC_OK = true;
 
-	if (sdc_in.SDC0 != 1)
+	if (sdc_in.SDC0 == 1)
 	{
 		setStatus(StateError);
 		sdc_in.SDC_OK = false;
 	}
 
+#if BAMOCAR_AVAILIBLE == 1
 	if (sdc_in.BTB_SDC != 1)
 	{
 		setStatus(StateError);
 		sdc_in.SDC_OK = false;
 	}
+#endif
 
+#if BMS_AVALIBLE == 1
 	if (sdc_in.AkkuSDC != 1)
 	{
 		setStatus(StateError);
 		sdc_in.SDC_OK = false;
 	}
+#endif
 
 	if (sdc_in.SDC_OK == true)
 	{
