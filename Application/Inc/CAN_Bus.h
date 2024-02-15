@@ -92,6 +92,7 @@ typedef struct
 	CAN_message_t msg;														// CAN-Nachricht
 	uint16_t sendeintervall;												// Intervall, wie oft die Nachricht gesendet wird (in ms)
 	uint32_t sende_time;													// Startzeit, ab wann die Nachricht gesendet wird
+	bool allowed;															// Senden erlaubt
 } CAN_PaketTypeDef;
 //----------------------------------------------------------------------
 
@@ -114,7 +115,7 @@ void initRingBuffer(RingbufferTypeDef *ring, volatile CAN_message_t *buffer, uin
 bool addToRingBuffer(RingbufferTypeDef *ring, CAN_message_t *msg);
 bool removeFromRingBuffer(RingbufferTypeDef *ring, CAN_message_t *msg);
 bool isRingBufferEmpty(RingbufferTypeDef *ring);
-CAN_PaketTypeDef CAN_Nachricht(uint16_t id, uint8_t length, uint16_t sendeintervall, uint32_t sende_time);
+CAN_PaketTypeDef CAN_Nachricht(uint16_t id, uint8_t length, uint16_t sendeintervall, uint32_t sende_time, bool allowed);
 //----------------------------------------------------------------------
 
 #endif /* INC_CAN_BUS_H_ */

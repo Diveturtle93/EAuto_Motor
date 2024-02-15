@@ -242,7 +242,7 @@ int main(void)
 			  }
 #endif
 
-			  //
+			  // Alle anderen Pakete laufen in leere und werden ignoriert
 			  default:
 			  {
 				  break;
@@ -305,8 +305,7 @@ int main(void)
 	  // Crash Ausgeloest
 	  if (system_in.Crash != 1)
 	  {
-		  mStrg_state.CriticalError = true;
-		  mStrg_state.Normal = false;
+		  setStatus(CriticalError);
 	  }
 
 	  // Wenn Statemaschine nicht im Standby ist
@@ -364,6 +363,8 @@ int main(void)
 		  leuchten_out.GreenLed = false;
 
 		  motor480.MotorLED = true;
+
+		  system_out.MotorSDC = false;
 	  }
 
 	  // Statemaschine von Motorsteuergeraet
@@ -602,7 +603,7 @@ int main(void)
 		  default:
 		  {
 			  uartTransmit("Motor Kritischer Fehler\n", 24);
-			  mStrg_state.CriticalError = true;
+			  setStatus(CriticalError);
 
 			  break;
 		  }

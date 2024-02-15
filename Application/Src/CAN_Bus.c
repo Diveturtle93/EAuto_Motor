@@ -155,13 +155,16 @@ void CANwork(void)
 	{
 		if (CAN_Output_PaketListe[i].sende_time < (millis() - CAN_Output_PaketListe[i].sendeintervall))
 		{
-			if (CANwrite(&CAN_Output_PaketListe[i].msg, false) != 1)
+			if (CAN_Output_PaketListe[i].allowed == true)
 			{
+				if (CANwrite(&CAN_Output_PaketListe[i].msg, false) != 1)
+				{
 
-			}
-			else
-			{
-				CAN_Output_PaketListe[i].sende_time = millis();
+				}
+				else
+				{
+					CAN_Output_PaketListe[i].sende_time = millis();
+				}
 			}
 		}
 	}
@@ -170,7 +173,7 @@ void CANwork(void)
 
 // CAN Nachricht definieren, Datentyp anpassen
 //----------------------------------------------------------------------
-CAN_PaketTypeDef CAN_Nachricht(uint16_t id, uint8_t length, uint16_t sendeintervall, uint32_t sende_time)
+CAN_PaketTypeDef CAN_Nachricht(uint16_t id, uint8_t length, uint16_t sendeintervall, uint32_t sende_time, bool allowed)
 {
 	CAN_PaketTypeDef TxHeader;
 
@@ -178,6 +181,7 @@ CAN_PaketTypeDef CAN_Nachricht(uint16_t id, uint8_t length, uint16_t sendeinterv
 	TxHeader.msg.len = length;
 	TxHeader.sendeintervall = sendeintervall - 1;
 	TxHeader.sende_time = sende_time;
+	TxHeader.allowed = allowed;
 
 	return TxHeader;
 }
