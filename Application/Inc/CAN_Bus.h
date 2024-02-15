@@ -30,6 +30,7 @@
 
 //----------------------------------------------------------------------
 
+// Typedefines definieren
 //----------------------------------------------------------------------
 typedef enum																// TypeDef fuer Empfangsbuffer groesse
 {																			// Tabellenform

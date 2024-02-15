@@ -90,8 +90,8 @@ void Error_Handler(void);
 #define SPI5_MISO_GPIO_Port GPIOF
 #define SPI5_MOSI_Pin GPIO_PIN_9
 #define SPI5_MOSI_GPIO_Port GPIOF
-#define WS2812_Pin GPIO_PIN_3
-#define WS2812_GPIO_Port GPIOC
+#define ENTER_Pin GPIO_PIN_3
+#define ENTER_GPIO_Port GPIOC
 #define CRASH_Pin GPIO_PIN_0
 #define CRASH_GPIO_Port GPIOA
 #define EMERGENCY_RUN_Pin GPIO_PIN_1
@@ -194,8 +194,8 @@ void Error_Handler(void);
 #define GRA4_GPIO_Port GPIOG
 #define SD_SW_Pin GPIO_PIN_6
 #define SD_SW_GPIO_Port GPIOC
-#define ENTER_Pin GPIO_PIN_7
-#define ENTER_GPIO_Port GPIOC
+#define WS2812_Pin GPIO_PIN_7
+#define WS2812_GPIO_Port GPIOC
 #define SD_D0_Pin GPIO_PIN_8
 #define SD_D0_GPIO_Port GPIOC
 #define SD_D1_Pin GPIO_PIN_9
