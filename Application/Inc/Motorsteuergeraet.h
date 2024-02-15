@@ -52,6 +52,17 @@
 // Tischaufbau
 //----------------------------------------------------------------------
 #define TISCHAUFBAU									1						// 0 = Auto, 1 = Tischaufbau
+//----------------------------------------------------------------------
+
+// Motorsteuergeraet vorhanden
+//----------------------------------------------------------------------
+#define BMS_AVALIBLE								0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define BAMOCAR_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define STROM_HV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define STROM_LV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define KOMBIINSTRUMENT_AVALIBLE					0						// 0 = Nicht vorhanden, 1 = vorhanden
+//----------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------
 #if TISCHAUFBAU == 1
@@ -128,7 +139,9 @@
 
 //
 //----------------------------------------------------------------------
-#define CAN_TIMEOUT									3000					// Zeit bis CAN Timeout auftritt
+#define CAN_TIMEOUT									10000					// Zeit 10s bis CAN Timeout auftritt
+#define ERROR_RESET									300000					// Zeit 5min bis Error Zurueckgesetzt werden kann
+#define WARNING_RESET								10000					// Zeit 10s bis Warning Zurueckgesetzt werden kann
 //----------------------------------------------------------------------
 
 // Define Statemaschine Typedefines
@@ -144,13 +157,17 @@ typedef enum
 	Drive,																	// 6 Fahrzeug im Fahrmodus
 	Standby,																// 7 Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
 	Ausschalten,															// 8 Motorsteuergeraet ausschalten
+	StateNormal = 0x10,														// 16 Normalzustand
+	StateWarning = 0x20,													// 32 Warnung
+	StateError = 0x40,														// 64 Fehler
+	CriticalError = 0x80,													// 128 Critischer Fehler
 } states;
 //----------------------------------------------------------------------
 typedef union
 {
 	struct
 	{
-		uint8_t States : 4;													// State der Statemaschine
+		uint8_t State : 4;													// State der Statemaschine
 		uint8_t Normal : 1;													// Statemaschine normal
 		uint8_t Warning : 1;												// Statemaschine warning
 		uint8_t Error : 1;													// Statemaschine error

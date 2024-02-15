@@ -58,7 +58,7 @@ void writeall_outputs(void)
 	HAL_GPIO_WritePin(GLUEHKERZEN_GPIO_Port, GLUEHKERZEN_Pin, system_out.Gluehkerzen);				// Gluehkerzenrelais J52
 	HAL_GPIO_WritePin(MOTOR_SDC_OUT_GPIO_Port, MOTOR_SDC_OUT_Pin, system_out.MotorSDC);				// Shutdown-Circuit Motorsteuergeraet
 	HAL_GPIO_WritePin(KLIMA_OUT_GPIO_Port, KLIMA_OUT_Pin, system_out.Klima);						// Klimaanlage
-	HAL_GPIO_WritePin(POWER_ON_GPIO_Port, POWER_ON_Pin, system_out.Power_On);						// Selbsthaltung DCDC-Wandler Motorsteuergeraet
+	HAL_GPIO_WritePin(POWER_ON_GPIO_Port, POWER_ON_Pin, system_out.PowerOn);						// Selbsthaltung DCDC-Wandler Motorsteuergeraet
 
 	// Schreibe Hochstromfaehige Ausgaenge
 	HAL_GPIO_WritePin(DIGITAL1_GPIO_Port, DIGITAL1_Pin, highcurrent_out.Digital1);					// Digitaler Ausgang 1

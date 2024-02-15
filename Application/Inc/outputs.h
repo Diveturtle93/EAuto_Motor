@@ -33,7 +33,7 @@ typedef union
 		uint8_t Gluehkerzen : 1;				// 4
 		uint8_t MotorSDC : 1;					// 5
 		uint8_t Klima : 1;						// 6
-		uint8_t Power_On : 1;					// 7
+		uint8_t PowerOn : 1;					// 7
 	};
 
 	uint8_t systemoutput;						// Byte
@@ -79,6 +79,7 @@ typedef union
 		uint8_t GreenLed : 1;					// C
 		uint8_t BlueLed : 1;					// D
 		uint8_t Reserve : 1;					// E
+		uint8_t  : 1;							// F						// Unused
 	};
 
 	uint16_t ledoutput;							// 2 Byte
