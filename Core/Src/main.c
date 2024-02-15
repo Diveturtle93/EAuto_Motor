@@ -92,7 +92,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	// Motorsteuergeraet Statemaschine Zeitvariablen
-	uint32_t timeStandby = 0, timeError = 0;
+	uint32_t timeStandby = 0, timeErrorLED = 0;
 
 	// Timer Task Variablen (PWM)
 	uint8_t task = 0;
@@ -100,7 +100,7 @@ int main(void)
 
 	// Motorsteuergeraet CAN-Bus Zeitvariable, Errorvariable
 	uint8_t  can_online = 0;
-	uint32_t timeBAMO = 0, timeBMS = 0;
+	uint32_t timeBAMO = 0, timeBMS = 0, timeStromHV = 0, timeStromLV = 0;
 
 	// CAN-Bus Receive Message
 	CAN_message_t RxMessage;
@@ -192,18 +192,17 @@ int main(void)
 	  ADC_VAL[8] = ADC_Kuhlwassertemperatur();
 	  ADC_VAL[9] = ADC_Gaspedal();
 
-	  // Shutdown-Circuit checken
-	  checkSDC();
-
 	  // Sortiere CAN-Daten auf CAN-Buffer
 	  sortCAN();
 
+	  // Lese CAN-Nachrichten ein
 	  if (CAN_available() >= 1)
 	  {
 		  CANread(&RxMessage);
 
 		  switch (RxMessage.id)
 		  {
+#if BAMOCAR_AVAILIBLE == 1
 			  // Bamocar ID
 			  case BAMOCAR_CAN_RX:
 			  {
@@ -212,7 +211,9 @@ int main(void)
 				  BAMOCAN_ID(&RxMessage.buf[0], RxMessage.len);
 				  break;
 			  }
+#endif
 
+#if BMS_AVALIBLE == 1
 			  // Batteriemanagement Status ID
 			  case BMS_CAN_STATUS:
 			  {
@@ -220,6 +221,7 @@ int main(void)
 				  can_online |= (1 << 1);
 				  break;
 			  }
+#endif
 
 			  //
 			  default:
@@ -229,14 +231,37 @@ int main(void)
 		  }
 	  }
 
+#if BAMOCAR_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
 	  if (millis() > (timeBAMO + CAN_TIMEOUT))
 	  {
 		  can_online &= ~(1 << 0);
 	  }
+#endif
+
+#if BMS_AVALIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
 	  if (millis() > (timeBMS + CAN_TIMEOUT))
 	  {
 		  can_online &= ~(1 << 1);
 	  }
+#endif
+
+#if STROM_HV_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
+	  if (millis() > (timeStromHV + CAN_TIMEOUT))
+	  {
+		  can_online &= ~(1 << 2);
+	  }
+#endif
+
+#if STROM_LV_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
+	  if (millis() > (timeStromLV + CAN_TIMEOUT))
+	  {
+		  can_online &= ~(1 << 3);
+	  }
+#endif
 
 	  // PWM Oelstandsensor Kombiinstrument ausgeben
 	  pwm_oelstand(count);
@@ -270,6 +295,9 @@ int main(void)
 	  {
 		  // Schreibe alle CAN-NAchrichten auf BUS, wenn nicht im Standby
 		  CANwork();
+
+		  // Shutdown-Circuit checken
+		  checkSDC();
 	  }
 
 	  // Statemaschine keine Fehler
@@ -284,12 +312,12 @@ int main(void)
 	  // Statemaschine hat Warnungen
 	  if (mStrg_state.Warning)
 	  {
-		  if (millis() - timeError > 1000)
+		  if (millis() - timeErrorLED > 1000)
 		  {
 			  leuchten_out.RedLed = !leuchten_out.RedLed;
 
 			  motor480.MotorLED = !motor480.MotorLED;
-			  timeError = millis();
+			  timeErrorLED = millis();
 		  }
 
 		  leuchten_out.GreenLed = true;
@@ -298,10 +326,10 @@ int main(void)
 	  // Statemaschine hat Fehler
 	  if (mStrg_state.Error)
 	  {
-		  if (millis() - timeError > 1000)
+		  if (millis() - timeErrorLED > 1000)
 		  {
 			  leuchten_out.RedLed = !leuchten_out.RedLed;
-			  timeError = millis();
+			  timeErrorLED = millis();
 		  }
 
 		  leuchten_out.GreenLed = false;
@@ -397,7 +425,7 @@ int main(void)
 		  // State Precharge, wenn Bremse beim Anlassen oder danach getreten ist
 		  case Precharge:
 		  {
-			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC != 1) && (sdc_in.EmergencyRun != 1))
+			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC != 1))
 			  {
 				  if (playRTDS() == true)
 				  {
@@ -406,6 +434,11 @@ int main(void)
 					  mStrg_state.States = ReadyToDrive;
 
 					  motor480.VorgluehenLED = false;
+				  }
+				  else
+				  {
+					  mStrg_state.States = KL15;
+					  sdc_in.Anlasser = false;
 				  }
 			  }
 
@@ -423,7 +456,7 @@ int main(void)
 		  // State ReadyToDrive, wenn SDC Ok ist und Vorgeladen wurde
 		  case ReadyToDrive:
 		  {
-			  if (komfort_in.Enter == 1)
+			  if (komfort_in.ASR1 == 1)
 			  {
 				  uartTransmit("Drive\n", 6);
 				  mStrg_state.States = Drive;
@@ -455,6 +488,12 @@ int main(void)
 			  else																	// Wenn Gaspedal unplausible oder Kupplung getreten
 			  {
 				  gas_mean = 0;
+			  }
+
+			  if (komfort_in.ASR1 == 1)
+			  {
+				  uartTransmit("KL15\n", 5);
+				  mStrg_state.States = KL15;
 			  }
 
 			  if (system_in.KL15 == 1)

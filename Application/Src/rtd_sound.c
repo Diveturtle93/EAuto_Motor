@@ -42,7 +42,7 @@ bool playRTDS(void)
 	{
 		readall_inputs();
 
-		if (sdc_in.EmergencyRun == 1)
+		if (sdc_in.AkkuSDC == 1)
 		{
 			uartTransmit("Abbruch RTDS !!!\n", 17);
 			abort = false;

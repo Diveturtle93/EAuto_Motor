@@ -8,7 +8,8 @@
 Debug/
 debug/
 Release/
-release
+release/
+Test/
 
 # Prerequisites
 *.d
@@ -61,5 +62,4 @@ Module.symvers
 Mkfile.old
 dkms.conf
 Application/Inc/git.h
-Debug/Motorsteuergeraet.list
-/Test/
+
