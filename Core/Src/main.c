@@ -466,6 +466,7 @@ int main(void)
 					  mStrg_state.State = ReadyToDrive;
 
 					  motor480.VorgluehenLED = false;
+
 					  timeStandby = millis();
 				  }
 				  else
@@ -524,10 +525,16 @@ int main(void)
 				  // Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
 				  // Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
 				  gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+
+				  // Todo: Wenn Drehzahl zu hoch dann Fehler Cockpit (Oelstand, Bremse)
+				  writeBamoReg16(BAMOCAR_REG_TORQUE_SETPOINT, gas_mean);
+				  motor280.Drehzahl = (gas_mean * 5);
 			  }
 			  else																	// Wenn Gaspedal unplausible oder Kupplung getreten
 			  {
 				  gas_mean = 0;
+				  writeBamoReg16(BAMOCAR_REG_TORQUE_SETPOINT, gas_mean);
+				  motor280.Drehzahl = gas_mean;
 			  }
 
 			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))

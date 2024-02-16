@@ -469,6 +469,8 @@ extern bamocar_can_read_tag bamocar_data;									// Variable fuer CAN-Daten def
 
 // Funktionen definieren
 //----------------------------------------------------------------------
+void writeBamoReg16(uint8_t REG, uint16_t data);							// Schreibe einzelnes Register mit zwei Byte
+void writeBamoReg32(uint8_t REG, uint32_t data);							// Schreibe einzelnes Register mit vier Byte
 void readBamoReg(uint8_t REG);												// Lese einzelnes Register
 void readBamoRegIntvl(uint8_t REG, uint8_t interval);						// Lese einzelnes Register mit Intervall
 void BAMOCAN_ID(uint8_t* data, uint8_t dlc);								// Zuordnung Empfangener Daten

@@ -33,29 +33,67 @@ bamocar_warnung_tag bamocar_warnung;										// Variable fuer Warnung definiere
 bamocar_can_read_tag bamocar_data;											// Variable fuer CAN-Daten definieren
 //----------------------------------------------------------------------
 
+// Schreibe Bamocar Register mit zwei Byte Daten
+//----------------------------------------------------------------------
+void writeBamoReg16(uint8_t REG, uint16_t data)
+{
+	CAN_message_t BamoTxMsg;
+
+	// Sendenachricht erstellen
+	BamoTxMsg.id = BAMOCAR_CAN_TX;											// Bamocar Sende ID
+	BamoTxMsg.len = 3;														// Laenge Daten
+	BamoTxMsg.flags.extended = 0;											// Extended ID = false
+
+	// Daten zusammenfuegen
+	BamoTxMsg.buf[0] = REG;													// Register welches beschrieben wird
+	BamoTxMsg.buf[1] = data;												// Datenbyte 0, Bit 0 - 7
+	BamoTxMsg.buf[2] = (data >> 8);											// Datenbyte 1, Bit 8 - 15
+
+	// Bamocar Register ueber CAN abrufen
+	CANwrite(&BamoTxMsg, true);
+}
+//----------------------------------------------------------------------
+
+// Schreibe Bamocar Register mit vier Byte Daten
+//----------------------------------------------------------------------
+void writeBamoReg32(uint8_t REG, uint32_t data)
+{
+	CAN_message_t BamoTxMsg;
+
+	// Sendenachricht erstellen
+	BamoTxMsg.id = BAMOCAR_CAN_TX;											// Bamocar Sende ID
+	BamoTxMsg.len = 5;														// Laenge Daten
+	BamoTxMsg.flags.extended = 0;											// Extended ID = false
+
+	// Daten zusammenfuegen
+	BamoTxMsg.buf[0] = REG;													// Register welches beschrieben wird
+	BamoTxMsg.buf[1] = data;												// Datenbyte 0, Bit 0 - 7
+	BamoTxMsg.buf[2] = (data >> 8);											// Datenbyte 1, Bit 8 - 15
+	BamoTxMsg.buf[3] = (data >> 16);										// Datenbyte 2, Bit 16 - 23
+	BamoTxMsg.buf[4] = (data >> 24);										// Datenbyte 3, Bit 24 - 31
+
+	// Bamocar Register ueber CAN abrufen
+	CANwrite(&BamoTxMsg, true);
+}
+//----------------------------------------------------------------------
+
 // Lese Bamocar Register
 //----------------------------------------------------------------------
 void readBamoReg(uint8_t REG)
 {
-	CAN_TxHeaderTypeDef BamoTxMsg;
-	uint8_t BamoTxData[3], status;
+	CAN_message_t BamoTxMsg;
 
 	// Sendenachricht erstellen
-	BamoTxMsg.StdId = BAMOCAR_CAN_TX;
-	BamoTxMsg.ExtId = 0;
-	BamoTxMsg.RTR = CAN_RTR_DATA;
-	BamoTxMsg.IDE = CAN_ID_STD;
-	BamoTxMsg.DLC = 3;
-	BamoTxMsg.TransmitGlobalTime=DISABLE;
+	BamoTxMsg.id = BAMOCAR_CAN_TX;											// Bamocar Sende ID
+	BamoTxMsg.len = 3;														// Laenge Daten
 
 	// Daten zusammenfuegen
-	BamoTxData[0] = BAMOCAR_REG_READ;										// Einstellung fuer lesen des Registers
-	BamoTxData[1] = REG;													// Register das gelesen werden soll
-	BamoTxData[2] = INTVL_IMMEDIATE;										// Register sofort senden, einmalig
+	BamoTxMsg.buf[0] = BAMOCAR_REG_READ;									// Einstellung fuer lesen des Registers
+	BamoTxMsg.buf[1] = REG;													// Register das gelesen werden soll
+	BamoTxMsg.buf[2] = INTVL_IMMEDIATE;										// Register sofort senden, einmalig
 
 	// Bamocar Register ueber CAN abrufen
-	status = HAL_CAN_AddTxMessage(&hcan3, &BamoTxMsg, BamoTxData, (uint32_t *)CAN_TX_MAILBOX0);
-	hal_error(status);
+	CANwrite(&BamoTxMsg, true);
 }
 //----------------------------------------------------------------------
 
@@ -63,25 +101,19 @@ void readBamoReg(uint8_t REG)
 //----------------------------------------------------------------------
 void readBamoRegIntvl(uint8_t REG, uint8_t interval)
 {
-	CAN_TxHeaderTypeDef BamoTxMsg;
-	uint8_t BamoTxData[3], status;
+	CAN_message_t BamoTxMsg;
 
 	// Sendenachricht erstellen
-	BamoTxMsg.StdId = BAMOCAR_CAN_TX;
-	BamoTxMsg.ExtId = 0;
-	BamoTxMsg.RTR = CAN_RTR_DATA;
-	BamoTxMsg.IDE = CAN_ID_STD;
-	BamoTxMsg.DLC = 3;
-	BamoTxMsg.TransmitGlobalTime=DISABLE;
+	BamoTxMsg.id = BAMOCAR_CAN_TX;											// Bamocar Sende ID
+	BamoTxMsg.len = 3;														// Laenge Daten
 
 	// Daten zusammenfuegen
-	BamoTxData[0] = BAMOCAR_REG_READ;										// Einstellung fuer lesen des Registers
-	BamoTxData[1] = REG;													// Register das gelesen werden soll
-	BamoTxData[2] = interval;												// Interval wie oft das Register gelesen werden soll
+	BamoTxMsg.buf[0] = BAMOCAR_REG_READ;									// Einstellung fuer lesen des Registers
+	BamoTxMsg.buf[1] = REG;													// Register das gelesen werden soll
+	BamoTxMsg.buf[2] = interval;											// Interval wie oft das Register gelesen werden soll
 
 	// Bamocar Zeitinterval einstellen ueber CAN
-	status = HAL_CAN_AddTxMessage(&hcan3, &BamoTxMsg, BamoTxData, (uint32_t *)CAN_TX_MAILBOX0);
-	hal_error(status);
+	CANwrite(&BamoTxMsg, true);
 }
 //----------------------------------------------------------------------
 
