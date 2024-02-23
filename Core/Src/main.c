@@ -146,7 +146,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	Set_LED(MAX_LED, 0, 0, 0);
-	Set_LED(0, 255, 0, 0);
+	Set_LED(0, 0, 255, 0);
 	WS2812_Send();
 
 	// Starte Timer 6 Interrupt
@@ -423,6 +423,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.State = Standby;
+				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -445,6 +446,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.State = Standby;
+				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -472,6 +474,7 @@ int main(void)
 				  else
 				  {
 					  mStrg_state.State = KL15;
+					  system_out.MotorSDC = false;
 					  sdc_in.Anlasser = false;
 				  }
 			  }
@@ -481,6 +484,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.State = Standby;
+				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -498,6 +502,7 @@ int main(void)
 				  mStrg_state.State = Drive;
 
 				  Set_LED(0, 0, 255, 0);
+				  WS2812_Send();
 
 				  timeStandby = millis();
 			  }
@@ -507,6 +512,7 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.State = Standby;
+				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -541,8 +547,10 @@ int main(void)
 			  {
 				  uartTransmit("KL15\n", 5);
 				  mStrg_state.State = KL15;
+				  system_out.MotorSDC = false;
 
 				  Set_LED(0, 255, 0, 0);
+				  WS2812_Send();
 
 				  timeStandby = millis();
 			  }
@@ -552,9 +560,11 @@ int main(void)
 			  {
 				  uartTransmit("Standby\n", 8);
 				  mStrg_state.State = Standby;
+				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 
 				  Set_LED(0, 255, 0, 0);
+				  WS2812_Send();
 
 				  timeStandby = millis();
 			  }
@@ -681,7 +691,7 @@ void checkSDC(void)
 {
 	sdc_in.SDC_OK = true;
 
-	if (sdc_in.SDC0 == 1)
+	if (((mStrg_state.State == Precharge) || (mStrg_state.State == ReadyToDrive) || (mStrg_state.State == Drive)) && sdc_in.SDC0 == 1)
 	{
 		setStatus(StateError);
 		sdc_in.SDC_OK = false;

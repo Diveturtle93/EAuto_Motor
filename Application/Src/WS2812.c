@@ -25,15 +25,16 @@
 
 // Variablen definieren
 //----------------------------------------------------------------------
-uint8_t LED_Data[MAX_LED][4];
-uint16_t pwmData[20 + (24 * MAX_LED) + 20 + 1];
-uint8_t datasentflag = 0;
+uint8_t LED_Data[MAX_LED][4];												// Farben fuer die einzelnen LEDs
+uint16_t pwmData[20 + (24 * MAX_LED) + 60 + 1];								// Array fuer PWM Daten
+uint8_t datasentflag = 0;													// Datenflag fuer Senden per DMA
 //----------------------------------------------------------------------
 
 // Setze LEDs
 //----------------------------------------------------------------------
 void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue)
 {
+	// Beschreibe Array und setze die Farben der einzelnen LEDs
 	LED_Data[LED_Num][0] = LED_Num;
 	LED_Data[LED_Num][1] = red;
 	LED_Data[LED_Num][2] = green;
@@ -45,42 +46,60 @@ void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue)
 //----------------------------------------------------------------------
 void WS2812_Send (void)
 {
-	uint32_t indx=0;
+	// Variablen fuer Funktion definieren
+	uint32_t indx = 0;
 	uint32_t color;
 
+	// Initial 20 Bit als Low senden, reset WS2812
 	for (int i = 0; i < 20; i++)
 	{
+		// Daten gleich 0 und Index hochzaehlen
 		pwmData[indx] = 0;
 		indx++;
 	}
 
+	// Daten der LED Farben konvertieren in PWM
 	for (int i = 0; i < MAX_LED; i++)
 	{
+		// Daten der LED
 		color = ((LED_Data[i][1] << 16) | (LED_Data[i][2] << 8) | (LED_Data[i][3]));
 
+		// Konvertieren
 		for (int i = 23; i >= 0; i--)
 		{
+			// Bit = 1 langer High Pulse, Bit = 0 kurzer High Pulse
 			if (color & (1 << i))
 			{
-				pwmData[indx] = 90;  // 2/3 of 135
+				// ca. 2/3 High, 850ns
+				pwmData[indx] = 87;
 			}
-
-			else pwmData[indx] = 45;  // 1/3 of 135
+			else
+			{
+				// ca. 1/3 High, 400ns
+				pwmData[indx] = 48;
+			}
 
 			indx++;
 		}
 
 	}
 
-	for (int i = 0; i < 20; i++)
+	// Reset der WS2812, Low Pulse, 50us gefordert, zur Sicherheit 60 mal senden
+	// eine Periode 1,25us, Gesamt = 60 x 1,25us = 75us
+	for (int i = 0; i < 60; i++)
 	{
 		pwmData[indx] = 0;
 		indx++;
 	}
+
+	// Sicher Pin auf High ziehen
 	pwmData[indx] = 255;
 	indx++;
 
+	// Starte DMA und sende Daten fuer PWM
 	HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_2, (uint32_t *)pwmData, indx);
+
+	// Warten bis alle Daten gesendet wurden und Interrupt DMA stoppt
 	while (!datasentflag){};
 	datasentflag = 0;
 }
@@ -92,7 +111,10 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == &htim3)
 	{
+		// Stop DMA
 		HAL_TIM_PWM_Stop_DMA(&htim3, TIM_CHANNEL_2);
+
+		// Flag setzen damit while aus WS2812_send verlassen werden kann
 		datasentflag = 1;
 	}
 }
