@@ -55,7 +55,8 @@
 // Funktionen definieren
 //----------------------------------------------------------------------
 void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue);		// Setze die Farben der einzelnen LEDs
-void WS2812_Send (void);														// Sende Daten als PWM
+void WS2812_Send_Wait (void);													// Sende Daten als PWM, mit Wartezeit
+uint8_t WS2812_Send (void);														// Sende Daten als PWM, keine Wartezeit
 //----------------------------------------------------------------------
 
 #endif /* INC_WS2812_H_ */

@@ -110,6 +110,9 @@ int main(void)
 
 	// ADC Wert Gaspedal
 	uint16_t gas_adc = 0;
+
+	// WS2812 LED
+	uint8_t WS2812_update = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -147,7 +150,7 @@ int main(void)
 
 	Set_LED(MAX_LED, 0, 0, 0);
 	Set_LED(0, 0, 255, 0);
-	WS2812_Send();
+	WS2812_Send_Wait();
 
 	// Starte Timer 6 Interrupt
 	HAL_TIM_Base_Start_IT(&htim6);
@@ -177,6 +180,12 @@ int main(void)
 		CAN_Output_PaketListe[j].msg.buf[6] = 0;
 		CAN_Output_PaketListe[j].msg.buf[7] = 0;
 	}
+
+	// Wenn Tischaufbau dann CAN-Nachricht fuer Lenkung senden
+#if TISCHAUFBAU == 1
+	CAN_Output_PaketListe[9].msg.buf[0] = 0;
+	CAN_Output_PaketListe[9].msg.buf[1] = 1;
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -502,7 +511,7 @@ int main(void)
 				  mStrg_state.State = Drive;
 
 				  Set_LED(0, 0, 255, 0);
-				  WS2812_Send();
+				  WS2812_update = 1;
 
 				  timeStandby = millis();
 			  }
@@ -550,7 +559,7 @@ int main(void)
 				  system_out.MotorSDC = false;
 
 				  Set_LED(0, 255, 0, 0);
-				  WS2812_Send();
+				  WS2812_update = 1;
 
 				  timeStandby = millis();
 			  }
@@ -564,7 +573,7 @@ int main(void)
 				  sdc_in.Anlasser = false;
 
 				  Set_LED(0, 255, 0, 0);
-				  WS2812_Send();
+				  WS2812_update = 1;
 
 				  timeStandby = millis();
 			  }
@@ -623,6 +632,17 @@ int main(void)
 			  setStatus(CriticalError);
 
 			  break;
+		  }
+	  }
+
+	  // Schreibe WS2812
+	  if (WS2812_update == 1)
+	  {
+		  // Wenn Schreiben moeglich
+		  if (WS2812_Send() == 1)
+		  {
+			  // Solange keine neuen Daten, kein Senden notwendig
+			  WS2812_update = 0;
 		  }
 	  }
 

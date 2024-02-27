@@ -115,7 +115,7 @@ Das entspricht ca. 0,45 bar und 2 bar. Diese Werte müssen entsprechend noch val
 werden. Ggf. ist auch eine Anpassung im Schaltplan notwendig.
 
 Nach einer erneuten Messung mit einem ausgebauten Sensor sind die Werte für den Druck, wie
-erwartet. Des Sensor gibt bei Umgebungsdruck (ca. 1 Bar) entsprechend eine Wert von um die
+erwartet. Der Sensor gibt bei Umgebungsdruck (ca. 1 Bar) entsprechend eine Wert von um die
 96 kPa zurück. Dies entspricht einem Druck von 0,96 Bar. Ebenfalls ist aufgefallen, dass
 der erster gemessene Sensor, eine andere Teilenummer hat. Die Recherche ergab, der Sensor
 hat einen geringeren maximal Druck. Dafür aber eine bessere Auflösung über den Wertebereich.
