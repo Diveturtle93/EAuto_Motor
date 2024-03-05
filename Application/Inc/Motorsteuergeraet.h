@@ -60,7 +60,7 @@
 #define BAMOCAR_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
 #define STROM_HV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
 #define STROM_LV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
-#define KOMBIINSTRUMENT_AVALIBLE					0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define KOMBIINSTRUMENT_AVALIBLE					1						// 0 = Nicht vorhanden, 1 = vorhanden
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
@@ -135,12 +135,38 @@
 #define BMS_CAN_Temperatur22						0x744					// Batterie-Temperatur 5-8 Modul 2
 #define BMS_CAN_Temperatur23						0x745					// Batterie-Temperatur 9-12 Modul 2
 //----------------------------------------------------------------------
+// Stromsensor HV-Kreis
+//----------------------------------------------------------------------
+#define STROM_HV_COMMAND_RX							0x411					// Befehl an Stromsensor senden
+#define STROM_HV_COMMAND_TX							0x511					// Befehl von Stromsensor empfanden
+#define STROM_HV_CAN_I								0x521					// Aktueller Stromverbrauch
+#define STROM_HV_CAN_U1								0x522					// Aktuelle Spannung U1
+#define STROM_HV_CAN_U2								0x523					// Aktuelle Spannung U2
+#define STROM_HV_CAN_U3								0x524					// Aktuelle Spannung U3
+#define STROM_HV_CAN_T								0x525					// Aktuelle Temperatur
+#define STROM_HV_CAN_W								0x526					// Power (U1 x I)
+#define STROM_HV_CAN_AS								0x527					// Gesamtstromvrbrauch
+#define STROM_HV_CAN_WH								0x528					// Gesamtenergie (U1 x I)
+//----------------------------------------------------------------------
+// Stromsensor LV-Kreis
+//----------------------------------------------------------------------
+//#define STROM_LV_COMMAND_RX							0x412					// Befehl an Stromsensor senden
+//#define STROM_LV_COMMAND_TX							0x512					// Befehl von Stromsensor empfanden
+//#define STROM_LV_CAN_I								0x521					// Aktueller Stromverbrauch
+//#define STROM_LV_CAN_U1								0x522					// Aktuelle Spannung U1
+//#define STROM_LV_CAN_U2								0x523					// Aktuelle Spannung U2
+//#define STROM_LV_CAN_U3								0x524					// Aktuelle Spannung U3
+//#define STROM_LV_CAN_T								0x525					// Aktuelle Temperatur
+//#define STROM_LV_CAN_W								0x526					// Power (U1 x I)
+//#define STROM_LV_CAN_AS								0x527					// Gesamtstromvrbrauch
+//#define STROM_LV_CAN_WH								0x528					// Gesamtenergie (U1 x I)
+//----------------------------------------------------------------------
 
-//
+// Zeit Intervalle
 //----------------------------------------------------------------------
 #define CAN_TIMEOUT									10000					// Zeit 10s bis CAN Timeout auftritt
-#define ERROR_RESET									300000					// Zeit 5min bis Error Zurueckgesetzt werden kann
-#define WARNING_RESET								10000					// Zeit 10s bis Warning Zurueckgesetzt werden kann
+#define ERROR_RESET									30000					// Zeit 30s bis Error Zurueckgesetzt werden kann
+#define WARNING_RESET								300000					// Zeit 5min bis Warning Zurueckgesetzt werden kann
 //----------------------------------------------------------------------
 
 // Define Statemaschine Typedefines

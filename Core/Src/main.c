@@ -54,6 +54,10 @@
 // Motorsteuergeraet Statevariable
 Motor_state mStrg_state = {{Start, true, false, false, false}};
 static uint32_t timeError = 0, timeWarning = 0;
+static uint32_t longerror = 0, longwarning = 0;
+
+// Fehler Speicher CAN-Bus
+uint8_t  can_online = 0;
 
 // Millisekunden Flag fuer PWM Task
 volatile uint8_t millisekunden_flag = 0;											// Flag fuer Millisekungen Timer Task
@@ -102,8 +106,7 @@ int main(void)
 	uint16_t count = 0;
 
 	// Motorsteuergeraet CAN-Bus Zeitvariable, Errorvariable
-	uint8_t  can_online = 0;
-	uint32_t timeBAMO = 0, timeBMS = 0, timeStromHV = 0, timeStromLV = 0;
+	uint32_t timeBAMO = 0, timeBMS = 0, timeStromHV = 0, timeStromLV = 0, timeKombi = 0;
 
 	// CAN-Bus Receive Message
 	CAN_message_t RxMessage;
@@ -149,7 +152,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	Set_LED(MAX_LED, 0, 0, 0);
-	Set_LED(0, 0, 255, 0);
+	Set_LED(0, 255, 0, 255);
 	WS2812_Send_Wait();
 
 	// Starte Timer 6 Interrupt
@@ -251,6 +254,31 @@ int main(void)
 			  }
 #endif
 
+#if STROM_LV_AVAILIBLE == 1
+			  // Stromsensor
+			  case STROM_LV_CAN_I:
+			  {
+				  can_online |= (1 << 3);
+				  timeStromHV = millis();
+				  break;
+			  }
+#endif
+
+#if KOMBIINSTRUMENT_AVALIBLE == 1
+			  // Stromsensor
+			  case KOMBI2_CAN:
+			  {
+				  can_online |= (1 << 4);
+				  timeKombi = millis();
+
+				  setStatus(StateNormal);
+
+				  break;
+			  }
+#endif
+
+
+
 			  // Alle anderen Pakete laufen in leere und werden ignoriert
 			  default:
 			  {
@@ -264,6 +292,9 @@ int main(void)
 	  if (millis() > (timeBAMO + CAN_TIMEOUT))
 	  {
 		  can_online &= ~(1 << 0);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
 	  }
 #endif
 
@@ -272,6 +303,9 @@ int main(void)
 	  if (millis() > (timeBMS + CAN_TIMEOUT))
 	  {
 		  can_online &= ~(1 << 1);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
 	  }
 #endif
 
@@ -280,6 +314,9 @@ int main(void)
 	  if (millis() > (timeStromHV + CAN_TIMEOUT))
 	  {
 		  can_online &= ~(1 << 2);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
 	  }
 #endif
 
@@ -288,6 +325,20 @@ int main(void)
 	  if (millis() > (timeStromLV + CAN_TIMEOUT))
 	  {
 		  can_online &= ~(1 << 3);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
+	  }
+#endif
+
+#if KOMBIINSTRUMENT_AVALIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
+	  if (millis() > (timeKombi + CAN_TIMEOUT))
+	  {
+		  can_online &= ~(1 << 4);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
 	  }
 #endif
 
@@ -714,6 +765,8 @@ void checkSDC(void)
 	if (((mStrg_state.State == Precharge) || (mStrg_state.State == ReadyToDrive) || (mStrg_state.State == Drive)) && sdc_in.SDC0 == 1)
 	{
 		setStatus(StateError);
+		longerror |= (1 << 0);
+
 		sdc_in.SDC_OK = false;
 	}
 
@@ -721,6 +774,8 @@ void checkSDC(void)
 	if (sdc_in.BTB_SDC != 1)
 	{
 		setStatus(StateError);
+		longerror |= (1 << 1);
+
 		sdc_in.SDC_OK = false;
 	}
 #endif
@@ -729,6 +784,8 @@ void checkSDC(void)
 	if (sdc_in.AkkuSDC != 1)
 	{
 		setStatus(StateError);
+		longerror |= (1 << 2);
+
 		sdc_in.SDC_OK = false;
 	}
 #endif
@@ -800,6 +857,9 @@ void sortCAN(void)
 
 	// Motor Status
 	CAN_Output_PaketListe[7].msg.buf[0] = mStrg_state.status;
+	CAN_Output_PaketListe[7].msg.buf[1] = longwarning;
+	CAN_Output_PaketListe[7].msg.buf[2] = longerror;
+	CAN_Output_PaketListe[7].msg.buf[3] = can_online;
 }
 
 // Set Status der Statemaschine
@@ -808,18 +868,29 @@ void setStatus(uint8_t Status)
 	switch (Status & 0xF0)
 	{
 		case StateNormal:
-		case StateWarning:
 		{
-			if (mStrg_state.status & CriticalError)
+			if (mStrg_state.status & StateWarning)
 			{
+				if (millis() > (timeWarning + WARNING_RESET))
+				{
+					mStrg_state.status = (Status | mStrg_state.State);
+
+					longwarning = 0;
+					longerror = 0;
+				}
+
 				break;
 			}
+		}
+		case StateWarning:
+		{
+			timeWarning = millis();
 
 			if (mStrg_state.status & StateError)
 			{
 				if (millis() > (timeError + ERROR_RESET))
 				{
-					mStrg_state.status = (Status | mStrg_state.State);
+					mStrg_state.status = (StateWarning | mStrg_state.State);
 				}
 
 				break;
@@ -841,7 +912,7 @@ void setStatus(uint8_t Status)
 		}
 		default:
 		{
-			mStrg_state.status = (Status | CriticalError);
+			mStrg_state.status = (CriticalError | mStrg_state.State);
 			break;
 		}
 	}

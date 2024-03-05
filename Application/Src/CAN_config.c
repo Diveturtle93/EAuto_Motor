@@ -36,7 +36,7 @@ void CAN_config(void)
 	CAN_Output_PaketListe[4] = CAN_Nachricht(MOTOR_CAN_DREHZAHL, 8, 20, 32, true);
 	CAN_Output_PaketListe[5] = CAN_Nachricht(MOTOR_CAN_LEUCHTEN, 8, 200, 65, true);
 	CAN_Output_PaketListe[6] = CAN_Nachricht(MOTOR_CAN_TEMPERATUR, 8, 500, 24, true);
-	CAN_Output_PaketListe[7] = CAN_Nachricht(MOTOR_CAN_STATUS, 1, 200, 5, true);
+	CAN_Output_PaketListe[7] = CAN_Nachricht(MOTOR_CAN_STATUS, 4, 200, 5, true);
 
 	// CAN-Nachricht Bamocar, muss im Programm aktiv geschaltet werden
 	CAN_Output_PaketListe[8] = CAN_Nachricht(BAMOCAR_CAN_TX, 3, 100, 45, false);
