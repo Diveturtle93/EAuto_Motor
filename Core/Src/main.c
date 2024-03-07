@@ -598,17 +598,19 @@ int main(void)
 				  // Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
 				  // Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
 				  gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
-
-				  // Todo: Wenn Drehzahl zu hoch dann Fehler Cockpit (Oelstand, Bremse)
-				  writeBamoReg16(BAMOCAR_REG_TORQUE_SETPOINT, gas_mean);
-				  motor280.Drehzahl = (gas_mean * 5);
 			  }
 			  else																	// Wenn Gaspedal unplausible oder Kupplung getreten
 			  {
 				  gas_mean = 0;
-				  writeBamoReg16(BAMOCAR_REG_TORQUE_SETPOINT, gas_mean);
-				  motor280.Drehzahl = gas_mean;
 			  }
+
+			  // Todo: Wenn Drehzahl zu hoch dann Fehler Cockpit (Oelstand, Bremse)
+			  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
+			  CAN_Output_PaketListe[8].msg.buf[1] = gas_mean;
+			  CAN_Output_PaketListe[8].msg.buf[2] = (gas_mean >> 8);
+			  CAN_Output_PaketListe[8].allowed = true;
+
+			  motor280.Drehzahl = (gas_mean * 5);
 
 			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
 			  {
@@ -618,6 +620,13 @@ int main(void)
 
 				  Set_LED(0, 255, 0, 0);
 				  WS2812_update = 1;
+
+				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
+				  CAN_Output_PaketListe[8].msg.buf[1] = 0;
+				  CAN_Output_PaketListe[8].msg.buf[2] = 0;
+				  CAN_Output_PaketListe[8].allowed = false;
+
+				  motor280.Drehzahl = 0;
 
 				  timeStandby = millis();
 			  }
@@ -632,6 +641,13 @@ int main(void)
 
 				  Set_LED(0, 255, 0, 0);
 				  WS2812_update = 1;
+
+				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
+				  CAN_Output_PaketListe[8].msg.buf[1] = 0;
+				  CAN_Output_PaketListe[8].msg.buf[2] = 0;
+				  CAN_Output_PaketListe[8].allowed = false;
+
+				  motor280.Drehzahl = 0;
 
 				  timeStandby = millis();
 			  }
