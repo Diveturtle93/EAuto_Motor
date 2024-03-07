@@ -97,7 +97,7 @@ void MX_CAN3_Init(void)
 	}
 
 	// Aktiviere Interrupts fuer CAN Bus
-	if((HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_FULL)) != HAL_OK)
+	if((HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
 	{
 		// Fehler in der Initialisierung des CAN Interrupts
 		Error_Handler();

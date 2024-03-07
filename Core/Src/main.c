@@ -289,7 +289,7 @@ int main(void)
 
 #if BAMOCAR_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
-	  if (millis() > (timeBAMO + CAN_TIMEOUT))
+	  if ((mStrg_state.State > 1) && (millis() > (timeBAMO + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 0);
 		  longwarning |= (1 << 0);
@@ -300,7 +300,7 @@ int main(void)
 
 #if BMS_AVALIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
-	  if (millis() > (timeBMS + CAN_TIMEOUT))
+	  if ((mStrg_state.State > 1) && (millis() > (timeBMS + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 1);
 		  longwarning |= (1 << 0);
@@ -311,7 +311,7 @@ int main(void)
 
 #if STROM_HV_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
-	  if (millis() > (timeStromHV + CAN_TIMEOUT))
+	  if ((mStrg_state.State > 1) && (millis() > (timeStromHV + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 2);
 		  longwarning |= (1 << 0);
@@ -322,7 +322,7 @@ int main(void)
 
 #if STROM_LV_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
-	  if (millis() > (timeStromLV + CAN_TIMEOUT))
+	  if ((mStrg_state.State > 1) && (millis() > (timeStromLV + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 3);
 		  longwarning |= (1 << 0);
@@ -333,7 +333,7 @@ int main(void)
 
 #if KOMBIINSTRUMENT_AVALIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
-	  if (millis() > (timeKombi + CAN_TIMEOUT))
+	  if ((mStrg_state.State > 1) && (millis() > (timeKombi + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 4);
 		  longwarning |= (1 << 0);
@@ -447,6 +447,13 @@ int main(void)
 			  cockpit_default();
 
 			  uartTransmit("KL15\n", 5);
+
+			  timeBMS = millis();
+			  timeBAMO = millis();
+			  timeStromHV = millis();
+			  timeStromLV = millis();
+			  timeKombi = millis();
+
 			  mStrg_state.State = KL15;
 
 			  break;
