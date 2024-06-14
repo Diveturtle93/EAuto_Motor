@@ -27,18 +27,26 @@
 //----------------------------------------------------------------------
 uint8_t LED_Data[MAX_LED][4];												// Farben fuer die einzelnen LEDs
 uint16_t pwmData[20 + (24 * MAX_LED) + 60 + 1];								// Array fuer PWM Daten
-uint8_t datasentflag = 0;													// Datenflag fuer Senden per DMA
+volatile uint8_t datasentflag = 0;											// Datenflag fuer Senden per DMA
 //----------------------------------------------------------------------
 
-// Setze LEDs
+// Setze einzelne LED mit individuellem Farbwert
 //----------------------------------------------------------------------
-void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue)
+void SetLED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue)
 {
 	// Beschreibe Array und setze die Farben der einzelnen LEDs
-	LED_Data[LED_Num][0] = LED_Num;
-	LED_Data[LED_Num][1] = red;
-	LED_Data[LED_Num][2] = green;
-	LED_Data[LED_Num][3] = blue;
+	LED_Data[LED_Num - 1][0] = LED_Num;
+	LED_Data[LED_Num - 1][1] = red;
+	LED_Data[LED_Num - 1][2] = green;
+	LED_Data[LED_Num - 1][3] = blue;
+}
+//----------------------------------------------------------------------
+
+// Setze einzelne LED mit fixem Farbwert
+//----------------------------------------------------------------------
+void SetLED_color (uint8_t LED_Num, WS2812_Color color)
+{
+	SetLED(LED_Num, color.red, color.green, color.blue);
 }
 //----------------------------------------------------------------------
 
@@ -47,8 +55,8 @@ void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue)
 void WS2812_Send_Wait (void)
 {
 	// Variablen fuer Funktion definieren
-	uint32_t indx = 0;
-	uint32_t color;
+	uint16_t indx = 0;
+	uint32_t color = 0;
 
 	// Initial 20 Bit als Low senden, reset WS2812
 	for (int i = 0; i < 20; i++)
@@ -101,7 +109,7 @@ void WS2812_Send_Wait (void)
 
 	// Warten bis alle Daten gesendet wurden und Interrupt DMA stoppt
 	while (!datasentflag){};
-	datasentflag = 0;
+	datasentflag = 1;
 }
 //----------------------------------------------------------------------
 
@@ -113,7 +121,7 @@ uint8_t WS2812_Send (void)
 	if (datasentflag == 1)
 	{
 		// Variablen fuer Funktion definieren
-		uint32_t indx = 0;
+		uint16_t indx = 0;
 		uint32_t color;
 
 		// Initial 20 Bit als Low senden, reset WS2812

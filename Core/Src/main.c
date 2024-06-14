@@ -151,8 +151,7 @@ int main(void)
   MX_CAN3_Init();
   /* USER CODE BEGIN 2 */
 
-	Set_LED(MAX_LED, 0, 0, 0);
-	Set_LED(0, 255, 0, 255);
+	SetLED_color(1, WS2812_ORANGE);
 	WS2812_Send_Wait();
 
 	// Starte Timer 6 Interrupt
@@ -170,7 +169,6 @@ int main(void)
 
 	CANinit(RX_SIZE_16, TX_SIZE_16);
 	CAN_config();
-	mStrg_state.State = Ready;
 
 	for (uint8_t j = 0; j < ANZAHL_OUTPUT_PAKETE; j++)
 	{
@@ -189,6 +187,10 @@ int main(void)
 	CAN_Output_PaketListe[9].msg.buf[0] = 0;
 	CAN_Output_PaketListe[9].msg.buf[1] = 1;
 #endif
+
+	SetLED_color(1, WS2812_GREEN);
+	WS2812_update = 1;
+	mStrg_state.State = Ready;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -568,7 +570,7 @@ int main(void)
 				  uartTransmit("Drive\n", 6);
 				  mStrg_state.State = Drive;
 
-				  Set_LED(0, 0, 255, 0);
+				  SetLED_color(1, WS2812_RED);
 				  WS2812_update = 1;
 
 				  timeStandby = millis();
@@ -618,7 +620,7 @@ int main(void)
 				  mStrg_state.State = KL15;
 				  system_out.MotorSDC = false;
 
-				  Set_LED(0, 255, 0, 0);
+				  SetLED_color(1, WS2812_GREEN);
 				  WS2812_update = 1;
 
 				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
@@ -639,7 +641,7 @@ int main(void)
 				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 
-				  Set_LED(0, 255, 0, 0);
+				  SetLED_color(1, WS2812_GREEN);
 				  WS2812_update = 1;
 
 				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
@@ -936,6 +938,7 @@ void setStatus(uint8_t Status)
 		default:
 		{
 			mStrg_state.status = (CriticalError | mStrg_state.State);
+			uartTransmit("mStrg Kritischer Fehler Statemaschine\n!", 38);
 			break;
 		}
 	}
