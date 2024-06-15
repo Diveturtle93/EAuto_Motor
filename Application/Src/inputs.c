@@ -62,7 +62,7 @@ void readall_inputs(void)
 	// SDC-Eingaenge einlesen
 	sdc_in.EmergencyRun = HAL_GPIO_ReadPin(EMERGENCY_RUN_GPIO_Port, EMERGENCY_RUN_Pin);			// Emergency Run, Akku
 	sdc_in.SDC0 = HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin);						// Shutdown-Circuit, OK
-#if BMS_AVALIBLE == 1
+#if BMS_AVAILIBLE == 1
 	sdc_in.AkkuSDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
 #else
 	sdc_in.AkkuSDC = 0;																			// Wenn BMS nicht verfügbar, SDC OK

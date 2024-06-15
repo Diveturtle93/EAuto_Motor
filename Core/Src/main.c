@@ -98,6 +98,7 @@ void setStatus(uint8_t Status);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	// Motorsteuergeraet Statemaschine Zeitvariablen
 	uint32_t timeStandby = 0, timeErrorLED = 0;
@@ -117,6 +118,9 @@ int main(void)
 
 	// WS2812 LED
 	uint8_t WS2812_update = 0;
+
+	// Anforderung BMS Status fuer Drive Modus
+	Motor_state BMS_State = {{Start, true, false, false, false}};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -150,6 +154,7 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM3_Init();
   MX_CAN3_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
 	SetLED_color(1, WS2812_ORANGE);
@@ -168,6 +173,7 @@ int main(void)
 	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 #endif
 
+	// CAN-Bus initialisieren
 	CANinit(RX_SIZE_16, TX_SIZE_16);
 	CAN_config();
 
@@ -242,6 +248,8 @@ int main(void)
 			  // Batteriemanagement Status ID
 			  case BMS_CAN_STATUS:
 			  {
+				  BMS_State.status = RxMessage.buf[0];
+
 				  timeBMS = millis();
 				  can_online |= (1 << 1);
 				  break;
@@ -268,7 +276,7 @@ int main(void)
 			  }
 #endif
 
-#if KOMBIINSTRUMENT_AVALIBLE == 1
+#if KOMBIINSTRUMENT_AVAILIBLE == 1
 			  // Stromsensor
 			  case KOMBI2_CAN:
 			  {
@@ -281,8 +289,6 @@ int main(void)
 			  }
 #endif
 
-
-
 			  // Alle anderen Pakete laufen in leere und werden ignoriert
 			  default:
 			  {
@@ -293,7 +299,7 @@ int main(void)
 
 #if BAMOCAR_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
-	  if ((mStrg_state.State > 1) && (millis() > (timeBAMO + CAN_TIMEOUT)))
+	  if ((mStrg_state.State > Ready) && (millis() > (timeBAMO + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 0);
 		  longwarning |= (1 << 0);
@@ -302,9 +308,9 @@ int main(void)
 	  }
 #endif
 
-#if BMS_AVALIBLE == 1
+#if BMS_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
-	  if ((mStrg_state.State > 1) && (millis() > (timeBMS + CAN_TIMEOUT)))
+	  if ((mStrg_state.State > Ready) && (millis() > (timeBMS + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 1);
 		  longwarning |= (1 << 0);
@@ -315,7 +321,7 @@ int main(void)
 
 #if STROM_HV_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
-	  if ((mStrg_state.State > 1) && (millis() > (timeStromHV + CAN_TIMEOUT)))
+	  if ((mStrg_state.State > Ready) && (millis() > (timeStromHV + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 2);
 		  longwarning |= (1 << 0);
@@ -326,7 +332,7 @@ int main(void)
 
 #if STROM_LV_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
-	  if ((mStrg_state.State > 1) && (millis() > (timeStromLV + CAN_TIMEOUT)))
+	  if ((mStrg_state.State > Ready) && (millis() > (timeStromLV + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 3);
 		  longwarning |= (1 << 0);
@@ -335,9 +341,9 @@ int main(void)
 	  }
 #endif
 
-#if KOMBIINSTRUMENT_AVALIBLE == 1
+#if KOMBIINSTRUMENT_AVAILIBLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
-	  if ((mStrg_state.State > 1) && (millis() > (timeKombi + CAN_TIMEOUT)))
+	  if ((mStrg_state.State > Ready) && (millis() > (timeKombi + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 4);
 		  longwarning |= (1 << 0);
@@ -562,7 +568,7 @@ int main(void)
 		  case ReadyToDrive:
 		  {
 			  // Bei Tasterbetaetigung umschalten in Drive Modus
-			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
+			  if (((BMS_State.State == ReadyToDrive) || (BMS_State.State == Drive)) && (komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
 			  {
 				  setState(Drive);
 
@@ -790,7 +796,7 @@ void checkSDC(void)
 	}
 
 #if BAMOCAR_AVAILIBLE == 1
-	if (sdc_in.BTB_SDC != 1)
+	if (sdc_in.BTB_SDC == 1)
 	{
 		setStatus(StateError);
 		longerror |= (1 << 1);
@@ -799,8 +805,8 @@ void checkSDC(void)
 	}
 #endif
 
-#if BMS_AVALIBLE == 1
-	if (sdc_in.AkkuSDC != 1)
+#if BMS_AVAILIBLE == 1
+	if (sdc_in.AkkuSDC == 1)
 	{
 		setStatus(StateError);
 		longerror |= (1 << 2);

@@ -138,15 +138,23 @@ void collectSoftwareInfo(void)
 //----------------------------------------------------------------------
 void collectMiddlewareInfo(void)
 {
-	#define STRING_CMSIS_VERSION			"\nCMSIS Version:\t\t\t"
+	#define STRING_CORTEX_CMSIS_VERSION		"\nCortex CMSIS Version:\t\t"
+	#define STRING_STM_CMSIS_VERSION		"\nSTM32F7 CMSIS Version:\t\t"
 	#define STRING_HAL_VERSION				"\nHAL Version:\t\t\t"
 	#define STRING_RTOS_CMSIS_VERSION		"\nRTOS CMSIS Version:\t\t"
 	#define STRING_RTOS_VERSION				"\nRTOS Version:\t\t\t"
 
-	uartTransmit(STRING_CMSIS_VERSION, sizeof(STRING_CMSIS_VERSION));
+	uartTransmit(STRING_CORTEX_CMSIS_VERSION, sizeof(STRING_CORTEX_CMSIS_VERSION));
 	uartTransmitNumber(__CM7_CMSIS_VERSION_MAIN, 10);						// CMSIS Version anzeigen
 	uartTransmit(".", 1);
 	uartTransmitNumber(__CM7_CMSIS_VERSION_SUB, 10);						// CMSIS Version anzeigen
+
+	uartTransmit(STRING_STM_CMSIS_VERSION, sizeof(STRING_STM_CMSIS_VERSION));
+	uartTransmitNumber(__STM32F7_CMSIS_VERSION_MAIN, 10);					// CMSIS Version anzeigen
+	uartTransmit(".", 1);
+	uartTransmitNumber(__STM32F7_CMSIS_VERSION_SUB1, 10);					// CMSIS Version anzeigen
+	uartTransmit(".", 1);
+	uartTransmitNumber(__STM32F7_CMSIS_VERSION_SUB2, 10);					// CMSIS Version anzeigen
 
 
 	uartTransmit(STRING_HAL_VERSION, sizeof(STRING_HAL_VERSION));			// Hal Version anzeigen
