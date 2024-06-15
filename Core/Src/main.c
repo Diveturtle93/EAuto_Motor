@@ -83,6 +83,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void checkSDC(void);
 void sortCAN(void);
+void setState(uint8_t State);
 void setStatus(uint8_t Status);
 /* USER CODE END PFP */
 
@@ -190,7 +191,8 @@ int main(void)
 
 	SetLED_color(1, WS2812_GREEN);
 	WS2812_update = 1;
-	mStrg_state.State = Ready;
+
+	setState(Ready);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -448,15 +450,13 @@ int main(void)
 			  uartTransmit("Cockpit LEDs standardmaessig ausschalten\n", 41);
 			  cockpit_default();
 
-			  uartTransmit("KL15\n", 5);
-
 			  timeBMS = millis();
 			  timeBAMO = millis();
 			  timeStromHV = millis();
 			  timeStromLV = millis();
 			  timeKombi = millis();
 
-			  mStrg_state.State = KL15;
+			  setState(KL15);
 
 			  break;
 		  }
@@ -470,8 +470,7 @@ int main(void)
 				  // Solange kein kritischer Fehler auftritt
 				  if (!(mStrg_state.CriticalError))
 				  {
-					  uartTransmit("Anlassen\n", 9);
-					  mStrg_state.State = Anlassen;
+					  setState(Anlassen);
 
 					  // Anlasser Zustand abspeichern
 					  sdc_in.Anlasser = true;
@@ -490,8 +489,8 @@ int main(void)
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.State = Standby;
+				  setState(Standby);
+
 				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
@@ -506,15 +505,14 @@ int main(void)
 			  // Kupplung und Bremse getreten
 			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
 			  {
-				  uartTransmit("Precharge\n", 10);
-				  mStrg_state.State = Precharge;
+				  setState(Precharge);
 			  }
 
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.State = Standby;
+				  setState(Standby);
+
 				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
@@ -533,8 +531,7 @@ int main(void)
 				  if (playRTDS() == true)
 				  {
 
-					  uartTransmit("ReadyToDrive\n", 13);
-					  mStrg_state.State = ReadyToDrive;
+					  setState(ReadyToDrive);
 
 					  motor480.VorgluehenLED = false;
 
@@ -551,8 +548,8 @@ int main(void)
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.State = Standby;
+				  setState(Standby);
+
 				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
@@ -567,8 +564,7 @@ int main(void)
 			  // Bei Tasterbetaetigung umschalten in Drive Modus
 			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
 			  {
-				  uartTransmit("Drive\n", 6);
-				  mStrg_state.State = Drive;
+				  setState(Drive);
 
 				  SetLED_color(1, WS2812_RED);
 				  WS2812_update = 1;
@@ -579,8 +575,8 @@ int main(void)
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.State = Standby;
+				  setState(Standby);
+
 				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
@@ -616,8 +612,8 @@ int main(void)
 
 			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
 			  {
-				  uartTransmit("KL15\n", 5);
-				  mStrg_state.State = KL15;
+				  setState(KL15);
+
 				  system_out.MotorSDC = false;
 
 				  SetLED_color(1, WS2812_GREEN);
@@ -636,8 +632,8 @@ int main(void)
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
 			  if (system_in.KL15 == 1)
 			  {
-				  uartTransmit("Standby\n", 8);
-				  mStrg_state.State = Standby;
+				  setState(Standby);
+
 				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 
@@ -672,17 +668,15 @@ int main(void)
 				  highcurrent_out.Pumpe_Kuhlung = false;
 			  }
 
-			  // Fuer 5min warten und BMS weiterhin aktiv halten
+			  // Fuer 5min warten und mStrg weiterhin aktiv halten
 			  if (millis() > (timeStandby + MOTORTIME))
 			  {
-				  uartTransmit("Ausschalten\n", 12);
-				  mStrg_state.State = Ausschalten;
+				  setState(Ausschalten);
 			  }
 			  // Falls innerhalb der 5min die KL15 wieder aktiviert wird
 			  else if (system_in.KL15 != 1)
 			  {
-				  uartTransmit("Ready\n", 6);
-				  mStrg_state.State = Ready;
+				  setState(Ready);
 			  }
 
 			  break;
@@ -704,8 +698,8 @@ int main(void)
 		  // Falls kein State zutrifft, dann Kritischer Fehler
 		  default:
 		  {
-			  uartTransmit("Motor Kritischer Fehler\n", 24);
 			  setStatus(CriticalError);
+			  uartTransmit("mStrg Kritischer Fehler While\n!", 30);
 
 			  break;
 		  }
@@ -885,6 +879,74 @@ void sortCAN(void)
 	CAN_Output_PaketListe[7].msg.buf[1] = longwarning;
 	CAN_Output_PaketListe[7].msg.buf[2] = longerror;
 	CAN_Output_PaketListe[7].msg.buf[3] = can_online;
+}
+
+// Set Statemaschine
+void setState(uint8_t State)
+{
+	switch (State)
+	{
+		case Ready:
+		{
+			mStrg_state.State = Ready;
+			uartTransmit("Ready\n", 6);
+
+			break;
+		}
+		case KL15:
+		{
+			mStrg_state.State = KL15;
+			uartTransmit("KL15\n", 5);
+
+			break;
+		}
+		case Anlassen:
+		{
+			mStrg_state.State = Anlassen;
+			uartTransmit("Anlassen\n", 9);
+
+			break;
+		}
+		case Precharge:
+		{
+			mStrg_state.State = Precharge;
+			uartTransmit("Precharge\n", 10);
+
+			break;
+		}
+		case ReadyToDrive:
+		{
+			mStrg_state.State = ReadyToDrive;
+			uartTransmit("ReadyToDrive\n", 13);
+
+			break;
+		}
+		case Drive:
+		{
+			mStrg_state.State = Drive;
+			uartTransmit("Drive\n", 6);
+
+			break;
+		}
+		case Standby:
+		{
+			mStrg_state.State = Standby;
+			uartTransmit("Standby\n", 8);
+
+			break;
+		}
+		case Ausschalten:
+		{
+			mStrg_state.State = Ausschalten;
+			uartTransmit("Ausschalten\n", 12);
+
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
 }
 
 // Set Status der Statemaschine
