@@ -21,6 +21,8 @@
 
 // Konstanten definieren
 //----------------------------------------------------------------------
+// STM32 interner Temperatur Sensor
+//----------------------------------------------------------------------
 //#define TEMP_SENSOR_AVG_SLOPE_MV_PER_CELSIUS			2.5f
 //#define TEMP_SENSOR_VOLTAGE_MV_AT_25					760.0f
 //#define ADC_REFERENCE_VOLTAGE_MV						3300.0f
@@ -29,6 +31,22 @@
 #define TEMP30_CAL_VALUE								((uint16_t*)((uint32_t)0x1FF0F44C))
 #define TEMP110											110.0f
 #define TEMP30											30.0f
+//----------------------------------------------------------------------
+// Spannungsmessung KL15
+//----------------------------------------------------------------------
+#define KL15_UVOLT										2208				// Unterspannung bei 9V
+#define KL15_OVOLT										3925				// Ueberspannung bei 16V
+#define KL15_RES0										2200				// Unterer Widerstand Spannungsteiler
+#define KL15_RES1										10000				// Oberer Parallelwiderstand Spannungsteiler
+#define KL15_RES2										10000				// Oberer Parallelwiderstand SPannungsteiler
+//----------------------------------------------------------------------
+// Klimaflap Auswertung
+//----------------------------------------------------------------------
+#define KLIMAFLAP_OPENWIRE								10					// Wenn Sensor nicht angesteckt, dann Wert kleiner 10
+#define KLIMAFLAP_UVOLT									2208				// Unterspannung bei 9V
+#define KLIMAFLAP_OVOLT									3925				// Ueberspannung bei 16V
+#define KLIMAFLAP_RES0									INF				// Oberer Widerstand Spannungsteiler
+#define KLIMAFLAP_RES1									100000				// Unterer Widerstand Spannungsteiler
 //----------------------------------------------------------------------
 
 // Funktionen definieren

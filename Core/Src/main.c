@@ -116,7 +116,7 @@ int main(void)
 	// ADC Wert Gaspedal
 	uint16_t gas_adc = 0;
 
-	// WS2812 LED
+	// WS2812 LED Farbwechsel Anforderung
 	uint8_t WS2812_update = 0;
 
 	// Anforderung BMS Status fuer Drive Modus
@@ -456,6 +456,9 @@ int main(void)
 			  uartTransmit("Cockpit LEDs standardmaessig ausschalten\n", 41);
 			  cockpit_default();
 
+			  // Motor Shutdown-Circuit aktivieren, wenn OK
+			  system_out.MotorSDC = true;
+
 			  timeBMS = millis();
 			  timeBAMO = millis();
 			  timeStromHV = millis();
@@ -483,9 +486,6 @@ int main(void)
 
 					  // LED in Cockpit aktivieren
 					  motor480.VorgluehenLED = true;
-
-					  // Motor Shutdown-Circuit aktivieren, wenn OK
-					  system_out.MotorSDC = true;
 				  }
 
 				  // Pumpe, Vakuumpumpe, Bamocar einschalten
@@ -497,7 +497,6 @@ int main(void)
 			  {
 				  setState(Standby);
 
-				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -512,6 +511,9 @@ int main(void)
 			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
 			  {
 				  setState(Precharge);
+
+				  // Setze WS2812 LED auf Rot
+				  SetLED_color(1, WS2812_RED);
 			  }
 
 			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
@@ -519,7 +521,9 @@ int main(void)
 			  {
 				  setState(Standby);
 
-				  system_out.MotorSDC = false;
+				  // LED in Cockpit deaktivieren
+				  motor480.VorgluehenLED = false;
+
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -539,14 +543,17 @@ int main(void)
 
 					  setState(ReadyToDrive);
 
+					  // LED in Cockpit deaktivieren
 					  motor480.VorgluehenLED = false;
 
 					  timeStandby = millis();
 				  }
 				  else
 				  {
+					  // LED in Cockpit deaktivieren
+					  motor480.VorgluehenLED = false;
+
 					  mStrg_state.State = KL15;
-					  system_out.MotorSDC = false;
 					  sdc_in.Anlasser = false;
 				  }
 			  }
@@ -556,7 +563,6 @@ int main(void)
 			  {
 				  setState(Standby);
 
-				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -572,7 +578,7 @@ int main(void)
 			  {
 				  setState(Drive);
 
-				  SetLED_color(1, WS2812_RED);
+				  SetLED_color(1, WS2812_PURPLE);
 				  WS2812_update = 1;
 
 				  timeStandby = millis();
@@ -583,7 +589,6 @@ int main(void)
 			  {
 				  setState(Standby);
 
-				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 				  timeStandby = millis();
 			  }
@@ -620,9 +625,7 @@ int main(void)
 			  {
 				  setState(KL15);
 
-				  system_out.MotorSDC = false;
-
-				  SetLED_color(1, WS2812_GREEN);
+				  SetLED_color(1, WS2812_YELLOW);
 				  WS2812_update = 1;
 
 				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
@@ -640,7 +643,6 @@ int main(void)
 			  {
 				  setState(Standby);
 
-				  system_out.MotorSDC = false;
 				  sdc_in.Anlasser = false;
 
 				  SetLED_color(1, WS2812_GREEN);
@@ -839,6 +841,7 @@ void sortCAN(void)
 	CAN_Output_PaketListe[2].msg.buf[3] = sdc_in.sdcinput;
 	CAN_Output_PaketListe[2].msg.buf[4] = (komfort_in.komfortinput >> 8);
 	CAN_Output_PaketListe[2].msg.buf[5] = komfort_in.komfortinput;
+	CAN_Output_PaketListe[2].msg.buf[6] = (komfort_in.komfortinput >> 16);
 
 	// Analogeingaenge
 	CAN_Output_PaketListe[3].msg.buf[0] = ADC_VAL[4];

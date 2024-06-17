@@ -29,6 +29,7 @@
 #include "inputs.h"
 #include "Bamocar.h"
 #include "millis.h"
+#include "navi_console.h"
 #include "outputs.h"
 #include "pedale.h"
 #include "rtd_sound.h"

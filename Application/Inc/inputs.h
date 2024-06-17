@@ -87,9 +87,15 @@ typedef union
 		uint8_t GRA3 : 1;						// D						// Schalter GRA3, Lenkstockschalter Geschwindigkeitsregelanlage
 		uint8_t GRA4 : 1;						// E						// Schalter GRA4, Lenkstockschalter Geschwindigkeitsregelanlage
 		uint8_t Durchfluss : 1;					// F						// Signal Durchfluss, Durchflusssensor Wasserkreislauf
+		uint8_t Traffic : 1;					// 10						// Taster Traffic betaetigt
+		uint8_t Info : 1;						// 11						// Taster Info betaetigt
+		uint8_t Return : 1;						// 12						// Taster Return betaetigt
+		uint8_t Navi : 1;						// 13						// Taster Navi betaetigt
+		uint8_t  : 4;							// 14 - 17					// Bit 20 - 23 Frei
+		uint8_t  : 8;							// 18 - 1F					// Bit 24 - 31 Frei
 	};
 
-	uint16_t komfortinput;						// 2 Byte
+	uint32_t komfortinput;						// 4 Byte
 } komfort_in_tag;
 //----------------------------------------------------------------------
 

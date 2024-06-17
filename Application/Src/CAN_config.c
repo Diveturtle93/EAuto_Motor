@@ -31,7 +31,7 @@ void CAN_config(void)
 	// Nachrichten werden dauerhaft gesendet, solange Motorsteuergeraet nicht im Standby
 	CAN_Output_PaketListe[0] = CAN_Nachricht(MOTOR_CAN_SAFETY, 6, 100, 17, true);
 	CAN_Output_PaketListe[1] = CAN_Nachricht(MOTOR_CAN_DIGITAL_OUT, 6, 200, 13, true);
-	CAN_Output_PaketListe[2] = CAN_Nachricht(MOTOR_CAN_DIGITAL_IN, 6, 200, 14, true);
+	CAN_Output_PaketListe[2] = CAN_Nachricht(MOTOR_CAN_DIGITAL_IN, 7, 200, 14, true);
 	CAN_Output_PaketListe[3] = CAN_Nachricht(MOTOR_CAN_ANALOG_IN, 8, 500, 7, true);
 	CAN_Output_PaketListe[4] = CAN_Nachricht(MOTOR_CAN_DREHZAHL, 8, 20, 32, true);
 	CAN_Output_PaketListe[5] = CAN_Nachricht(MOTOR_CAN_LEUCHTEN, 8, 200, 65, true);
