@@ -10,11 +10,12 @@
 
 // Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
-#include "stdbool.h"
+
 //----------------------------------------------------------------------
 
 // Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
+#include "main.h"
 #include "git.h"
 #include "SystemInfo.h"
 #include "BasicUart.h"
@@ -91,6 +92,7 @@ void collectSoftwareInfo(void)
 	#define STRING_GIT_COMMIT				"\nGit Commit:\t\t\t"
 	#define STRING_GIT_BRANCH				"\nGit Branch:\t\t\t"
 	#define STRING_GIT_HASH					"\nGit Hash:\t\t\t"
+	#define STRING_GIT_TAGS					"\nGit Branch Tags:\t\t"
 	#define STRING_GIT_LAST_TAG				"\nGit letzter Tags:\t\t"
 	#define STRING_GIT_TAG_COMMIT			"\nGit Tags commit:\t\t"
 	#define STRING_GIT_TAG_DIRTY			"\nGit Dirty commit:\t\t"
@@ -107,6 +109,9 @@ void collectSoftwareInfo(void)
 	uartTransmit(GIT_HASH, sizeof(GIT_HASH));								// Git Hash anzeigen
 
 	uartTransmit("\n", 1);													// Leerzeile einfuegen
+
+	uartTransmit(STRING_GIT_TAGS, sizeof(STRING_GIT_TAGS));
+	uartTransmit(GIT_TAGS, sizeof(GIT_TAGS));								// Git alle Tags des Branch anzeigen
 
 	uartTransmit(STRING_GIT_LAST_TAG, sizeof(STRING_GIT_LAST_TAG));
 	uartTransmit(GIT_LAST_TAG, sizeof(GIT_LAST_TAG));						// Git letzten Tags anzeigen
@@ -133,15 +138,23 @@ void collectSoftwareInfo(void)
 //----------------------------------------------------------------------
 void collectMiddlewareInfo(void)
 {
-	#define STRING_CMSIS_VERSION			"\nCMSIS Version:\t\t\t"
+	#define STRING_CORTEX_CMSIS_VERSION		"\nCortex CMSIS Version:\t\t"
+	#define STRING_STM_CMSIS_VERSION		"\nSTM32F7 CMSIS Version:\t\t"
 	#define STRING_HAL_VERSION				"\nHAL Version:\t\t\t"
 	#define STRING_RTOS_CMSIS_VERSION		"\nRTOS CMSIS Version:\t\t"
 	#define STRING_RTOS_VERSION				"\nRTOS Version:\t\t\t"
 
-	uartTransmit(STRING_CMSIS_VERSION, sizeof(STRING_CMSIS_VERSION));
+	uartTransmit(STRING_CORTEX_CMSIS_VERSION, sizeof(STRING_CORTEX_CMSIS_VERSION));
 	uartTransmitNumber(__CM7_CMSIS_VERSION_MAIN, 10);						// CMSIS Version anzeigen
 	uartTransmit(".", 1);
 	uartTransmitNumber(__CM7_CMSIS_VERSION_SUB, 10);						// CMSIS Version anzeigen
+
+	uartTransmit(STRING_STM_CMSIS_VERSION, sizeof(STRING_STM_CMSIS_VERSION));
+	uartTransmitNumber(__STM32F7_CMSIS_VERSION_MAIN, 10);					// CMSIS Version anzeigen
+	uartTransmit(".", 1);
+	uartTransmitNumber(__STM32F7_CMSIS_VERSION_SUB1, 10);					// CMSIS Version anzeigen
+	uartTransmit(".", 1);
+	uartTransmitNumber(__STM32F7_CMSIS_VERSION_SUB2, 10);					// CMSIS Version anzeigen
 
 
 	uartTransmit(STRING_HAL_VERSION, sizeof(STRING_HAL_VERSION));			// Hal Version anzeigen
@@ -289,13 +302,9 @@ reset_reason readResetSource(void)
 //----------------------------------------------------------------------
 void printResetSource(reset_reason reset_flags)
 {
-	// Returns für Absatz nach Neustart.
-	uartTransmit("\r\r\r\r\r\r", 6);
-
-
-	if (reset_flags == STARTUP)											// Regulärer Start
+	if (reset_flags == STARTUP)												// Regulaerer Start
 	{
-		uartTransmit("Regular Start\r\n", 15);
+		uartTransmit("Regular Start\n", 15);
 	}
 	else
 	{
@@ -313,6 +322,7 @@ void printResetSource(reset_reason reset_flags)
 		{
 			uartTransmit("CPU Reset\n", 10);
 		}
+
 		if (reset_flags & BORST1)											// Brown out Reset
 		{
 			uartTransmit("Brown Out Reset\n", 16);

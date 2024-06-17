@@ -21,30 +21,20 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
+#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "SystemInfo.h"
-#include "BasicUart.h"
-#include "inputs.h"
-#include "outputs.h"
-#include "error.h"
-#include "Bamocar.h"
-#include "millis.h"
 #include "Motorsteuergeraet.h"
-#include "adc_inputs.h"
-#include "pedale.h"
-#include "DIS_Draw.h"
-#include "DIS_Comms.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 // TODO: OELDRUCKSCHALTER
-// FIXME: CAN Bus *(CAN-Bus braucht Ablaufprogramm)
+// FIXME: CAN Bus (CAN-Bus braucht Ablaufprogramm)
 // xxx: Schlechte Performance
 /* USER CODE END PTD */
 
@@ -61,34 +51,45 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int32_t temperature;
-CAN_RxHeaderTypeDef RxMessage, RxNav;
-uint8_t UART2_rxBuffer[12] = {0};
-uint8_t UART2_msg[12] = {0};
-uint8_t uart_count = 0;
-uint8_t RxData[8], RxDataNav[8];
-volatile uint8_t millisekunden_flag_1 = 0, can_change = 0;
-motor1_tag motor1;																	// Variable fuer Motor CAN-Nachricht 1 definieren
-motor2_tag motor2;																	// Variable fuer Motor CAN-Nachricht 2 definieren
-uint8_t reset = 0;
-uint8_t paused = 0;
+// Motorsteuergeraet Statevariable
+Motor_state mStrg_state = {{Start, true, false, false, false}};
+static uint32_t timeError = 0, timeWarning = 0;
+static uint32_t longerror = 0, longwarning = 0;
+
+// Fehler Speicher CAN-Bus
+uint8_t  can_online = 0;
+
+// Millisekunden Flag fuer PWM Task
+volatile uint8_t millisekunden_flag = 0;											// Flag fuer Millisekungen Timer Task
+
+// Motor CAN Variablen
+motor280_tag motor280;																// Daten der CAN-Nachricht 280
+//motor288_tag motor288;																// Daten der CAN-Nachricht 288
+//motor380_tag motor380;																// Daten der CAN-Nachricht 380
+//motor388_tag motor388;																// Daten der CAN-Nachricht 388
+motor480_tag motor480;																// Daten der CAN-Nachricht 480
+//motor488_tag motor488;																// Daten der CAN-Nachricht 488
+//motor580_tag motor580;																// Daten der CAN-Nachricht 580
+
+// ADC Array
+uint16_t ADC_VAL[10] = {0};
+
+// Mittelwert Gaspedal
+uint16_t gas_mean = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void checkSDC(void);
+void sortCAN(void);
+void setState(uint8_t State);
+void setStatus(uint8_t Status);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void startComms(void)
-{
-   // Start DIS Comms
-    initDIS();
-    claimScreen();
-    drawFrame();
-}
+
 /* USER CODE END 0 */
 
 /**
@@ -97,8 +98,29 @@ void startComms(void)
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
-	uint16_t ADC_VAL[10] = {0};
+	// Motorsteuergeraet Statemaschine Zeitvariablen
+	uint32_t timeStandby = 0, timeErrorLED = 0;
+
+	// Timer Task Variablen (PWM)
+	uint8_t task = 0;
+	uint16_t count = 0;
+
+	// Motorsteuergeraet CAN-Bus Zeitvariable, Errorvariable
+	uint32_t timeBAMO = 0, timeBMS = 0, timeStromHV = 0, timeStromLV = 0, timeKombi = 0;
+
+	// CAN-Bus Receive Message
+	CAN_message_t RxMessage;
+
+	// ADC Wert Gaspedal
+	uint16_t gas_adc = 0;
+
+	// WS2812 LED
+	uint8_t WS2812_update = 0;
+
+	// Anforderung BMS Status fuer Drive Modus
+	Motor_state BMS_State = {{Start, true, false, false, false}};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -108,101 +130,75 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-	// Definiere Variablen fuer Main-Funktion
-	uint8_t TxData[8], OutData[6] = {0}, InData[6] = {0}, AnalogData[8] = {0}, TempData[8] = {0};
-	uint8_t status, tmp[4], task = 0, TxRadioData[8] = {0};
-	uint16_t count = 0, gas_adc = 0, gas_mean = 0, nav_tmp = 1;
-  	uint32_t lastcan = 0, lastsendcan = 0;
-//  	uint8_t nav = 0, a_nav[8], nav_count = 0;
-
-  	// Erstelle Can-Nachrichten
-    // Sendenachricht erstellen
-  	CAN_TxHeaderTypeDef TxMessage = {0x123, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-	// Sendenachricht Motorsteuergeraet digitale Ausgaenge erstellen
-  	CAN_TxHeaderTypeDef TxOutput = {MOTOR_CAN_DIGITAL_OUT, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
-	// Sendenachricht Motorsteuergeraet digitale Eingaenge erstellen
-  	CAN_TxHeaderTypeDef TxInput = {MOTOR_CAN_DIGITAL_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
-	// Sendenachricht Motorsteuergeraet Motor1 erstellen
-  	CAN_TxHeaderTypeDef TxMotor1 = {MOTOR_CAN_DREHZAHL, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-  	// Sendenachricht Motorsteuergeraet an Bamocar erstellen
-  	CAN_TxHeaderTypeDef TxBamocar = {BAMOCAR_TX_ID, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
-  	// Sendenachricht Lenkgetriebe an Kombi erstellen, Simulation
-  	CAN_TxHeaderTypeDef TxLenkrad = {0x3D0, 0, CAN_RTR_DATA, CAN_ID_STD, 3, DISABLE};
-	// Sendenachricht Motorsteuergeraet analoge Eingaenge erstellen
-  	CAN_TxHeaderTypeDef TxAnalog = {MOTOR_CAN_ANALOG_IN, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-  	// Sendenachricht Motorsteuergeraet Temperatur Eingaenge erstellen
-  	CAN_TxHeaderTypeDef TxTemperatur = {MOTOR_CAN_TEMPERATUR, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-  	// Sendenachricht Navi
-//  	CAN_TxHeaderTypeDef TxNav = {0x6C0, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-  	CAN_TxHeaderTypeDef TxRadio = {0x661, 0, CAN_RTR_DATA, CAN_ID_STD, 8, DISABLE};
-//  	CAN_TxHeaderTypeDef TxRing = {0x436, 0, CAN_RTR_DATA, CAN_ID_STD, 6, DISABLE};
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  MX_USART2_UART_Init();
 
+#ifdef DEBUG
+	app_info();
+	HAL_Delay(3000);
+#endif
+
+	uartTransmit("Start\n", 6);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
-  MX_CAN3_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
-  MX_TIM6_Init();
   MX_CAN1_Init();
-  MX_CAN2_Init();
+  MX_TIM6_Init();
+  MX_TIM3_Init();
+  MX_CAN3_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // ITM HCLK
-  ITM_SendChar('H');
-  ITM_SendChar('a');
-  ITM_SendChar('l');
-  ITM_SendChar('l');
-  ITM_SendChar('o');
-  ITM_SendChar(' ');
-  	// Start Timer 6 Interrupt
-  	HAL_TIM_Base_Start_IT(&htim6);
-  	HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
+	SetLED_color(1, WS2812_ORANGE);
+	WS2812_Send_Wait();
 
-  	// Schreibe Resetquelle auf die Konsole
+	// Starte Timer 6 Interrupt
+	HAL_TIM_Base_Start_IT(&htim6);
+
+	leuchten_out.Anhaenger = true;
+	leuchten_out.Niveau = true;
+	HAL_GPIO_WritePin(ANHAENGER_GPIO_Port, ANHAENGER_Pin, leuchten_out.Anhaenger);
+	HAL_GPIO_WritePin(NIVEAU_OUT_GPIO_Port, NIVEAU_OUT_Pin, leuchten_out.Niveau);
+
 #ifdef DEBUG
-	printResetSource(readResetSource());
-
-  	// Teste serielle Schnittstelle
-  	#define TEST_STRING_UART	"\nUART2 Transmitting in polling mode, Hello Diveturtle93!\n"
-  	uartTransmit(TEST_STRING_UART, sizeof(TEST_STRING_UART));
-
-  	// Sammel Systeminformationen
-  	collectSystemInfo();
+	#define MAINWHILE			"\nStarte While Schleife\n"
+	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
 #endif
 
-	// Leds Testen
-  	testPCB_Leds();
-	testCockpit_Leds();
+	// CAN-Bus initialisieren
+	CANinit(RX_SIZE_16, TX_SIZE_16);
+	CAN_config();
 
-  	// Testen der Versorgungsspannung am Shutdown-Circuit
-  	testSDC();
+	for (uint8_t j = 0; j < ANZAHL_OUTPUT_PAKETE; j++)
+	{
+		CAN_Output_PaketListe[j].msg.buf[0] = 0;
+		CAN_Output_PaketListe[j].msg.buf[1] = 0;
+		CAN_Output_PaketListe[j].msg.buf[2] = 0;
+		CAN_Output_PaketListe[j].msg.buf[3] = 0;
+		CAN_Output_PaketListe[j].msg.buf[4] = 0;
+		CAN_Output_PaketListe[j].msg.buf[5] = 0;
+		CAN_Output_PaketListe[j].msg.buf[6] = 0;
+		CAN_Output_PaketListe[j].msg.buf[7] = 0;
+	}
 
-  	// Alle Fehler Cockpit loeschen
-  	cockpit_default();
+	// Wenn Tischaufbau dann CAN-Nachricht fuer Lenkung senden
+#if TISCHAUFBAU == 1
+	CAN_Output_PaketListe[9].msg.buf[0] = 0;
+	CAN_Output_PaketListe[9].msg.buf[1] = 1;
+#endif
 
-  	// Lese alle Eingaenge
-  	readall_inputs();
+	SetLED_color(1, WS2812_GREEN);
+	WS2812_update = 1;
 
-    // Sendenachricht 0x123 mit Dummy-Daten fuellen
-  	for (uint8_t j = 0; j < 8; j++)
-  		TxData[j] = (j + 1);
-
-  	// Starte While-Schleife
-#define MAINWHILE				"\nStarte While Schleife\n"
-  	uartTransmit(MAINWHILE, sizeof(MAINWHILE));
-
-  	startComms();
-  	drawFrame();
-
+	setState(Ready);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -212,241 +208,522 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  	switch (UART2_msg[0])
-	  	{
-	  		case 1:
-				HAL_UART_Transmit(&huart2, (uint8_t*)"\nSystem Reset\r\n", 15, 100);
-				NVIC_SystemReset();
-			break;
-	  		case 2:
-	  			UART2_msg[0] = 0;
-	  			nav_tmp = 1;
-	  			startComms();
-	  			drawFrame();
-			break;
-	  		case 3:
-	  			UART2_msg[0] = 0;
-	  			nav_tmp = 0;
-			break;
-			default:
-			break;
-		}
+	  // Alle Eingaenge einlesen
+	  readall_inputs();
 
+	  // Alle ADC einlesen
+	  ADC_VAL[0] = ADC_Bremsdruck();
+	  ADC_VAL[1] = ADC_Bremsdrucktemperatur();
+	  ADC_VAL[2] = ADC_STMTemperatur();
+	  ADC_VAL[3] = ADC_PCBTemperatur();
+	  ADC_VAL[4] = ADC_KL15();
+	  ADC_VAL[5] = ADC_Klimaflap();
+	  ADC_VAL[6] = ADC_Info();
+	  ADC_VAL[7] = ADC_Return();
+	  ADC_VAL[8] = ADC_Kuhlwassertemperatur();
+	  ADC_VAL[9] = ADC_Gaspedal();
 
-	  	// Task wird jede Millisekunde ausgefuehrt
-		if (millisekunden_flag_1 == 1)
-		{
-			count++;																	// Zaehler count hochzaehlen
-			millisekunden_flag_1 = 0;													// Setze Millisekunden-Flag zurueck
+	  // Sortiere CAN-Daten auf CAN-Buffer
+	  sortCAN();
 
-			// Setze Flag start, nur wenn millisekunden Flag gesetzt war
-			task = 1;
-		}
+	  // Lese CAN-Nachrichten ein
+	  if (CAN_available() >= 1)
+	  {
+		  CANread(&RxMessage);
 
-		// PWM Oelstandsensor Kombiinstrument ausgeben
-		pwm_oelstand(count);
-
-		// Task wird alle 20 Millisekunden ausgefuehrt
-		if (((count % 20) == 0) && (task == 1))
-		{
-			// Sende Nachricht Motor1
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxMotor1, motor1.output, (uint32_t *)CAN_TX_MAILBOX0);
-			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			tmp[0] = 0;
-			tmp[1] = 1;
-
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxLenkrad, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-		}
-
-		// Task wird alle 100 Millisekunden ausgefuehrt
-		if (((count % 100) == 0) && (task == 1))
-		{
-			// alle Inputs einlesen
-			readall_inputs();
-
-			// Anlasser abfragen
-			readAnlasser();
-
-			// Bremse pruefen
-			readBrake();
-
-			// Gaspedal pruefen
-			gas_adc = readTrottle();
-
-			// Abfrage ob Mittelwertbildung
-			if (gas_adc > 0)															// Wenn Gaspedal Plausible dann Mittelwertbildung
-			{
-				// Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
-				// Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
-				gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
-			}
-			else																		// Wenn Gaspedal unplausible oder Kupplung getreten
-			{
-				gas_mean = 0;
-			}
-
-			// Daten in Bamocarformat umwandeln
-			tmp[0] = 0x90;
-			tmp[1] = (gas_mean);
-			tmp[2] = ((gas_mean) >> 8);
-
-			// Drehmoment an Bamocar senden
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-
-			if (nav_tmp == 1)
-			{
-				drawFrame();
-			}
-		}
-
-		// Task wird alle 200 Millisekunden ausgefuehrt
-		if (((count % 200) == 0) && (task == 1))
-		{
-			// Daten fuer Ausgaenge zusammenfuehren
-			OutData[0] = system_out.systemoutput;
-			OutData[1] = highcurrent_out.high_out;
-			OutData[2] = (leuchten_out.ledoutput >> 8);
-			OutData[3] = leuchten_out.ledoutput;
-			OutData[4] = komfort_out.komfortoutput;
-			OutData[5] ++;
-
-			// Sende Nachricht digitale Ausgaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxOutput, OutData, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-
-			// ADC-Werte einlesen Bremse und Temperaturen
-			ADC_VAL[0] = ADC_Bremsdruck();
-			ADC_VAL[1] = ADC_Bremsdrucktemperatur();
-			ADC_VAL[2] = ADC_STMTemperatur();
-			ADC_VAL[3] = ADC_PCBTemperatur();
-
-			// Daten fuer Eingaenge zusammenfuehren
-			InData[0] ++;
-			InData[1] = (system_in.systeminput >> 8);
-			InData[2] = system_in.systeminput;
-			InData[3] = sdc_in.sdcinput;
-			InData[4] = (komfort_in.komfortinput >> 8);
-			InData[5] = komfort_in.komfortinput;
-
-			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			// Sende Nachricht digitale Eingaenge
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxInput, InData, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-
-			// ADC-Werte einlesen Navi, Klima, KL15
-			ADC_VAL[4] = ADC_KL15();
-			ADC_VAL[5] = ADC_Klimaflap();
-			ADC_VAL[6] = ADC_Info();
-			ADC_VAL[7] = ADC_Return();
-
-			// ADC-Werte umwandeln
-			AnalogData[0] = ADC_VAL[4];
-			AnalogData[1] = (ADC_VAL[4] >> 8) | (ADC_VAL[0] << 4);
-			AnalogData[2] = (ADC_VAL[0] >> 4);
-			AnalogData[3] = ADC_VAL[6];
-			AnalogData[4] = (ADC_VAL[6] >> 8) | (ADC_VAL[7] << 4);
-			AnalogData[5] = (ADC_VAL[7] >> 4);
-			AnalogData[6] = ADC_VAL[5];
-			AnalogData[7] = (ADC_VAL[5] >> 8);
-
-			// Bamocar Fehler auslesen
-//			tmp[0] = 0x3D;
-//			tmp[1] = 0x8F;
-//			tmp[2] = 0x00;
-
-//			// Befehl Fehler auslesen an Bamocar senden
-//			status = HAL_CAN_AddTxMessage(&hcan3, &TxBamocar, tmp, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-
-			// ADC-Werte einlesen Kuehlwassertemperatur
-			ADC_VAL[8] = ADC_Kuhlwassertemperatur();
-
-			// ADC-Werte umwandeln
-			TempData[0] = ADC_VAL[2];
-			TempData[1] = (ADC_VAL[2] >> 8) | (ADC_VAL[3] << 4);
-			TempData[2] = (ADC_VAL[3] >> 4);
-			TempData[3] = ADC_VAL[8];
-			TempData[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
-			TempData[5] = (ADC_VAL[1] >> 4);
-
-			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			// Befehl Fehler auslesen an Bamocar senden
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxTemperatur, TempData, (uint32_t *)CAN_TX_MAILBOX0);
-			while (HAL_CAN_IsTxMessagePending(&hcan3, CAN_TX_MAILBOX0) == 1);
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxAnalog, AnalogData, (uint32_t *)CAN_TX_MAILBOX0);
-		}
-
-		if (((count % 400) == 0) && (task == 1))
-		{
-			TxRadioData[0] = 0x83;
-			TxRadioData[1] = 0x01;
-			TxRadioData[2] = 0x12;
-			TxRadioData[3] = 0xA0;
-
-			// Navi Meldung
-			//while (HAL_CAN_IsTxMessagePending(&hcan2, CAN_TX_MAILBOX0) == 1);
-			//status = HAL_CAN_AddTxMessage(&hcan2, &TxRadio, TxRadioData, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-
-			// Variable count auf 0 zuruecksetzen
-			count = 0;
-		}
-
-		// Zuruecksetzen Flag start
-		task = 0;
-
-
-	  	// Task wird alle 5 Millisekunden ausgefuehrt
-	  	if (millis() - lastcan >= 5)
-		{
-			// Wenn Nachricht ueber den CAN-Bus empfangen wurden
-			if (can_change == 1)
-			{
-				// Nachricht ID ueber UART ausgeben
-				uartTransmitNumber(RxMessage.StdId, 16);
-				uartTransmit("\t", 1);
-				for (uint8_t i = 0; i < RxMessage.DLC; i++)
-				{
-					uartTransmitNumber(RxData[i], 16);
-				}
-				uartTransmit("\n", 1);
-
-				// Sortieren der IDs nach Geraeten
-				switch (RxMessage.StdId)
-				{
-					case BAMOCAR_RX_ID:
-						BAMOCAN_ID(&RxData[0], RxMessage.DLC);
-						break;
-					case 0x111:
-						uartTransmit("CAN-ID Computer config\n", 23);
-						break;
-					default:
-						uartTransmit("CAN-ID nicht verfuegbar\n", 24);
-						break;
-				}
-
-				// Drehzahl ausgeben
-				TxData[2] = motor1.output[2];
-				TxData[3] = motor1.output[3];
-				lastcan = millis();
-
-				can_change = 0;
-			}
-		}
-
-#ifdef DEBUG
-		// Sende CAN Nachricht auf CAN-Bus / Teste CAN-BUS
-		if (millis() - lastsendcan >= 1000)
-		{
-			status = HAL_CAN_AddTxMessage(&hcan3, &TxMessage, TxData, (uint32_t *)CAN_TX_MAILBOX0);
-			//hal_error(status);
-			lastsendcan = millis();
-
-			HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
-		}
+		  switch (RxMessage.id)
+		  {
+#if BAMOCAR_AVAILIBLE == 1
+			  // Bamocar ID
+			  case BAMOCAR_CAN_RX:
+			  {
+				  can_online |= (1 << 0);
+				  timeBAMO = millis();
+				  BAMOCAN_ID(&RxMessage.buf[0], RxMessage.len);
+				  break;
+			  }
 #endif
+
+#if BMS_AVAILIBLE == 1
+			  // Batteriemanagement Status ID
+			  case BMS_CAN_STATUS:
+			  {
+				  BMS_State.status = RxMessage.buf[0];
+
+				  timeBMS = millis();
+				  can_online |= (1 << 1);
+				  break;
+			  }
+#endif
+
+#if STROM_HV_AVAILIBLE == 1
+			  // Stromsensor
+			  case STROM_HV_CAN_I:
+			  {
+				  can_online |= (1 << 2);
+				  timeStromHV = millis();
+				  break;
+			  }
+#endif
+
+#if STROM_LV_AVAILIBLE == 1
+			  // Stromsensor
+			  case STROM_LV_CAN_I:
+			  {
+				  can_online |= (1 << 3);
+				  timeStromHV = millis();
+				  break;
+			  }
+#endif
+
+#if KOMBIINSTRUMENT_AVAILIBLE == 1
+			  // Stromsensor
+			  case KOMBI2_CAN:
+			  {
+				  can_online |= (1 << 4);
+				  timeKombi = millis();
+
+				  setStatus(StateNormal);
+
+				  break;
+			  }
+#endif
+
+			  // Alle anderen Pakete laufen in leere und werden ignoriert
+			  default:
+			  {
+				  break;
+			  }
+		  }
+	  }
+
+#if BAMOCAR_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
+	  if ((mStrg_state.State > Ready) && (millis() > (timeBAMO + CAN_TIMEOUT)))
+	  {
+		  can_online &= ~(1 << 0);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
+	  }
+#endif
+
+#if BMS_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
+	  if ((mStrg_state.State > Ready) && (millis() > (timeBMS + CAN_TIMEOUT)))
+	  {
+		  can_online &= ~(1 << 1);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
+	  }
+#endif
+
+#if STROM_HV_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
+	  if ((mStrg_state.State > Ready) && (millis() > (timeStromHV + CAN_TIMEOUT)))
+	  {
+		  can_online &= ~(1 << 2);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
+	  }
+#endif
+
+#if STROM_LV_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
+	  if ((mStrg_state.State > Ready) && (millis() > (timeStromLV + CAN_TIMEOUT)))
+	  {
+		  can_online &= ~(1 << 3);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
+	  }
+#endif
+
+#if KOMBIINSTRUMENT_AVAILIBLE == 1
+	  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
+	  if ((mStrg_state.State > Ready) && (millis() > (timeKombi + CAN_TIMEOUT)))
+	  {
+		  can_online &= ~(1 << 4);
+		  longwarning |= (1 << 0);
+
+		  setStatus(StateWarning);
+	  }
+#endif
+
+	  // PWM Oelstandsensor Kombiinstrument ausgeben
+	  pwm_oelstand(count);
+
+	  // Task wird jede Millisekunde ausgefuehrt
+	  if (millisekunden_flag == 1)
+	  {
+		  count++;																	// Zaehler count hochzaehlen
+		  millisekunden_flag = 0;													// Setze Millisekunden-Flag zurueck
+
+		  // Setze Flag start, nur wenn millisekunden Flag gesetzt war
+		  task = 1;
+	  }
+
+	  // Zuruecksetzen der Countervariable fuer pwm_Oelstand
+	  if (((count % 400) == 0) && (task == 1))
+	  {
+		  // Variable count auf 0 zuruecksetzen
+		  count = 0;
+	  }
+
+	  // Crash Ausgeloest
+	  if (system_in.Crash != 1)
+	  {
+		  setStatus(CriticalError);
+	  }
+
+	  // Wenn Statemaschine nicht im Standby ist
+	  if (mStrg_state.State != Standby)
+	  {
+		  // Schreibe alle CAN-NAchrichten auf BUS, wenn nicht im Standby
+		  CANwork();
+
+		  // Shutdown-Circuit checken
+		  checkSDC();
+	  }
+
+	  // Statemaschine keine Fehler
+	  if (mStrg_state.Normal)
+	  {
+		  leuchten_out.RedLed = false;
+		  leuchten_out.GreenLed = true;
+
+		  motor480.MotorLED = false;
+	  }
+
+	  // Statemaschine hat Warnungen
+	  if (mStrg_state.Warning)
+	  {
+		  if (millis() - timeErrorLED > 1000)
+		  {
+			  leuchten_out.RedLed = !leuchten_out.RedLed;
+
+			  motor480.MotorLED = !motor480.MotorLED;
+			  timeErrorLED = millis();
+		  }
+
+		  leuchten_out.GreenLed = true;
+	  }
+
+	  // Statemaschine hat Fehler
+	  if (mStrg_state.Error)
+	  {
+		  if (millis() - timeErrorLED > 1000)
+		  {
+			  leuchten_out.RedLed = !leuchten_out.RedLed;
+			  timeErrorLED = millis();
+		  }
+
+		  leuchten_out.GreenLed = false;
+
+		  motor480.MotorLED = true;
+	  }
+
+	  // Statemaschine hat Kritische Fehler
+	  if (mStrg_state.CriticalError)
+	  {
+		  leuchten_out.RedLed = true;
+		  leuchten_out.Ladeleuchte = false;
+		  leuchten_out.GreenLed = false;
+
+		  motor480.MotorLED = true;
+
+		  system_out.MotorSDC = false;
+	  }
+
+	  // Statemaschine von Motorsteuergeraet
+	  switch (mStrg_state.State)
+	  {
+		  // State Ready, Vorbereiten des Motorsteuergeraetes
+		  case Ready:
+		  {
+			  // LEDs testen
+			  uartTransmit("Testen der PCB und Cockpit LEDs\n", 32);
+			  testPCB_Leds();
+			  testCockpit_Leds();
+
+			  // Testen der Versorgungsspannung am Shutdown Circuit
+			  uartTransmit("Testen der SDC-Sicherung\n", 25);
+			  //testSDC();
+
+			  // Alle Fehler am Cockpit loeschen
+			  uartTransmit("Cockpit LEDs standardmaessig ausschalten\n", 41);
+			  cockpit_default();
+
+			  timeBMS = millis();
+			  timeBAMO = millis();
+			  timeStromHV = millis();
+			  timeStromLV = millis();
+			  timeKombi = millis();
+
+			  setState(KL15);
+
+			  break;
+		  }
+
+		  // State KL15, wenn Schluessel auf Position 2, KL15 einschalten
+		  case KL15:
+		  {
+			  // Wenn Schluessel auf Position 3 geschaltet wird, nur einmal moeglich
+			  if ((system_in.Anlasser != 1) || ((sdc_in.Anlasser == 1) && (komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000))))
+			  {
+				  // Solange kein kritischer Fehler auftritt
+				  if (!(mStrg_state.CriticalError))
+				  {
+					  setState(Anlassen);
+
+					  // Anlasser Zustand abspeichern
+					  sdc_in.Anlasser = true;
+
+					  // LED in Cockpit aktivieren
+					  motor480.VorgluehenLED = true;
+
+					  // Motor Shutdown-Circuit aktivieren, wenn OK
+					  system_out.MotorSDC = true;
+				  }
+
+				  // Pumpe, Vakuumpumpe, Bamocar einschalten
+				  // system_out.Gluehkerzen = 1;
+			  }
+
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
+			  if (system_in.KL15 == 1)
+			  {
+				  setState(Standby);
+
+				  system_out.MotorSDC = false;
+				  sdc_in.Anlasser = false;
+				  timeStandby = millis();
+			  }
+
+			  break;
+		  }
+
+		  // State Anlassen, wenn Schluessel auf Position 3 und keine kritischen Fehler, Anlasser einschalten
+		  case Anlassen:
+		  {
+			  // Kupplung und Bremse getreten
+			  if ((system_in.Kupplung != 1) && (system_in.BremseNO != 1) && (system_in.BremseNC == 1))
+			  {
+				  setState(Precharge);
+			  }
+
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
+			  if (system_in.KL15 == 1)
+			  {
+				  setState(Standby);
+
+				  system_out.MotorSDC = false;
+				  sdc_in.Anlasser = false;
+				  timeStandby = millis();
+			  }
+
+			  break;
+		  }
+
+		  // State Precharge, wenn Bremse beim Anlassen oder danach getreten ist
+		  case Precharge:
+		  {
+			  // Abfrage Shutdown-Circuit
+			  if ((sdc_in.SDC0 != 1) && (sdc_in.BTB_SDC != 1) && (sdc_in.AkkuSDC != 1))
+			  {
+				  // ReadyToDrive Sound abspielen und warten, ob abgeschlossen werden kann
+				  if (playRTDS() == true)
+				  {
+
+					  setState(ReadyToDrive);
+
+					  motor480.VorgluehenLED = false;
+
+					  timeStandby = millis();
+				  }
+				  else
+				  {
+					  mStrg_state.State = KL15;
+					  system_out.MotorSDC = false;
+					  sdc_in.Anlasser = false;
+				  }
+			  }
+
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
+			  if (system_in.KL15 == 1)
+			  {
+				  setState(Standby);
+
+				  system_out.MotorSDC = false;
+				  sdc_in.Anlasser = false;
+				  timeStandby = millis();
+			  }
+
+			  break;
+		  }
+
+		  // State ReadyToDrive, wenn SDC Ok ist und Vorgeladen wurde
+		  case ReadyToDrive:
+		  {
+			  // Bei Tasterbetaetigung umschalten in Drive Modus
+			  if (((BMS_State.State == ReadyToDrive) || (BMS_State.State == Drive)) && (komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
+			  {
+				  setState(Drive);
+
+				  SetLED_color(1, WS2812_RED);
+				  WS2812_update = 1;
+
+				  timeStandby = millis();
+			  }
+
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
+			  if (system_in.KL15 == 1)
+			  {
+				  setState(Standby);
+
+				  system_out.MotorSDC = false;
+				  sdc_in.Anlasser = false;
+				  timeStandby = millis();
+			  }
+
+			  break;
+		  }
+
+		  // State Drive, wenn Fahrmodus manuel aktiviert wird
+		  case Drive:
+		  {
+			   gas_adc = readTrottle(ADC_VAL[9]);
+
+			  // Abfrage ob Mittelwertbildung
+			  if (gas_adc > 0)														// Wenn Gaspedal Plausible dann Mittelwertbildung
+			  {
+				  // Mittelwert bilden (https://nestedsoftware.com/2018/03/20/calculating-a-moving-average-on-streaming-data-5a7k.22879.html)
+				  // Mittelwertbildung aus 10 Werten (Weniger die 10 verkleineren, Mehr die 10 vergroeßern)
+				  gas_mean = (gas_mean + ((gas_adc - gas_mean)/10));
+			  }
+			  else																	// Wenn Gaspedal unplausible oder Kupplung getreten
+			  {
+				  gas_mean = 0;
+			  }
+
+			  // Todo: Wenn Drehzahl zu hoch dann Fehler Cockpit (Oelstand, Bremse)
+			  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
+			  CAN_Output_PaketListe[8].msg.buf[1] = gas_mean;
+			  CAN_Output_PaketListe[8].msg.buf[2] = (gas_mean >> 8);
+			  CAN_Output_PaketListe[8].allowed = true;
+
+			  motor280.Drehzahl = (gas_mean * 5);
+
+			  if ((komfort_in.ASR1 == 1) && (millis() > (timeStandby + 3000)))
+			  {
+				  setState(KL15);
+
+				  system_out.MotorSDC = false;
+
+				  SetLED_color(1, WS2812_GREEN);
+				  WS2812_update = 1;
+
+				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
+				  CAN_Output_PaketListe[8].msg.buf[1] = 0;
+				  CAN_Output_PaketListe[8].msg.buf[2] = 0;
+				  CAN_Output_PaketListe[8].allowed = false;
+
+				  motor280.Drehzahl = 0;
+
+				  timeStandby = millis();
+			  }
+
+			  // Falls KL15 abfaellt und der Schluessel abgezogen wird
+			  if (system_in.KL15 == 1)
+			  {
+				  setState(Standby);
+
+				  system_out.MotorSDC = false;
+				  sdc_in.Anlasser = false;
+
+				  SetLED_color(1, WS2812_GREEN);
+				  WS2812_update = 1;
+
+				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
+				  CAN_Output_PaketListe[8].msg.buf[1] = 0;
+				  CAN_Output_PaketListe[8].msg.buf[2] = 0;
+				  CAN_Output_PaketListe[8].allowed = false;
+
+				  motor280.Drehzahl = 0;
+
+				  timeStandby = millis();
+			  }
+
+			  break;
+		  }
+
+		  // State Standby, wenn Schluessel gezogen wird, KL15 ausschalten
+		  case Standby:
+		  {
+			  // Gluehkerzenrelais nach 1min abschalten, erst nach der Pumpe moeglich
+			  if ((highcurrent_out.Pumpe_Kuhlung == false) && (millis() > (timeStandby + PUMPTIME + 1000)))
+			  {
+				  system_out.Gluehkerzen = false;
+			  }
+
+			  // Pumpe nach 1min abschalten
+			  if ((highcurrent_out.Pumpe_Kuhlung == true) && (millis() > (timeStandby + PUMPTIME)))
+			  {
+				  highcurrent_out.Pumpe_Kuhlung = false;
+			  }
+
+			  // Fuer 5min warten und mStrg weiterhin aktiv halten
+			  if (millis() > (timeStandby + MOTORTIME))
+			  {
+				  setState(Ausschalten);
+			  }
+			  // Falls innerhalb der 5min die KL15 wieder aktiviert wird
+			  else if (system_in.KL15 != 1)
+			  {
+				  setState(Ready);
+			  }
+
+			  break;
+		  }
+
+		  // State Ausschalten, wenn Standby State laenger als 5min dauert
+		  case Ausschalten:
+		  {
+			  // Alle Ausgaenge ausschalten
+			  system_out.systemoutput = 0;
+			  highcurrent_out.high_out = 0;
+			  leuchten_out.ledoutput = 0;
+			  komfort_out.komfortoutput = 0;
+			  sdc_in.sdcinput = 0;
+
+			  break;
+		  }
+
+		  // Falls kein State zutrifft, dann Kritischer Fehler
+		  default:
+		  {
+			  setStatus(CriticalError);
+			  uartTransmit("mStrg Kritischer Fehler While\n!", 30);
+
+			  break;
+		  }
+	  }
+
+	  // Schreibe WS2812
+	  if (WS2812_update == 1)
+	  {
+		  // Wenn Schreiben moeglich
+		  if (WS2812_Send() == 1)
+		  {
+			  // Solange keine neuen Daten, kein Senden notwendig
+			  WS2812_update = 0;
+		  }
+	  }
+
+	  // Alle Ausgaenge schreiben
+	  writeall_outputs();
   }
   /* USER CODE END 3 */
 }
@@ -505,79 +782,234 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-// Interrupts
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+// Checke Shutdown-Circuit
+void checkSDC(void)
 {
-	HAL_UART_Transmit(&huart2, &UART2_rxBuffer[uart_count], 1, 100);
+	sdc_in.SDC_OK = true;
 
-	if (UART2_rxBuffer[uart_count] == 0x7F)
+	if (((mStrg_state.State == Precharge) || (mStrg_state.State == ReadyToDrive) || (mStrg_state.State == Drive)) && sdc_in.SDC0 == 1)
 	{
-		uart_count--;
-	}
-	else
-	{
-		uart_count++;
-	}
+		setStatus(StateError);
+		longerror |= (1 << 0);
 
-	if (UART2_rxBuffer[uart_count-1] == '\r')
-	{
-		HAL_UART_Transmit(&huart2, (uint8_t*)"\nEingabe OK\r\n", 13, 100);
-		if (UART2_rxBuffer[0] == 'R' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'S')
-		{
-			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
-			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
-			HAL_UART_Transmit(&huart2, c, 10, 100);
-			UART2_msg[0] = 1;
-		}
-		else if (UART2_rxBuffer[0] == 'N' && UART2_rxBuffer[1] == 'A' && UART2_rxBuffer[2] == 'V')
-		{
-			uartTransmit("Display Nav\r\n", 13);
-			UART2_msg[0] = 2;
-		}
-		else if (UART2_rxBuffer[0] == 'T' && UART2_rxBuffer[1] == 'E' && UART2_rxBuffer[2] == 'L')
-		{
-			uartTransmit("Display Tel\r\n", 13);
-			UART2_msg[0] = 3;
-		}
-		else
-		{
-			uint8_t c[10] = {204, 205, 205, 205, 205, 205, 205, 205, 205, 185};
-			HAL_UART_Transmit(&huart2, (uint8_t*)"\a", 1, 100);
-			HAL_UART_Transmit(&huart2, c, 10, 100);
-			uartTransmit("Falsche Eingabe\r\n", 17);
-		}
-		uart_count = 0;
+		sdc_in.SDC_OK = false;
 	}
 
-	if (uart_count == 12)
+#if BAMOCAR_AVAILIBLE == 1
+	if (sdc_in.BTB_SDC == 1)
 	{
-		uint8_t tmp = 0x81;
-		HAL_UART_Transmit(&huart2, (uint8_t*) "\r\nEingabe Ung", 13, 100);
-		HAL_UART_Transmit(&huart2, &tmp, 1, 100);
-		HAL_UART_Transmit(&huart2, (uint8_t*) "ltig\r\n", 6, 100);
-		uart_count = 0;
-	}
-    HAL_UART_Receive_IT(&huart2, &UART2_rxBuffer[uart_count], 1);
-}
+		setStatus(StateError);
+		longerror |= (1 << 1);
 
-// Can-Interrupt: Nachricht wartet
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
-{
-	if (hcan == &hcan2)
+		sdc_in.SDC_OK = false;
+	}
+#endif
+
+#if BMS_AVAILIBLE == 1
+	if (sdc_in.AkkuSDC == 1)
 	{
-		// Nachricht aus Speicher auslesen
-		//HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxMessage, RxData);
-		can_change = 1;
+		setStatus(StateError);
+		longerror |= (1 << 2);
+
+		sdc_in.SDC_OK = false;
+	}
+#endif
+
+	if (sdc_in.SDC_OK == true)
+	{
+		setStatus(StateNormal);
 	}
 }
 
-// Can-Interrupt: Fifo0 ist voll
-void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
+// Sortiere CAN Daten
+void sortCAN(void)
 {
-	// Fifo0 voll
-	uartTransmit("Fifo0 von CAN3 ist voll\n", 24);
+	// Digital-Ausgaenge
+	CAN_Output_PaketListe[1].msg.buf[0] = system_out.systemoutput;
+	CAN_Output_PaketListe[1].msg.buf[1] = highcurrent_out.high_out;
+	CAN_Output_PaketListe[1].msg.buf[2] = (leuchten_out.ledoutput >> 8);
+	CAN_Output_PaketListe[1].msg.buf[3] = leuchten_out.ledoutput;
+	CAN_Output_PaketListe[1].msg.buf[4] = komfort_out.komfortoutput;
+	CAN_Output_PaketListe[1].msg.buf[5] = 0;
 
-	Error_Handler();
+	// Digital-Eingaenge
+	CAN_Output_PaketListe[2].msg.buf[0] = 0;
+	CAN_Output_PaketListe[2].msg.buf[1] = (system_in.systeminput >> 8);
+	CAN_Output_PaketListe[2].msg.buf[2] = system_in.systeminput;
+	CAN_Output_PaketListe[2].msg.buf[3] = sdc_in.sdcinput;
+	CAN_Output_PaketListe[2].msg.buf[4] = (komfort_in.komfortinput >> 8);
+	CAN_Output_PaketListe[2].msg.buf[5] = komfort_in.komfortinput;
+
+	// Analogeingaenge
+	CAN_Output_PaketListe[3].msg.buf[0] = ADC_VAL[4];
+	CAN_Output_PaketListe[3].msg.buf[1] = (ADC_VAL[4] >> 8) | (ADC_VAL[0] << 4);
+	CAN_Output_PaketListe[3].msg.buf[2] = (ADC_VAL[0] >> 4);
+	CAN_Output_PaketListe[3].msg.buf[3] = gas_mean;
+	CAN_Output_PaketListe[3].msg.buf[4] = (gas_mean >> 8) | (ADC_VAL[6] << 4);
+	CAN_Output_PaketListe[3].msg.buf[5] = (ADC_VAL[6] >> 4);
+	CAN_Output_PaketListe[3].msg.buf[6] = ADC_VAL[7];
+	CAN_Output_PaketListe[3].msg.buf[7] = (ADC_VAL[7] >> 8);
+
+	// Motor 280
+	CAN_Output_PaketListe[4].msg.buf[0] = motor280.motor280output[0];
+	CAN_Output_PaketListe[4].msg.buf[1] = motor280.motor280output[1];
+	CAN_Output_PaketListe[4].msg.buf[2] = motor280.motor280output[2];
+	CAN_Output_PaketListe[4].msg.buf[3] = motor280.motor280output[3];
+	CAN_Output_PaketListe[4].msg.buf[4] = motor280.motor280output[4];
+	CAN_Output_PaketListe[4].msg.buf[5] = motor280.motor280output[5];
+	CAN_Output_PaketListe[4].msg.buf[6] = motor280.motor280output[6];
+	CAN_Output_PaketListe[4].msg.buf[7] = motor280.motor280output[7];
+
+	// Motor 480
+	CAN_Output_PaketListe[5].msg.buf[0] = motor480.motor480output[0];
+	CAN_Output_PaketListe[5].msg.buf[1] = motor480.motor480output[1];
+	CAN_Output_PaketListe[5].msg.buf[2] = motor480.motor480output[2];
+	CAN_Output_PaketListe[5].msg.buf[3] = motor480.motor480output[3];
+	CAN_Output_PaketListe[5].msg.buf[4] = motor480.motor480output[4];
+	CAN_Output_PaketListe[5].msg.buf[5] = motor480.motor480output[5];
+	CAN_Output_PaketListe[5].msg.buf[6] = motor480.motor480output[6];
+	CAN_Output_PaketListe[5].msg.buf[7] = motor480.motor480output[7];
+
+	// Temperatureingaenge
+	CAN_Output_PaketListe[6].msg.buf[0] = ADC_VAL[2];
+	CAN_Output_PaketListe[6].msg.buf[1] = (ADC_VAL[2] >> 8) | (ADC_VAL[3] << 4);
+	CAN_Output_PaketListe[6].msg.buf[2] = (ADC_VAL[3] >> 4);
+	CAN_Output_PaketListe[6].msg.buf[3] = ADC_VAL[8];
+	CAN_Output_PaketListe[6].msg.buf[4] = (ADC_VAL[8] >> 8) | (ADC_VAL[1] << 4);
+	CAN_Output_PaketListe[6].msg.buf[5] = (ADC_VAL[1] >> 4);
+	CAN_Output_PaketListe[6].msg.buf[6] = ADC_VAL[5];
+	CAN_Output_PaketListe[6].msg.buf[7] = (ADC_VAL[5] >> 8);
+
+	// Motor Status
+	CAN_Output_PaketListe[7].msg.buf[0] = mStrg_state.status;
+	CAN_Output_PaketListe[7].msg.buf[1] = longwarning;
+	CAN_Output_PaketListe[7].msg.buf[2] = longerror;
+	CAN_Output_PaketListe[7].msg.buf[3] = can_online;
+}
+
+// Set Statemaschine
+void setState(uint8_t State)
+{
+	switch (State)
+	{
+		case Ready:
+		{
+			mStrg_state.State = Ready;
+			uartTransmit("Ready\n", 6);
+
+			break;
+		}
+		case KL15:
+		{
+			mStrg_state.State = KL15;
+			uartTransmit("KL15\n", 5);
+
+			break;
+		}
+		case Anlassen:
+		{
+			mStrg_state.State = Anlassen;
+			uartTransmit("Anlassen\n", 9);
+
+			break;
+		}
+		case Precharge:
+		{
+			mStrg_state.State = Precharge;
+			uartTransmit("Precharge\n", 10);
+
+			break;
+		}
+		case ReadyToDrive:
+		{
+			mStrg_state.State = ReadyToDrive;
+			uartTransmit("ReadyToDrive\n", 13);
+
+			break;
+		}
+		case Drive:
+		{
+			mStrg_state.State = Drive;
+			uartTransmit("Drive\n", 6);
+
+			break;
+		}
+		case Standby:
+		{
+			mStrg_state.State = Standby;
+			uartTransmit("Standby\n", 8);
+
+			break;
+		}
+		case Ausschalten:
+		{
+			mStrg_state.State = Ausschalten;
+			uartTransmit("Ausschalten\n", 12);
+
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+// Set Status der Statemaschine
+void setStatus(uint8_t Status)
+{
+	switch (Status & 0xF0)
+	{
+		case StateNormal:
+		{
+			if (mStrg_state.status & StateWarning)
+			{
+				if (millis() > (timeWarning + WARNING_RESET))
+				{
+					mStrg_state.status = (Status | mStrg_state.State);
+
+					longwarning = 0;
+					longerror = 0;
+				}
+
+				break;
+			}
+		}
+		case StateWarning:
+		{
+			timeWarning = millis();
+
+			if (mStrg_state.status & StateError)
+			{
+				if (millis() > (timeError + ERROR_RESET))
+				{
+					mStrg_state.status = (StateWarning | mStrg_state.State);
+				}
+
+				break;
+			}
+		}
+		case StateError:
+		{
+			timeError = millis();
+
+			if (mStrg_state.status & CriticalError)
+			{
+				break;
+			}
+		}
+		case CriticalError:
+		{
+			mStrg_state.status = (Status | mStrg_state.State);
+			break;
+		}
+		default:
+		{
+			mStrg_state.status = (CriticalError | mStrg_state.State);
+			uartTransmit("mStrg Kritischer Fehler Statemaschine\n!", 38);
+			break;
+		}
+	}
 }
 
 // Timer-Interrupt: Timer ist uebergelaufen
@@ -586,7 +1018,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	// Kontrolliere welcher Timer den Ueberlauf ausgeloest hat
 	if (htim == &htim6)																	// Wenn Timer 6 den ueberlauf ausgeloest hat
 	{
-		millisekunden_flag_1 = 1;														// Setze Millisekunden Flag
+		millisekunden_flag = 1;															// Setze Millisekunden Flag
 	}
 }
 /* USER CODE END 4 */

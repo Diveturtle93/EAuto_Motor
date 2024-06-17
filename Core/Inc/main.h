@@ -32,29 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#if REVISION == 255
-//#error "Revision ist nicht definiert"
-//#elif REVISION == 1
-//#warning "PCB Revision 1.0 definiert"
-//#elif REVISION == 2
-//#warning "PCB Revision 1.1 definiert"
-//#endif
 
-// FIXME: BAMOCAR_IN1
-// FIXME: BAMOCAR_IN2
-// FIXME: BAMOCAR_Out1
-// FIXME: BAMOCAR_Out2
-// FIXME: Anhaenger
-// FIXME: Klima_PWM
-// FIXME: Klima Out
-// FIXME: DCDC_Instruction
-// FIXME: EGas
-// FIXME: Reserve
-// FIXME: DCDC_Fault
-// FIXME: HW_Wake
-// FIXME: BC_Rst_Out
-// FIXME: Niveau
-// FIXME: BC_Rst_Out
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -112,8 +90,8 @@ void Error_Handler(void);
 #define SPI5_MISO_GPIO_Port GPIOF
 #define SPI5_MOSI_Pin GPIO_PIN_9
 #define SPI5_MOSI_GPIO_Port GPIOF
-#define WS2812_Pin GPIO_PIN_3
-#define WS2812_GPIO_Port GPIOC
+#define ENTER_Pin GPIO_PIN_3
+#define ENTER_GPIO_Port GPIOC
 #define CRASH_Pin GPIO_PIN_0
 #define CRASH_GPIO_Port GPIOA
 #define EMERGENCY_RUN_Pin GPIO_PIN_1
@@ -198,8 +176,8 @@ void Error_Handler(void);
 #define KLIMA_PWM_GPIO_Port GPIOD
 #define ANHAENGER_Pin GPIO_PIN_14
 #define ANHAENGER_GPIO_Port GPIOD
-#define RESERVE_OUT_Pin GPIO_PIN_15
-#define RESERVE_OUT_GPIO_Port GPIOD
+#define NIVEAU_OUT_Pin GPIO_PIN_15
+#define NIVEAU_OUT_GPIO_Port GPIOD
 #define BUZZER_Pin GPIO_PIN_2
 #define BUZZER_GPIO_Port GPIOG
 #define GENERATOR_LED_Pin GPIO_PIN_3
@@ -216,8 +194,8 @@ void Error_Handler(void);
 #define GRA4_GPIO_Port GPIOG
 #define SD_SW_Pin GPIO_PIN_6
 #define SD_SW_GPIO_Port GPIOC
-#define ENTER_Pin GPIO_PIN_7
-#define ENTER_GPIO_Port GPIOC
+#define WS2812_Pin GPIO_PIN_7
+#define WS2812_GPIO_Port GPIOC
 #define SD_D0_Pin GPIO_PIN_8
 #define SD_D0_GPIO_Port GPIOC
 #define SD_D1_Pin GPIO_PIN_9
@@ -278,8 +256,21 @@ void Error_Handler(void);
 #define HEATER1_GPIO_Port GPIOE
 #define DIGITAL2_Pin GPIO_PIN_1
 #define DIGITAL2_GPIO_Port GPIOE
-/* USER CODE BEGIN Private defines */
 
+/* USER CODE BEGIN Private defines */
+// Anzahl der CAN Output Pakete definieren
+//----------------------------------------------------------------------
+#define ANZAHL_OUTPUT_PAKETE			10									// Anzahl Sende Nachrichten
+//----------------------------------------------------------------------
+
+// Typedefine Boolean definieren
+//----------------------------------------------------------------------
+typedef enum
+{
+	false,
+	true
+} bool;
+//----------------------------------------------------------------------
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

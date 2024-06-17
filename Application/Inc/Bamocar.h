@@ -21,8 +21,8 @@
 
 // Definiere CAN-IDs
 //----------------------------------------------------------------------
-#define BAMOCAR_RX_ID							0x181						// Empfangs-Adresse kann zwischen 0x181 und 0x1FF liegen
-#define BAMOCAR_TX_ID							0x201						// Sende-Adresse kann zwischen 0x201 und 0x27F liegen
+#define BAMOCAR_CAN_RX							0x181						// Empfangs-Adresse kann zwischen 0x181 und 0x1FF liegen
+#define BAMOCAR_CAN_TX							0x210						// Sende-Adresse kann zwischen 0x201 und 0x27F liegen
 //----------------------------------------------------------------------
 
 // Definiere RegIDs
@@ -320,8 +320,10 @@
 
 // Definiere Union Statusinformationen Ein- / Augaenge (NDrive S.21)
 //----------------------------------------------------------------------
-typedef union __bamocar_statusIO_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t LMT1 : 1;													// Digitaler Eingang Limit 1 aktiv
 		uint8_t LMT2 : 1;													// Digitaler Eingang Limit 2 aktiv
 		uint8_t IN2 : 1;													// Digitaler Eingang Din 2 aktiv
@@ -347,8 +349,10 @@ typedef union __bamocar_statusIO_tag {
 
 // Definiere Union Status Geraeteinformationen (NDrive S. 22)
 //----------------------------------------------------------------------
-typedef union __bamocar_status_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Ena : 1;													// Antrieb freigegeben (Kombination Hardware RUN und Software)
 		uint8_t NcR0 : 1;													// Drehzahl auf null begrenzt
 		uint8_t LimPos : 1;													// Endschalter Plus belegt
@@ -391,8 +395,10 @@ typedef union __bamocar_status_tag {
 
 // Definiere Union Bamocar Error (NDrive S. 23)
 //----------------------------------------------------------------------
-typedef union __bamocar_error_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t BadParas : 1;												// Parameter beschaedigt
 		uint8_t PowerFault : 1;												// Hardware-Fehler
 		uint8_t RFE : 1;													// Sicherheitskreis fehlerhaft
@@ -418,8 +424,10 @@ typedef union __bamocar_error_tag {
 
 // Definiere Union Bamocar Warnungen (NDrive S. 24)
 //----------------------------------------------------------------------
-typedef union __bamocar_warnung_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Warnung0 : 1;												// Geraeteerkennung inkonsistent
 		uint8_t IllegalStatus : 1;											// RUN Signal gestoert, EMV
 		uint8_t Warnung2 : 1;												// RFE Eingang inaktiv (ohne RUN Eingang aktiv)
@@ -442,7 +450,8 @@ typedef union __bamocar_warnung_tag {
 
 // Daten gelesener Register
 //----------------------------------------------------------------------
-typedef union __bamocar_can_read_tag {
+typedef union
+{
 	uint32_t data;															// Status in 16 Bit Variable
 
 	uint8_t can[4];															// Status in Array
@@ -460,10 +469,13 @@ extern bamocar_can_read_tag bamocar_data;									// Variable fuer CAN-Daten def
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-void readBAMOReg(uint8_t REG);
-void readBAMORegIntvl(uint8_t REG, uint8_t interval);
-void BAMOCAN_ID(uint8_t* data, uint8_t dlc);
-void BamocarInfo(void);
+void writeBamoReg16(uint8_t REG, uint16_t data);							// Schreibe einzelnes Register mit zwei Byte
+void writeBamoReg32(uint8_t REG, uint32_t data);							// Schreibe einzelnes Register mit vier Byte
+void readBamoReg(uint8_t REG);												// Lese einzelnes Register
+void readBamoRegIntvl(uint8_t REG, uint8_t interval);						// Lese einzelnes Register mit Intervall
+void BAMOCAN_ID(uint8_t* data, uint8_t dlc);								// Zuordnung Empfangener Daten
+void BamocarInfo(void);														// Ausgabe Revision
+int8_t convert_IGBT_TEMP(uint16_t num);										// Umrechner der IGBT Temperatur
 //----------------------------------------------------------------------
 
 #endif /* INC_BAMOCAR_H_ */

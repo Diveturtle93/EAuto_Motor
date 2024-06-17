@@ -16,7 +16,8 @@
 
 // Reset Reasons definieren
 //----------------------------------------------------------------------
-typedef enum {
+typedef enum
+{
 	STARTUP = 0x00,
 	IWDG1 = 0x01,
 	WWDG1 = 0x02,

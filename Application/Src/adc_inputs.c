@@ -21,7 +21,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "adc_inputs.h"
-#include "error.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Gaspedal einlesen

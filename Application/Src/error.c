@@ -16,9 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "error.h"
-#include "BasicUart.h"
-#include "outputs.h"
-#include "inputs.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Hal Error auswerten und ausgeben

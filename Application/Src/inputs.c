@@ -16,7 +16,7 @@
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "inputs.h"
-#include "error.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Variablen einbinden
@@ -37,8 +37,15 @@ void readall_inputs(void)
 	// Systemeingaenge einlesen
 	system_in.Kickdown = HAL_GPIO_ReadPin(KICKDOWN_GPIO_Port, KICKDOWN_Pin);					// Eingang Gaspedal getreten
 	system_in.Leerlauf = HAL_GPIO_ReadPin(LEERLAUF_GPIO_Port, LEERLAUF_Pin);					// Eingang Gaspedal nicht getreten
+
+#if TISCHAUFBAU == 1
+	system_in.BremseNO = false;																	// Eingang Bremse nicht getreten
+	system_in.BremseNC = true;																	// Eingang Bremse getreten
+#else
 	system_in.BremseNO = HAL_GPIO_ReadPin(BREMSE_NO_GPIO_Port, BREMSE_NO_Pin);					// Eingang Bremse nicht getreten
 	system_in.BremseNC = HAL_GPIO_ReadPin(BREMSE_NC_GPIO_Port, BREMSE_NC_Pin);					// Eingang Bremse getreten
+#endif
+
 	system_in.Kupplung = HAL_GPIO_ReadPin(KUPPLUNG_NO_GPIO_Port, KUPPLUNG_NO_Pin);				// Eingang Kupplung nicht getreten
 	system_in.Recuperation = HAL_GPIO_ReadPin(RECUPERATION_GPIO_Port, RECUPERATION_Pin);		// Eingang Recuperation
 	system_in.ECON = HAL_GPIO_ReadPin(ECON_GPIO_Port, ECON_Pin);								// Eingang Klima
@@ -55,7 +62,11 @@ void readall_inputs(void)
 	// SDC-Eingaenge einlesen
 	sdc_in.EmergencyRun = HAL_GPIO_ReadPin(EMERGENCY_RUN_GPIO_Port, EMERGENCY_RUN_Pin);			// Emergency Run, Akku
 	sdc_in.SDC0 = HAL_GPIO_ReadPin(SENSE_SDC_0_GPIO_Port, SENSE_SDC_0_Pin);						// Shutdown-Circuit, OK
-	sdc_in.Akku1SDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
+#if BMS_AVAILIBLE == 1
+	sdc_in.AkkuSDC = HAL_GPIO_ReadPin(SENSE_SDC_AKKU_GPIO_Port, SENSE_SDC_AKKU_Pin);			// Shutdown-Circuit Akku, OK
+#else
+	sdc_in.AkkuSDC = 0;																			// Wenn BMS nicht verfügbar, SDC OK
+#endif
 	sdc_in.BTB_SDC = HAL_GPIO_ReadPin(SENSE_SDC_BTB_GPIO_Port, SENSE_SDC_BTB_Pin);				// Shutdown-Circuit Bamocar, OK
 	sdc_in.DCDC_Fault = HAL_GPIO_ReadPin(DCDC_FAULT_GPIO_Port, DCDC_FAULT_Pin);					// DCDC Wandler funktioniert nicht richtig
 

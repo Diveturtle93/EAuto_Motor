@@ -17,12 +17,15 @@
 // Define Debug Symbols
 //----------------------------------------------------------------------
 #define DEBUG_OUTPUT
+#define DEBUG_SDC
 //----------------------------------------------------------------------
 
 // Strukturen definieren
 //----------------------------------------------------------------------
-typedef union __system_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t J317 : 1;						// 0
 		uint8_t F54 : 1;						// 1
 		uint8_t F18 : 1;						// 2
@@ -30,7 +33,7 @@ typedef union __system_out_tag {
 		uint8_t Gluehkerzen : 1;				// 4
 		uint8_t MotorSDC : 1;					// 5
 		uint8_t Klima : 1;						// 6
-		uint8_t Power_On : 1;					// 7
+		uint8_t PowerOn : 1;					// 7
 	};
 
 	uint8_t systemoutput;						// Byte
@@ -38,8 +41,10 @@ typedef union __system_out_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __highcurrent_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Digital1 : 1;					// 0
 		uint8_t Digital2 : 1;					// 1
 		uint8_t Pumpe_Bremse : 1;				// 2
@@ -55,22 +60,26 @@ typedef union __highcurrent_out_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __leuchten_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t Bremslicht : 1;					// 0
 		uint8_t Rueckfahrlicht : 1;				// 1
 		uint8_t Generator : 1;					// 2
 		uint8_t Buzzer : 1;						// 3
-		uint8_t Ruechwarn : 1;					// 4
+		uint8_t Rueckwarn : 1;					// 4
 		uint8_t Ladeleuchte : 1;				// 5
 		uint8_t Wischwarn : 1;					// 6
 		uint8_t Bremswarn : 1;					// 7
 		uint8_t Oeldruck : 1;					// 8
-		uint8_t Reserve : 1;					// 9
+		uint8_t Niveau : 1;						// 9
 		uint8_t Anhaenger : 1;					// A
 		uint8_t RedLed : 1;						// B
 		uint8_t GreenLed : 1;					// C
 		uint8_t BlueLed : 1;					// D
+		uint8_t Reserve : 1;					// E
+		uint8_t  : 1;							// F						// Unused
 	};
 
 	uint16_t ledoutput;							// 2 Byte
@@ -78,8 +87,10 @@ typedef union __leuchten_out_tag {
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-typedef union __komfort_out_tag {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t BC_Rst_Out : 1;					// 0
 		uint8_t BC_Up_Out : 1;					// 1
 		uint8_t BC_Down_Out : 1;				// 2

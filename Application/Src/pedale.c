@@ -20,26 +20,17 @@
 
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "BasicUart.h"
-#include "inputs.h"
-#include "error.h"
-#include "adc_inputs.h"
 #include "pedale.h"
+#include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
 // Gaspedal auswerten
 //----------------------------------------------------------------------
-uint16_t readTrottle(void)
+uint16_t readTrottle(uint16_t ADC_Gas)
 {
-	// Variablen anlegen
-	uint16_t ADC_Gas = 0;
-
 	// Pruefen ob Variable Anlasser aktiv ist
 	if (sdc_in.Anlasser == 1)												// Nur aktiv, wenn KL15 an und Anlasser einmal betaetigt.
 	{
-		// Gaspedal einlesen
-		ADC_Gas = ADC_Gaspedal();
-
 		// Pruefen ob Kupplung getreten wurde
 		if (system_in.Kupplung == 1)										// Wenn Kupplung nicht getreten wurde == 1
 		{
@@ -47,34 +38,41 @@ uint16_t readTrottle(void)
 			if ((system_in.Leerlauf == 1) && (system_in.Kickdown == 1))
 			{
 				// Fehlermeldung auf Uart ausgeben
-#define TROTTLE_INVALID				"Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown und Leerlauf"
-				uartTransmit(TROTTLE_INVALID, sizeof(TROTTLE_INVALID));
+				uartTransmitString("Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown und Leerlauf");
 				// Gaspedal invalide
 				software_error(ERROR_GASPEDAL);
 			}
-			// Threshold Wert vergleichen / Threshold Wert >= THRESHOLD und Leerlauf aktiv
-			else if ((system_in.Leerlauf == 1) && (ADC_Gas >= GAS_THRESHOLD))
+			// Threshold Wert vergleichen / Threshold Wert >= THRESHOLD und Leerlauf nicht aktiv
+			else if ((system_in.Leerlauf != 1) && (ADC_Gas >= GAS_MIN_ADC))
 			{
 				// Wenn Wert groesser THRESHOLD ist, dann THRESHOLD vom ADC-Wert abziehen
-				ADC_Gas -= GAS_THRESHOLD;
+				ADC_Gas -= GAS_MIN_ADC;
 			}
 			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Leerlauf aktiv
-			else if ((system_in.Leerlauf == 1) && (ADC_Gas < GAS_THRESHOLD))
+			else if ((system_in.Leerlauf == 1) || ((system_in.Leerlauf != 1) && (ADC_Gas < GAS_MIN_ADC)))
 			{
 				// Wenn der Wert kleine als THRESHOLD ist, dann ADC ignorieren, alle Werte sind 0
 				ADC_Gas = 0;
 			}
-			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Kickdown aktiv
-			else if ((system_in.Kickdown == 1) && (ADC_Gas < (GAS_MAX_ADC - GAS_THRESHOLD)))
+			// Threshold Wert vergleichen / Threshold Wert < THRESHOLD und Kickdown  nicht aktiv
+			else if ((system_in.Kickdown != 1) && (ADC_Gas < (GAS_MAX_ADC - GAS_MIN_ADC)))
 			{
 				// Wenn Wert kleiner THRESHOLD ist
 
 			}
 			// Threshold Wert vergleichen / Threshold Wert > THRESHOLD und Kickdown aktiv
-			else if ((system_in.Kickdown == 1) && (ADC_Gas >= (GAS_MAX_ADC - GAS_THRESHOLD)))
+			else if ((system_in.Kickdown == 1) && (ADC_Gas >= (GAS_MAX_ADC - GAS_MIN_ADC)))
 			{
 				// Wenn Wert gleich THRESHOLD ist
 				ADC_Gas = GAS_MAX_ADC;
+			}
+			// Wenn Kickdown betaetigt, Gaspedal Error
+			else if (system_in.Kickdown != 1)
+			{
+				// Fehlermeldung ausgeben
+				uartTransmitString("Error_Gaspedal_1 Plausibilitaetsfehler: Kickdown");
+				// Gaspedal invalide
+				software_error(ERROR_GASPEDAL);
 			}
 		}
 		// Wenn Kupplung getreten == 0
