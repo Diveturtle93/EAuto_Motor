@@ -24,6 +24,13 @@
 #include "Motorsteuergeraet.h"
 //----------------------------------------------------------------------
 
+// Variablen definieren
+//----------------------------------------------------------------------
+// Drehgeber
+//----------------------------------------------------------------------
+uint8_t inc = 0, dec = 0, outa;
+//----------------------------------------------------------------------
+
 // Traffic und Info Button auswerten, ADC Wert
 //----------------------------------------------------------------------
 void traffic_info_button (uint16_t value)
@@ -64,6 +71,31 @@ void return_navi_button (uint16_t value)
 	{
 		komfort_in.Return = 0;
 		komfort_in.Navi = 1;
+	}
+}
+//----------------------------------------------------------------------
+
+// Drehgeber abfragen und auswerten
+//----------------------------------------------------------------------
+void drehgeber (void)
+{
+	if ((komfort_in.OutA != 1) && (outa == 1) && (komfort_in.OutB == 1))
+	{
+		outa = 0;
+	}
+	else if ((komfort_in.OutA == 1) && (outa != 1) && (komfort_in.OutB != 1))
+	{
+		outa = 1;
+		inc = 1;
+	}
+	else if ((komfort_in.OutA == 1) && (outa != 1) && (komfort_in.OutB == 1))
+	{
+		outa = 1;
+	}
+	else if ((komfort_in.OutA != 1) && (outa == 1) && (komfort_in.OutB != 1))
+	{
+		outa = 0;
+		dec = 1;
 	}
 }
 //----------------------------------------------------------------------

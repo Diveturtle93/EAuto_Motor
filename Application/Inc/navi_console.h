@@ -33,6 +33,7 @@
 //----------------------------------------------------------------------
 void traffic_info_button (uint16_t value);									// ADC Wert Traffic Button auswerten
 void return_navi_button (uint16_t value);									// ADC Wert Return Button auswerten
+void drehgeber (void);														// Drehgeber auswerten
 //----------------------------------------------------------------------
 
 #endif /* INC_NAVI_CONSOLE_H_ */
