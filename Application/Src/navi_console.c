@@ -79,23 +79,23 @@ void return_navi_button (uint16_t value)
 //----------------------------------------------------------------------
 void drehgeber (void)
 {
-	if ((komfort_in.OutA != 1) && (outa == 1) && (komfort_in.OutB == 1))
+	if ((komfort_in.OutA != 1) && (outa == 1))
 	{
 		outa = 0;
+
+		if (komfort_in.OutB != 1)
+		{
+			dec = 1;
+		}
 	}
-	else if ((komfort_in.OutA == 1) && (outa != 1) && (komfort_in.OutB != 1))
+	else if ((komfort_in.OutA == 1) && (outa != 1))
 	{
 		outa = 1;
-		inc = 1;
-	}
-	else if ((komfort_in.OutA == 1) && (outa != 1) && (komfort_in.OutB == 1))
-	{
-		outa = 1;
-	}
-	else if ((komfort_in.OutA != 1) && (outa == 1) && (komfort_in.OutB != 1))
-	{
-		outa = 0;
-		dec = 1;
+
+		if (komfort_in.OutB != 1)
+		{
+			inc = 1;
+		}
 	}
 }
 //----------------------------------------------------------------------
