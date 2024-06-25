@@ -223,12 +223,39 @@ int main(void)
 	  ADC_VAL[8] = ADC_Kuhlwassertemperatur();
 	  ADC_VAL[9] = ADC_Gaspedal();
 
+	  // PWM Oelstandsensor Kombiinstrument ausgeben
+	  pwm_oelstand(count);
+
+	  // Task wird jede Millisekunde ausgefuehrt
+	  if (millisekunden_flag == 1)
+	  {
+		  count++;																	// Zaehler count hochzaehlen
+		  millisekunden_flag = 0;													// Setze Millisekunden-Flag zurueck
+
+		  // Setze Flag start, nur wenn millisekunden Flag gesetzt war
+		  task = 1;
+	  }
+
+	  // Zuruecksetzen der Countervariable fuer pwm_Oelstand
+	  if (((count % 400) == 0) && (task == 1))
+	  {
+		  // Variable count auf 0 zuruecksetzen
+		  count = 0;
+	  }
+
+	  // Crash Ausgeloest
+	  if (system_in.Crash != 1)
+	  {
+		  setStatus(CriticalError);
+	  }
+
 	  // Sortiere CAN-Daten auf CAN-Buffer
 	  sortCAN();
 
 	  // Lese CAN-Nachrichten ein
 	  if (CAN_available() >= 1)
 	  {
+		  // Lese CAN-Nachricht wenn eine verfuegbar
 		  CANread(&RxMessage);
 
 		  switch (RxMessage.id)
@@ -297,95 +324,74 @@ int main(void)
 		  }
 	  }
 
-#if BAMOCAR_AVAILIBLE == 1
-	  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
-	  if ((mStrg_state.State > Ready) && (millis() > (timeBAMO + CAN_TIMEOUT)))
+	  // Wenn Statemaschine nicht im State Standby oder Ausschalten ist
+	  if ((mStrg_state.State != Standby) && (mStrg_state.State != Ausschalten))
 	  {
-		  can_online &= ~(1 << 0);
-		  longwarning |= (1 << 0);
 
-		  setStatus(StateWarning);
-	  }
+#if BAMOCAR_AVAILIBLE == 1
+		  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
+		  if (millis() > (timeBAMO + CAN_TIMEOUT))
+		  {
+			  can_online &= ~(1 << 0);
+			  longwarning |= (1 << 0);
+
+			  setStatus(StateWarning);
+		  }
 #endif
 
 #if BMS_AVAILIBLE == 1
-	  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
-	  if ((mStrg_state.State > Ready) && (millis() > (timeBMS + CAN_TIMEOUT)))
-	  {
-		  can_online &= ~(1 << 1);
-		  longwarning |= (1 << 0);
+		  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
+		  if (millis() > (timeBMS + CAN_TIMEOUT))
+		  {
+			  can_online &= ~(1 << 1);
+			  longwarning |= (1 << 0);
 
-		  setStatus(StateWarning);
-	  }
+			  setStatus(StateWarning);
+		  }
 #endif
 
 #if STROM_HV_AVAILIBLE == 1
-	  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
-	  if ((mStrg_state.State > Ready) && (millis() > (timeStromHV + CAN_TIMEOUT)))
-	  {
-		  can_online &= ~(1 << 2);
-		  longwarning |= (1 << 0);
+		  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
+		  if (millis() > (timeStromHV + CAN_TIMEOUT))
+		  {
+			  can_online &= ~(1 << 2);
+			  longwarning |= (1 << 0);
 
-		  setStatus(StateWarning);
-	  }
+			  setStatus(StateWarning);
+		  }
 #endif
 
 #if STROM_LV_AVAILIBLE == 1
-	  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
-	  if ((mStrg_state.State > Ready) && (millis() > (timeStromLV + CAN_TIMEOUT)))
-	  {
-		  can_online &= ~(1 << 3);
-		  longwarning |= (1 << 0);
+		  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
+		  if (millis() > (timeStromLV + CAN_TIMEOUT))
+		  {
+			  can_online &= ~(1 << 3);
+			  longwarning |= (1 << 0);
 
-		  setStatus(StateWarning);
-	  }
+			  setStatus(StateWarning);
+		  }
 #endif
 
 #if KOMBIINSTRUMENT_AVAILIBLE == 1
-	  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
-	  if ((mStrg_state.State > Ready) && (millis() > (timeKombi + CAN_TIMEOUT)))
-	  {
-		  can_online &= ~(1 << 4);
-		  longwarning |= (1 << 0);
+		  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
+		  if (millis() > (timeKombi + CAN_TIMEOUT))
+		  {
+			  can_online &= ~(1 << 4);
+			  longwarning |= (1 << 0);
 
-		  setStatus(StateWarning);
-	  }
+			  setStatus(StateWarning);
+		  }
 #endif
 
-	  // PWM Oelstandsensor Kombiinstrument ausgeben
-	  pwm_oelstand(count);
-
-	  // Task wird jede Millisekunde ausgefuehrt
-	  if (millisekunden_flag == 1)
-	  {
-		  count++;																	// Zaehler count hochzaehlen
-		  millisekunden_flag = 0;													// Setze Millisekunden-Flag zurueck
-
-		  // Setze Flag start, nur wenn millisekunden Flag gesetzt war
-		  task = 1;
-	  }
-
-	  // Zuruecksetzen der Countervariable fuer pwm_Oelstand
-	  if (((count % 400) == 0) && (task == 1))
-	  {
-		  // Variable count auf 0 zuruecksetzen
-		  count = 0;
-	  }
-
-	  // Crash Ausgeloest
-	  if (system_in.Crash != 1)
-	  {
-		  setStatus(CriticalError);
-	  }
-
-	  // Wenn Statemaschine nicht im Standby ist
-	  if (mStrg_state.State != Standby)
-	  {
 		  // Schreibe alle CAN-NAchrichten auf BUS, wenn nicht im Standby
 		  CANwork();
 
 		  // Shutdown-Circuit checken
 		  checkSDC();
+
+		  // Navibedienelement auswerten
+		  traffic_info_button(ADC_VAL[6]);
+		  return_navi_button(ADC_VAL[7]);
 	  }
 
 	  // Statemaschine keine Fehler
