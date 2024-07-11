@@ -2,9 +2,6 @@
 #include "Motorsteuergeraet.h"
 // TODO: Formatierung
 
-extern	uint8_t sendCounter;
-extern	uint8_t	recCounter;
-
 unsigned long DIS_SEND_ID = 0x6C0;
 unsigned long DIS_REC_ID = 0x6C1;
 
@@ -67,6 +64,7 @@ uint8_t  M2E_REC[] =           {0x10, 0x2E};
 uint8_t  M2F_REC[] =           {0x10, 0x2F};
 uint8_t  M39_REC[] =           {0x10, 0x39};
 uint8_t  M00_02_REC[] =        {0x10, 0x00, 0x02};
+uint8_t  M0B_REC[] = 		   {0x0B, 0x01, 0x00};
 
 /* Ack Types */
 const uint8_t  NORMAL_ACK = 1;
@@ -79,10 +77,6 @@ uint32_t fis_time = 0;
 
 
 void initDIS(void) {
-
-	sendCounter = 0;
-	recCounter = 0;
-
 	/* Establish Comms */
 
 	switch (fis_state)
@@ -98,7 +92,7 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-			    sendDIS(DIS_SEND_ID,  sizeof(M15_SEND), M15_SEND);				// {0x10, 0x15, 0x02, 0x01, 0x02, 0x00, 0x00}
+			    sendDIS(DIS_SEND_ID, sizeof(M15_SEND), M15_SEND);				// {0x10, 0x15, 0x02, 0x01, 0x02, 0x00, 0x00}
 			    fis_state = 3;
 			}
 			break;
@@ -114,7 +108,7 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M01_02_00_SEND), M01_02_00_SEND);	// {0x10, 0x01, 0x02, 0x00}
+				sendDIS(DIS_SEND_ID, sizeof(M01_02_00_SEND), M01_02_00_SEND);	// {0x10, 0x01, 0x02, 0x00}
 			    fis_state = 5;
 			}
 			break;
@@ -130,21 +124,32 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
+				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_state = 7;
 				fis_time = millis();
 			}
 			break;
 		}
-	    for(int i = 0; i<4; i++)  {
-			sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
-			HAL_Delay(25);
-	    }
+		case 7:
+		{
+		    for(int i = 0; i < 3; i++)
+		    {
+				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
+				fis_time = millis();
+				while (millis <= (fis_time + 10))
+				{
+					readDIS(DIS_REC_ID);
+				}
+		    }
+		    fis_state = 8;
+		    fis_time = millis();
+		    break;
+		}
 		case 8:
 		{
-			if (millis() >= (fis_time + 25))
+			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M01_02_01_SEND), M01_02_01_SEND);	// {0x10, 0x01, 0x02, 0x01}
+				sendDIS(DIS_SEND_ID, sizeof(M01_02_01_SEND), M01_02_01_SEND);	// {0x10, 0x01, 0x02, 0x01}
 				fis_state = 9;
 			}
 			break;
@@ -160,7 +165,7 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M01_01_00_SEND), M01_01_00_SEND);	// {0x10, 0x01, 0x01, 0x00}
+				sendDIS(DIS_SEND_ID, sizeof(M01_01_00_SEND), M01_01_00_SEND);	// {0x10, 0x01, 0x01, 0x00}
 				fis_state = 11;
 			    fis_time = millis();
 			}
@@ -170,7 +175,7 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M08_SEND), M08_SEND);				// {0x10, 0x08}
+				sendDIS(DIS_SEND_ID, sizeof(M08_SEND), M08_SEND);				// {0x10, 0x08}
 				fis_state = 12;
 			}
 			break;
@@ -192,9 +197,9 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M09_1_SEND), M09_1_SEND);			// {0x20, 0x09, 0x20, 0x00, 0x50, 0x07, 0x12,  0x4E}
-				sendDIS(DIS_SEND_ID,  sizeof(M09_2_SEND), M09_2_SEND);			// {0x20, 0x41, 0x56, 0x4C, 0x4C, 0x2D, 0x30,  0x32}
-				sendDIS(DIS_SEND_ID,  sizeof(M09_3_SEND), M09_3_SEND);			// {0x10, 0x30, 0x30, 0x00}
+				sendDIS(DIS_SEND_ID, sizeof(M09_1_SEND), M09_1_SEND);			// {0x20, 0x09, 0x20, 0x00, 0x50, 0x07, 0x12,  0x4E}
+				sendDIS(DIS_SEND_ID, sizeof(M09_2_SEND), M09_2_SEND);			// {0x20, 0x41, 0x56, 0x4C, 0x4C, 0x2D, 0x30,  0x32}
+				sendDIS(DIS_SEND_ID, sizeof(M09_3_SEND), M09_3_SEND);			// {0x10, 0x30, 0x30, 0x00}
 				fis_state = 15;
 			    fis_time = millis();
 			}
@@ -204,7 +209,7 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-			    sendDIS(DIS_SEND_ID,  sizeof(M24_SEND), M24_SEND);				// {0x10, 0x24}
+			    sendDIS(DIS_SEND_ID, sizeof(M24_SEND), M24_SEND);				// {0x10, 0x24}
 				fis_state = 16;
 			    fis_time = millis();
 			}
@@ -214,23 +219,33 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
+				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_state = 17;
 				fis_time = millis();
 			}
 			break;
 		}
-	    for(int i = 0; i<4; i++)  {
-			sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
-			HAL_Delay(25);
-	    }
+		case 17:
+		{
+		    for(int i = 0; i < 3; i++)
+		    {
+				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
+				fis_time = millis();
+				while (millis <= (fis_time + 10))
+				{
+					readDIS(DIS_REC_ID);
+				}
+		    }
+		    fis_state = 18;
+		    fis_time = millis();
+		    break;
+		}
 		case 18:
 		{
-			if (millis() >= (fis_time + 25))
+			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M28_SEND), M28_SEND);				// {0x10, 0x28}
+				sendDIS(DIS_SEND_ID, sizeof(M28_SEND), M28_SEND);				// {0x10, 0x28}
 				fis_state = 19;
-				fis_time = millis();
 			}
 			break;
 		}
@@ -251,9 +266,8 @@ void initDIS(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M20_SEND), M20_SEND);				// {0x10, 0x20, 0x3B, 0xA0, 0x00}
+				sendDIS(DIS_SEND_ID, sizeof(M20_SEND), M20_SEND);				// {0x10, 0x20, 0x3B, 0xA0, 0x00}
 				fis_state = 22;
-				fis_time = millis();
 			}
 			break;
 		}
@@ -271,12 +285,12 @@ void initDIS(void) {
 }
 
 
-void claimScreen(void) {
+uint8_t claimScreen(void) {
 	switch (fis_state)
 	{
 		case 23:
 		{
-			sendDIS(DIS_SEND_ID,  sizeof(R_CLAIM), R_CLAIM);					// {0x10, 0x52, 0x05, 0x80, 0x00, 0x1B, 0x40, 0x30}
+			sendDIS(DIS_SEND_ID, sizeof(R_CLAIM), R_CLAIM);						// {0x10, 0x52, 0x05, 0x80, 0x00, 0x1B, 0x40, 0x30}
 			fis_state = 24;
 			break;
 		}
@@ -303,7 +317,7 @@ void claimScreen(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M2F_SEND), M2F_SEND);				// {0x10, 0x2F}
+				sendDIS(DIS_SEND_ID, sizeof(M2F_SEND), M2F_SEND);				// {0x10, 0x2F}
 				fis_state = 28;
 				fis_time = millis();
 			}
@@ -313,7 +327,7 @@ void claimScreen(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(R_CLAIM), R_CLAIM);				// {0x10, 0x52, 0x05, 0x80, 0x00, 0x1B, 0x40, 0x30}
+				sendDIS(DIS_SEND_ID, sizeof(R_CLAIM), R_CLAIM);					// {0x10, 0x52, 0x05, 0x80, 0x00, 0x1B, 0x40, 0x30}
 				fis_state = 29;
 			}
 			break;
@@ -329,7 +343,7 @@ void claimScreen(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(R_CLEAR), R_CLEAR);				// {0x10, 0x52, 0x05, 0x02, 0x00, 0x1B, 0x40, 0x30}
+				sendDIS(DIS_SEND_ID, sizeof(R_CLEAR), R_CLEAR);				// {0x10, 0x52, 0x05, 0x02, 0x00, 0x1B, 0x40, 0x30}
 				fis_state = 31;
 				fis_time = millis();
 			}
@@ -339,12 +353,15 @@ void claimScreen(void) {
 		{
 			if (millis() >= (fis_time + 10))
 			{
-				sendDIS(DIS_SEND_ID,  sizeof(M39_SEND), M39_SEND);				// {0x10, 0x39}
+				sendDIS(DIS_SEND_ID, sizeof(M39_SEND), M39_SEND);				// {0x10, 0x39}
 				fis_state = 32;
+				return 1;
 			}
 			break;
 		}
 	}
+
+	return 0;
 }
 
 
@@ -364,14 +381,14 @@ void drawFrame(void)
 	uint8_t test1[8] = {0x20, 0x57, 0x0F, 0x06, 0x01, 0x01, 0x48, 0x41};
 	uint8_t test2[8] = {0x20, 0x4C, 0x4C, 0x4F, 0x65, 0x50, 0x08, 0x09};
 	uint8_t test3[4] = {0x10, 0x0C, 0x09, 0x10};
-	sendDIS(DIS_SEND_ID,  sizeof(test1), test1);
-	sendDIS(DIS_SEND_ID,  sizeof(test2), test2);
-	sendDIS(DIS_SEND_ID,  sizeof(test3), test3);
+	sendDIS(DIS_SEND_ID, sizeof(test1), test1);
+	sendDIS(DIS_SEND_ID, sizeof(test2), test2);
+	sendDIS(DIS_SEND_ID, sizeof(test3), test3);
 
-    sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
-    sendDIS(DIS_SEND_ID,  sizeof(M39_SEND), M39_SEND);					// {0x10, 0x39}
-    sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
-//    waitDIS(DIS_REC_ID, M0B_REC);										// {0x0B, 0x01, 0x00}
+    sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
+    sendDIS(DIS_SEND_ID, sizeof(M39_SEND), M39_SEND);					// {0x10, 0x39}
+    sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
+    waitDIS(DIS_REC_ID, M0B_REC);										// {0x0B, 0x01, 0x00}
  
 }   
 
@@ -424,14 +441,14 @@ void drawData(int num1, int num2, int num3, int num4) {
 	dataDraw_7[1] = data[3];
 
 	
-    sendDIS(DIS_SEND_ID,  sizeof(dataDraw_2), dataDraw_2);
-    sendDIS(DIS_SEND_ID,  sizeof(dataDraw_3), dataDraw_3);
-    sendDIS(DIS_SEND_ID,  sizeof(dataDraw_4), dataDraw_4);
-    sendDIS(DIS_SEND_ID,  sizeof(dataDraw_5), dataDraw_5);
-    sendDIS(DIS_SEND_ID,  sizeof(dataDraw_6), dataDraw_6);
-    sendDIS(DIS_SEND_ID,  sizeof(dataDraw_7), dataDraw_7);
-    sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);
-    sendDIS(DIS_SEND_ID,  sizeof(M39_SEND), M39_SEND);
-    sendDIS(DIS_SEND_ID,  sizeof(A3_MESSAGE), A3_MESSAGE);
+    sendDIS(DIS_SEND_ID, sizeof(dataDraw_2), dataDraw_2);
+    sendDIS(DIS_SEND_ID, sizeof(dataDraw_3), dataDraw_3);
+    sendDIS(DIS_SEND_ID, sizeof(dataDraw_4), dataDraw_4);
+    sendDIS(DIS_SEND_ID, sizeof(dataDraw_5), dataDraw_5);
+    sendDIS(DIS_SEND_ID, sizeof(dataDraw_6), dataDraw_6);
+    sendDIS(DIS_SEND_ID, sizeof(dataDraw_7), dataDraw_7);
+    sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);
+    sendDIS(DIS_SEND_ID, sizeof(M39_SEND), M39_SEND);
+    sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);
  	
 }

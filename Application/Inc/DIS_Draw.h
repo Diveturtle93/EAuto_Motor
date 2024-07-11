@@ -3,7 +3,7 @@
 // TODO: Formatierung
 
 void initDIS(void);
-void claimScreen(void);
+uint8_t claimScreen(void);
 void drawFrame(void);
 void drawData(int num1, int num2, int num3, int num4);
 

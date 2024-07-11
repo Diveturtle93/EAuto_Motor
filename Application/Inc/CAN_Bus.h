@@ -105,8 +105,11 @@ extern CAN_PaketTypeDef CAN_Output_PaketListe[ANZAHL_OUTPUT_PAKETE];
 //----------------------------------------------------------------------
 void CANinit(RXQUEUE_TABLE rxSize, TXQUEUE_TABLE txSize);
 bool CANwrite(CAN_message_t *CAN_tx_msg, bool MB);
+bool CANwrite2(CAN_message_t *CAN_tx_msg, bool MB);
 uint8_t CAN_available(void);
+uint8_t CAN_available2(void);
 bool CANread(CAN_message_t *CAN_rx_msg);
+bool CANread2(CAN_message_t *CAN_rx_msg);
 void CANwork(void);
 void CAN_config(void);
 bool isInitialized(void);

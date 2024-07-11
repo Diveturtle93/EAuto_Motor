@@ -25,6 +25,8 @@
 #include "adc_inputs.h"
 #include "app_info.h"
 #include "Bamocar.h"
+#include "DIS_Comms.h"
+#include "DIS_Draw.h"
 #include "error.h"
 #include "inputs.h"
 #include "Bamocar.h"
@@ -56,7 +58,7 @@
 
 // Motorsteuergeraet vorhanden
 //----------------------------------------------------------------------
-#define BMS_AVAILIBLE								1						// 0 = Nicht vorhanden, 1 = vorhanden
+#define BMS_AVAILIBLE								0						// 0 = Nicht vorhanden, 1 = vorhanden
 #define BAMOCAR_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
 #define STROM_HV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
 #define STROM_LV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden

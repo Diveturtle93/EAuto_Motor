@@ -70,9 +70,9 @@ void MX_CAN1_Init(void)
 	sFilterConfig.FilterBank = 0;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	sFilterConfig.FilterIdHigh = 0x07FF << 5;
+	sFilterConfig.FilterIdHigh = 0x0;
 	sFilterConfig.FilterIdLow = 0x0;
-	sFilterConfig.FilterMaskIdHigh = 0x0FFF << 5;
+	sFilterConfig.FilterMaskIdHigh = 0x0;
 	sFilterConfig.FilterMaskIdLow = 0x0;
 	sFilterConfig.FilterFIFOAssignment = 0;
 	sFilterConfig.FilterActivation = ENABLE;
@@ -127,11 +127,11 @@ void MX_CAN2_Init(void)
 	sFilterConfig.FilterBank = 14;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	sFilterConfig.FilterIdHigh = 0x0 << 5;
+	sFilterConfig.FilterIdHigh = 0x6C1 << 5;
 	sFilterConfig.FilterIdLow = 0x0;
-	sFilterConfig.FilterMaskIdHigh = 0x0 << 5;
+	sFilterConfig.FilterMaskIdHigh = 0xFFFF;
 	sFilterConfig.FilterMaskIdLow = 0x0;
-	sFilterConfig.FilterFIFOAssignment = 0;
+	sFilterConfig.FilterFIFOAssignment = 0x0;
 	sFilterConfig.FilterActivation = ENABLE;
 
 	// Filter Bank schreiben
@@ -266,6 +266,11 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     GPIO_InitStruct.Alternate = GPIO_AF9_CAN2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* CAN2 interrupt Init */
+    HAL_NVIC_SetPriority(CAN2_TX_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
+    HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
   /* USER CODE BEGIN CAN2_MspInit 1 */
 
   /* USER CODE END CAN2_MspInit 1 */
@@ -343,6 +348,9 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5|GPIO_PIN_6);
 
+    /* CAN2 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
+    HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
   /* USER CODE BEGIN CAN2_MspDeInit 1 */
 
   /* USER CODE END CAN2_MspDeInit 1 */

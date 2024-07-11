@@ -2,8 +2,8 @@
 #include "Motorsteuergeraet.h"
 // TODO: Formatierung
 
-extern 	unsigned long 	DIS_REC_ID;
-extern 	unsigned long 	DIS_SEND_ID;
+extern unsigned long 	DIS_REC_ID;
+extern unsigned long 	DIS_SEND_ID;
 
 unsigned long 	responseTime = 200; 	// 200 msec
 unsigned long 	delayStart = 0; 		// the time the delay started
@@ -38,9 +38,10 @@ void readDIS(unsigned long id) 					// read waiting message(s) and send ack
 				/* Send ack */
 				if (recBuf[0] < 0x20)  					// Don't ack 2X message */
 				{
-					TxNavi.msg.buf[0] = (0xB0 + recCounter % 15);
+					TxNavi.msg.buf[0] = (0xB0 + (recCounter % 15));
 					TxNavi.msg.len = 1;
-					CANwrite(&TxNavi.msg, false);
+//					while (CANwrite2(&TxNavi.msg, false) == false);
+					CANwrite2(&TxNavi.msg, false);
 				}
 			}
 		}
@@ -77,12 +78,12 @@ uint8_t sendDIS(unsigned long id, uint8_t len, uint8_t *message)
 	readDIS(DIS_REC_ID);
 	/* Send the message */
 	TxNavi.msg.len = len;
-	CANwrite(&TxNavi.msg, false);
+	while (CANwrite2(&TxNavi.msg, false) == false);
 
 /* Wait for Ack */
 	uint8_t ackBuf[8];
 	delayStart = millis();
-	while (responseTime >=(millis() - delayStart) && (ack == 0))
+	while (millis() <= (delayStart + responseTime) && (ack == 0))
 	{
 		if((HAL_CAN_GetRxFifoFillLevel(&hcan2, CAN_RX_FIFO0) != 0) && (ack == 0))        // check if data coming
 		{
@@ -121,7 +122,7 @@ void waitDIS(unsigned long id, uint8_t *message) 			// wait for message
 	delayStart = millis();
 	uint8_t recBuf[8];
 
-	while (responseTime >=(millis() - delayStart) && (messageReceived == 0))
+	while (millis() <= (delayStart + responseTime) && (messageReceived == 0))
 	{
 		if((HAL_CAN_GetRxFifoFillLevel(&hcan2, CAN_RX_FIFO0) != 0) && (messageReceived == 0))        // check if data coming
 		{
@@ -137,51 +138,56 @@ void waitDIS(unsigned long id, uint8_t *message) 			// wait for message
 				{
 					recCounter++;
 				}
+
 				if (recBuf[0] < 0x20)  					// Don't ack 2X message */
 				{
-					TxNavi.msg.buf[0] = (0xB0 + recCounter % 15);
+					TxNavi.msg.buf[0] = (0xB0 + (recCounter % 15));
 					TxNavi.msg.len = 1;
-					CANwrite(&TxNavi.msg, false);
+					while (CANwrite2(&TxNavi.msg, false) == false);
 				}
 			}
 		}
 	}
 }
 
-uint8_t disCommsOk(void)
+void disCommsOk(void)
 {
 	uint8_t len = 0;
 	uint8_t ack = 0;
 	TxNavi = CAN_Nachricht(0x6C0, 8, 50, 10, false);
+	TxNavi.msg.flags.extended = 0;
 
-	/* check for waiting message */
-	readDIS(DIS_REC_ID);
-	/* send keepalives */
+	sendCounter = 0;
+	recCounter = 0;
 
-	TxNavi.msg.len = sizeof(KA_MESSAGE);
-	CANwrite(&TxNavi.msg, false);
-
-	/* check for keep alive response */
-	uint8_t ackBuf[8];
-	delayStart = millis();
-	while (responseTime >=(millis() - delayStart) && (ack == 0))
-	{
-		if((HAL_CAN_GetRxFifoFillLevel(&hcan2, CAN_RX_FIFO0) != 0) && (ack == 0))        // check if data coming
-		{
-			HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &RxNavi, ackBuf);    			// read data,  len: data length, buf: data buf
-			len = RxNavi.DLC;
-			if (RxNavi.StdId == DIS_REC_ID)
-			{
-				ack = 1;
-				for(int i = 0; i<len; i++)
-				{
-					if (ackBuf[i] != KA_RESPONSE[i])
-					{
-						ack = 0;
-					}	
-				}
-			}
-		}
-	}
-	return ack;
+//	/* check for waiting message */
+//	readDIS(DIS_REC_ID);
+//	/* send keepalives */
+//
+//	TxNavi.msg.len = sizeof(KA_MESSAGE);
+//	CANwrite2(&TxNavi.msg, false);
+//
+//	/* check for keep alive response */
+//	uint8_t ackBuf[8];
+//	delayStart = millis();
+//	while (millis() <= (delayStart + responseTime) && (ack == 0))
+//	{
+//		if((HAL_CAN_GetRxFifoFillLevel(&hcan2, CAN_RX_FIFO0) != 0) && (ack == 0))        // check if data coming
+//		{
+//			HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &RxNavi, ackBuf);    			// read data,  len: data length, buf: data buf
+//			len = RxNavi.DLC;
+//			if (RxNavi.StdId == DIS_REC_ID)
+//			{
+//				ack = 1;
+//				for(int i = 0; i<len; i++)
+//				{
+//					if (ackBuf[i] != KA_RESPONSE[i])
+//					{
+//						ack = 0;
+//					}
+//				}
+//			}
+//		}
+//	}
+//	return ack;
 }

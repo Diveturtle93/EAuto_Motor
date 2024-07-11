@@ -121,6 +121,8 @@ int main(void)
 
 	// Anforderung BMS Status fuer Drive Modus
 	Motor_state BMS_State = {{Start, true, false, false, false}};
+
+	uint8_t temp_fis = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -155,6 +157,7 @@ int main(void)
   MX_TIM3_Init();
   MX_CAN3_Init();
   MX_USART2_UART_Init();
+  MX_CAN2_Init();
   /* USER CODE BEGIN 2 */
 
 	SetLED_color(1, WS2812_ORANGE);
@@ -198,6 +201,8 @@ int main(void)
 	SetLED_color(1, WS2812_GREEN);
 	WS2812_update = 1;
 
+	disCommsOk();
+
 	setState(Ready);
   /* USER CODE END 2 */
 
@@ -210,6 +215,17 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  // Alle Eingaenge einlesen
 	  readall_inputs();
+
+	  if (mStrg_state.State >= KL15)
+	  {
+		  initDIS();
+		  temp_fis = claimScreen();
+
+		  if (temp_fis == 1)
+		  {
+			  drawFrame();
+		  }
+	  }
 
 	  // Alle ADC einlesen
 	  ADC_VAL[0] = ADC_Bremsdruck();
