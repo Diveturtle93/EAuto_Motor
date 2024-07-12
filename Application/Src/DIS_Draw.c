@@ -90,7 +90,7 @@ void initDIS(void) {
 		}
 		case 2:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 			    sendDIS(DIS_SEND_ID, sizeof(M15_SEND), M15_SEND);				// {0x10, 0x15, 0x02, 0x01, 0x02, 0x00, 0x00}
 			    fis_state = 3;
@@ -106,7 +106,7 @@ void initDIS(void) {
 		}
 		case 4:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M01_02_00_SEND), M01_02_00_SEND);	// {0x10, 0x01, 0x02, 0x00}
 			    fis_state = 5;
@@ -122,7 +122,7 @@ void initDIS(void) {
 		}
 		case 6:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_state = 7;
@@ -136,7 +136,7 @@ void initDIS(void) {
 		    {
 				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_time = millis();
-				while (millis() <= (fis_time + 10))
+				while (millis() <= (fis_time + 5))
 				{
 					readDIS(DIS_REC_ID);
 				}
@@ -147,7 +147,7 @@ void initDIS(void) {
 		}
 		case 8:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M01_02_01_SEND), M01_02_01_SEND);	// {0x10, 0x01, 0x02, 0x01}
 				fis_state = 9;
@@ -163,7 +163,7 @@ void initDIS(void) {
 		}
 		case 10:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M01_01_00_SEND), M01_01_00_SEND);	// {0x10, 0x01, 0x01, 0x00}
 				fis_state = 11;
@@ -173,7 +173,7 @@ void initDIS(void) {
 		}
 		case 11:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M08_SEND), M08_SEND);				// {0x10, 0x08}
 				fis_state = 12;
@@ -195,7 +195,7 @@ void initDIS(void) {
 		}
 		case 14:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M09_1_SEND), M09_1_SEND);			// {0x20, 0x09, 0x20, 0x00, 0x50, 0x07, 0x12,  0x4E}
 				sendDIS(DIS_SEND_ID, sizeof(M09_2_SEND), M09_2_SEND);			// {0x20, 0x41, 0x56, 0x4C, 0x4C, 0x2D, 0x30,  0x32}
@@ -207,7 +207,7 @@ void initDIS(void) {
 		}
 		case 15:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 			    sendDIS(DIS_SEND_ID, sizeof(M24_SEND), M24_SEND);				// {0x10, 0x24}
 				fis_state = 16;
@@ -217,7 +217,7 @@ void initDIS(void) {
 		}
 		case 16:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_state = 17;
@@ -231,7 +231,7 @@ void initDIS(void) {
 		    {
 				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_time = millis();
-				while (millis() <= (fis_time + 10))
+				while (millis() <= (fis_time + 5))
 				{
 					readDIS(DIS_REC_ID);
 				}
@@ -242,7 +242,7 @@ void initDIS(void) {
 		}
 		case 18:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M28_SEND), M28_SEND);				// {0x10, 0x28}
 				fis_state = 19;
@@ -264,7 +264,7 @@ void initDIS(void) {
 		}
 		case 21:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M20_SEND), M20_SEND);				// {0x10, 0x20, 0x3B, 0xA0, 0x00}
 				fis_state = 22;
@@ -315,7 +315,7 @@ uint8_t claimScreen(void) {
 		}
 		case 27:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M2F_SEND), M2F_SEND);				// {0x10, 0x2F}
 				fis_state = 28;
@@ -325,7 +325,7 @@ uint8_t claimScreen(void) {
 		}
 		case 28:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(R_CLAIM), R_CLAIM);					// {0x10, 0x52, 0x05, 0x80, 0x00, 0x1B, 0x40, 0x30}
 				fis_state = 29;
@@ -341,7 +341,7 @@ uint8_t claimScreen(void) {
 		}
 		case 30:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(R_CLEAR), R_CLEAR);				// {0x10, 0x52, 0x05, 0x02, 0x00, 0x1B, 0x40, 0x30}
 				fis_state = 31;
@@ -351,7 +351,7 @@ uint8_t claimScreen(void) {
 		}
 		case 31:
 		{
-			if (millis() >= (fis_time + 10))
+			if (millis() >= (fis_time + 5))
 			{
 				sendDIS(DIS_SEND_ID, sizeof(M39_SEND), M39_SEND);				// {0x10, 0x39}
 				fis_state = 32;
