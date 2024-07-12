@@ -5,7 +5,7 @@
 extern unsigned long 	DIS_REC_ID;
 extern unsigned long 	DIS_SEND_ID;
 
-unsigned long 	responseTime = 200; 	// 200 msec
+unsigned long 	responseTime = 100; 	// 200 msec
 unsigned long 	delayStart = 0; 		// the time the delay started
 uint8_t 		sendCounter = 0;
 uint8_t 		recCounter = 0;
@@ -67,7 +67,11 @@ uint8_t sendDIS(unsigned long id, uint8_t len, uint8_t *message)
 		{
 			expectedAck = NO_ACK;
 			ack = 1;
-			HAL_Delay(50);  									// don't send multi-line messages too fast
+			delayStart = millis();
+			while (millis() <= (delayStart + 50))
+			{
+				readDIS(DIS_REC_ID);
+			}
 		}
 		else
 		{
@@ -152,8 +156,8 @@ void waitDIS(unsigned long id, uint8_t *message) 			// wait for message
 
 void disCommsOk(void)
 {
-	uint8_t len = 0;
-	uint8_t ack = 0;
+//	uint8_t len = 0;
+//	uint8_t ack = 0;
 	TxNavi = CAN_Nachricht(0x6C0, 8, 50, 10, false);
 	TxNavi.msg.flags.extended = 0;
 

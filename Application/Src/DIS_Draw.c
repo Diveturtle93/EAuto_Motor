@@ -136,7 +136,7 @@ void initDIS(void) {
 		    {
 				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_time = millis();
-				while (millis <= (fis_time + 10))
+				while (millis() <= (fis_time + 10))
 				{
 					readDIS(DIS_REC_ID);
 				}
@@ -231,7 +231,7 @@ void initDIS(void) {
 		    {
 				sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);			// {0xA3}
 				fis_time = millis();
-				while (millis <= (fis_time + 10))
+				while (millis() <= (fis_time + 10))
 				{
 					readDIS(DIS_REC_ID);
 				}
