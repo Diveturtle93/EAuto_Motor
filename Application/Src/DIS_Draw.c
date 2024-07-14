@@ -368,16 +368,7 @@ uint8_t claimScreen(void) {
 void drawFrame(void)
 {
 //	sendDIS(DIS_SEND_ID,  sizeof(DRAW_1), DRAW_1);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_2), DRAW_2);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_3), DRAW_3);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_4), DRAW_4);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_5), DRAW_5);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_6), DRAW_6);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_7), DRAW_7);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_8), DRAW_8);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_9), DRAW_9);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_10), DRAW_10);
-//    sendDIS(DIS_SEND_ID,  sizeof(DRAW_11), DRAW_11);
+
 	uint8_t test1[8] = {0x20, 0x57, 0x0F, 0x06, 0x01, 0x01, 0x48, 0x41};
 	uint8_t test2[8] = {0x20, 0x4C, 0x4C, 0x4F, 0x65, 0x50, 0x08, 0x09};
 	uint8_t test3[4] = {0x10, 0x0C, 0x09, 0x10};
@@ -388,67 +379,6 @@ void drawFrame(void)
     sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
     sendDIS(DIS_SEND_ID, sizeof(M39_SEND), M39_SEND);					// {0x10, 0x39}
     sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);				// {0xA3}
-    waitDIS(DIS_REC_ID, M0B_REC);										// {0x0B, 0x01, 0x00}
+//    waitDIS(DIS_REC_ID, M0B_REC);										// {0x0B, 0x01, 0x00}
  
-}   
-
-void drawData(int num1, int num2, int num3, int num4) {
-	
-	char data[4];
-	
-//	sprintf(data, "%4d", num1);
-	for(int i = 0; i < 3; i++) {   		// change blanks to "65"
-		if (data[i] == 0x20) {
-			data[i] = 0x65;
-		}
-	}
-	dataDraw_2[6] = data[0];
-	dataDraw_2[7] = data[1];
-	dataDraw_3[1] = data[2];
-	dataDraw_3[2] = data[3];
-	
-//	sprintf(data, "%4d", num2);
-	for(int i = 0; i < 3; i++) {   		// change blanks to "65"
-		if (data[i] == 0x20) {
-			data[i] = 0x65;
-		}
-	}
-	dataDraw_4[1] = data[0];
-	dataDraw_4[2] = data[1];
-	dataDraw_4[3] = data[2];
-	dataDraw_4[4] = data[3];
-
-//	sprintf(data, "%4d", num3);
-	for(int i = 0; i < 3; i++) {   		// change blanks to "65"
-		if (data[i] == 0x20) {
-			data[i] = 0x65;
-		}
-	}
-	dataDraw_5[3] = data[0];
-	dataDraw_5[4] = data[1];
-	dataDraw_5[5] = data[2];
-	dataDraw_5[6] = data[3];
-
-//	sprintf(data, "%4d", num4);
-	for(int i = 0; i < 3; i++) {   		// change blanks to "65"
-		if (data[i] == 0x20) {
-			data[i] = 0x65;
-		}
-	}
-	dataDraw_6[5] = data[0];
-	dataDraw_6[6] = data[1];
-	dataDraw_6[7] = data[2];
-	dataDraw_7[1] = data[3];
-
-	
-    sendDIS(DIS_SEND_ID, sizeof(dataDraw_2), dataDraw_2);
-    sendDIS(DIS_SEND_ID, sizeof(dataDraw_3), dataDraw_3);
-    sendDIS(DIS_SEND_ID, sizeof(dataDraw_4), dataDraw_4);
-    sendDIS(DIS_SEND_ID, sizeof(dataDraw_5), dataDraw_5);
-    sendDIS(DIS_SEND_ID, sizeof(dataDraw_6), dataDraw_6);
-    sendDIS(DIS_SEND_ID, sizeof(dataDraw_7), dataDraw_7);
-    sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);
-    sendDIS(DIS_SEND_ID, sizeof(M39_SEND), M39_SEND);
-    sendDIS(DIS_SEND_ID, sizeof(A3_MESSAGE), A3_MESSAGE);
- 	
 }

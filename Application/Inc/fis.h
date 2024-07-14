@@ -14,22 +14,24 @@
 #define INC_FIS_H_
 //----------------------------------------------------------------------
 
-// ... definieren
+// Konstanten definieren
 //----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-
-// ... definieren
-//----------------------------------------------------------------------
-
+#define 		LONG_ACK						1
+#define			NORMAL_ACK						2
+#define 		NO_ACK							3
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
 void readFIS (uint32_t id);
-uint8_t sendFIS (uint32_t id, uint8_t len, uint8_t *message);
+uint8_t sendFIS (uint8_t len, uint8_t *message);
+void waitFIS(uint32_t id, uint8_t *message);
 void initFIS (void);
 void startComms (void);
+
+void initFIS(void);
+uint8_t claimScreen(void);
+void drawFrame(void);
 //----------------------------------------------------------------------
 
 #endif /* INC_FIS_H_ */
