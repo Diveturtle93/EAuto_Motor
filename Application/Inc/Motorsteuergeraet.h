@@ -31,6 +31,7 @@
 #include "millis.h"
 #include "outputs.h"
 #include "pedale.h"
+#include "ResetReason.h"
 #include "rtd_sound.h"
 #include "SystemInfo.h"
 #include "statemaschine.h"
