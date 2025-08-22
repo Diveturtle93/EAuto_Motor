@@ -52,9 +52,7 @@
 
 /* USER CODE BEGIN PV */
 // Motorsteuergeraet Statevariable
-Motor_state mStrg_state = {{Start, true, false, false, false}};
-static uint32_t timeError = 0, timeWarning = 0;
-static uint32_t longerror = 0, longwarning = 0;
+Statemaschine mStrg_state = {{Start, true, false, false, false}};
 
 // Fehler Speicher CAN-Bus
 uint8_t  can_online = 0;
@@ -120,7 +118,7 @@ int main(void)
 	uint8_t WS2812_update = 0;
 
 	// Anforderung BMS Status fuer Drive Modus
-	Motor_state BMS_State = {{Start, true, false, false, false}};
+	Statemaschine BMS_State = {{Start, true, false, false, false}};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -233,7 +231,7 @@ int main(void)
 
 		  switch (RxMessage.id)
 		  {
-#if BAMOCAR_AVAILIBLE == 1
+#if BAMOCAR_AVAILABLE == 1
 			  // Bamocar ID
 			  case BAMOCAR_CAN_RX:
 			  {
@@ -244,11 +242,11 @@ int main(void)
 			  }
 #endif
 
-#if BMS_AVAILIBLE == 1
+#if BMS_AVAILABLE == 1
 			  // Batteriemanagement Status ID
 			  case BMS_CAN_STATUS:
 			  {
-				  BMS_State.status = RxMessage.buf[0];
+				  BMS_State.Status = RxMessage.buf[0];
 
 				  timeBMS = millis();
 				  can_online |= (1 << 1);
@@ -256,7 +254,7 @@ int main(void)
 			  }
 #endif
 
-#if STROM_HV_AVAILIBLE == 1
+#if STROM_HV_AVAILABLE == 1
 			  // Stromsensor
 			  case STROM_HV_CAN_I:
 			  {
@@ -266,7 +264,7 @@ int main(void)
 			  }
 #endif
 
-#if STROM_LV_AVAILIBLE == 1
+#if STROM_LV_AVAILABLE == 1
 			  // Stromsensor
 			  case STROM_LV_CAN_I:
 			  {
@@ -276,7 +274,7 @@ int main(void)
 			  }
 #endif
 
-#if KOMBIINSTRUMENT_AVAILIBLE == 1
+#if KOMBIINSTRUMENT_AVAILABLE == 1
 			  // Stromsensor
 			  case KOMBI2_CAN:
 			  {
@@ -297,56 +295,56 @@ int main(void)
 		  }
 	  }
 
-#if BAMOCAR_AVAILIBLE == 1
+#if BAMOCAR_AVAILABLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Bamocar CAN-Timeout
 	  if ((mStrg_state.State > Ready) && (millis() > (timeBAMO + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 0);
-		  longwarning |= (1 << 0);
+		  longWarning |= (1 << 0);
 
 		  setStatus(StateWarning);
 	  }
 #endif
 
-#if BMS_AVAILIBLE == 1
+#if BMS_AVAILABLE == 1
 	  // Wenn Timeoutzeit ueberschritten, BMS CAN-Timeout
 	  if ((mStrg_state.State > Ready) && (millis() > (timeBMS + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 1);
-		  longwarning |= (1 << 0);
+		  longWarning |= (1 << 0);
 
 		  setStatus(StateWarning);
 	  }
 #endif
 
-#if STROM_HV_AVAILIBLE == 1
+#if STROM_HV_AVAILABLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Stromsensor HV CAN-Timeout
 	  if ((mStrg_state.State > Ready) && (millis() > (timeStromHV + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 2);
-		  longwarning |= (1 << 0);
+		  longWarning |= (1 << 0);
 
 		  setStatus(StateWarning);
 	  }
 #endif
 
-#if STROM_LV_AVAILIBLE == 1
+#if STROM_LV_AVAILABLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Stromsensor LV CAN-Timeout
 	  if ((mStrg_state.State > Ready) && (millis() > (timeStromLV + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 3);
-		  longwarning |= (1 << 0);
+		  longWarning |= (1 << 0);
 
 		  setStatus(StateWarning);
 	  }
 #endif
 
-#if KOMBIINSTRUMENT_AVAILIBLE == 1
+#if KOMBIINSTRUMENT_AVAILABLE == 1
 	  // Wenn Timeoutzeit ueberschritten, Kombiinstrument
 	  if ((mStrg_state.State > Ready) && (millis() > (timeKombi + CAN_TIMEOUT)))
 	  {
 		  can_online &= ~(1 << 4);
-		  longwarning |= (1 << 0);
+		  longWarning |= (1 << 0);
 
 		  setStatus(StateWarning);
 	  }
@@ -612,7 +610,7 @@ int main(void)
 			  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
 			  CAN_Output_PaketListe[8].msg.buf[1] = gas_mean;
 			  CAN_Output_PaketListe[8].msg.buf[2] = (gas_mean >> 8);
-			  CAN_Output_PaketListe[8].allowed = true;
+			  CAN_Output_PaketListe[8].sendpossible = true;
 
 			  motor280.Drehzahl = (gas_mean * 5);
 
@@ -628,7 +626,7 @@ int main(void)
 				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
 				  CAN_Output_PaketListe[8].msg.buf[1] = 0;
 				  CAN_Output_PaketListe[8].msg.buf[2] = 0;
-				  CAN_Output_PaketListe[8].allowed = false;
+				  CAN_Output_PaketListe[8].sendpossible = false;
 
 				  motor280.Drehzahl = 0;
 
@@ -649,7 +647,7 @@ int main(void)
 				  CAN_Output_PaketListe[8].msg.buf[0] = BAMOCAR_REG_TORQUE_SETPOINT;
 				  CAN_Output_PaketListe[8].msg.buf[1] = 0;
 				  CAN_Output_PaketListe[8].msg.buf[2] = 0;
-				  CAN_Output_PaketListe[8].allowed = false;
+				  CAN_Output_PaketListe[8].sendpossible = false;
 
 				  motor280.Drehzahl = 0;
 
@@ -790,12 +788,12 @@ void checkSDC(void)
 	if (((mStrg_state.State == Precharge) || (mStrg_state.State == ReadyToDrive) || (mStrg_state.State == Drive)) && sdc_in.SDC0 == 1)
 	{
 		setStatus(StateError);
-		longerror |= (1 << 0);
+		longError |= (1 << 0);
 
 		sdc_in.SDC_OK = false;
 	}
 
-#if BAMOCAR_AVAILIBLE == 1
+#if BAMOCAR_AVAILABLE == 1
 	if (sdc_in.BTB_SDC == 1)
 	{
 		setStatus(StateError);
@@ -805,11 +803,11 @@ void checkSDC(void)
 	}
 #endif
 
-#if BMS_AVAILIBLE == 1
+#if BMS_AVAILABLE == 1
 	if (sdc_in.AkkuSDC == 1)
 	{
 		setStatus(StateError);
-		longerror |= (1 << 2);
+		longError |= (1 << 2);
 
 		sdc_in.SDC_OK = false;
 	}
@@ -881,135 +879,10 @@ void sortCAN(void)
 	CAN_Output_PaketListe[6].msg.buf[7] = (ADC_VAL[5] >> 8);
 
 	// Motor Status
-	CAN_Output_PaketListe[7].msg.buf[0] = mStrg_state.status;
-	CAN_Output_PaketListe[7].msg.buf[1] = longwarning;
-	CAN_Output_PaketListe[7].msg.buf[2] = longerror;
+	CAN_Output_PaketListe[7].msg.buf[0] = mStrg_state.Status;
+	CAN_Output_PaketListe[7].msg.buf[1] = longWarning;
+	CAN_Output_PaketListe[7].msg.buf[2] = longError;
 	CAN_Output_PaketListe[7].msg.buf[3] = can_online;
-}
-
-// Set Statemaschine
-void setState(uint8_t State)
-{
-	switch (State)
-	{
-		case Ready:
-		{
-			mStrg_state.State = Ready;
-			uartTransmit("Ready\n", 6);
-
-			break;
-		}
-		case KL15:
-		{
-			mStrg_state.State = KL15;
-			uartTransmit("KL15\n", 5);
-
-			break;
-		}
-		case Anlassen:
-		{
-			mStrg_state.State = Anlassen;
-			uartTransmit("Anlassen\n", 9);
-
-			break;
-		}
-		case Precharge:
-		{
-			mStrg_state.State = Precharge;
-			uartTransmit("Precharge\n", 10);
-
-			break;
-		}
-		case ReadyToDrive:
-		{
-			mStrg_state.State = ReadyToDrive;
-			uartTransmit("ReadyToDrive\n", 13);
-
-			break;
-		}
-		case Drive:
-		{
-			mStrg_state.State = Drive;
-			uartTransmit("Drive\n", 6);
-
-			break;
-		}
-		case Standby:
-		{
-			mStrg_state.State = Standby;
-			uartTransmit("Standby\n", 8);
-
-			break;
-		}
-		case Ausschalten:
-		{
-			mStrg_state.State = Ausschalten;
-			uartTransmit("Ausschalten\n", 12);
-
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-}
-
-// Set Status der Statemaschine
-void setStatus(uint8_t Status)
-{
-	switch (Status & 0xF0)
-	{
-		case StateNormal:
-		{
-			if (mStrg_state.status & StateWarning)
-			{
-				if (millis() > (timeWarning + WARNING_RESET))
-				{
-					mStrg_state.status = (Status | mStrg_state.State);
-
-					longwarning = 0;
-					longerror = 0;
-				}
-
-				break;
-			}
-		}
-		case StateWarning:
-		{
-			timeWarning = millis();
-
-			if (mStrg_state.status & StateError)
-			{
-				if (millis() > (timeError + ERROR_RESET))
-				{
-					mStrg_state.status = (StateWarning | mStrg_state.State);
-				}
-
-				break;
-			}
-		}
-		case StateError:
-		{
-			timeError = millis();
-
-			if (mStrg_state.status & CriticalError)
-			{
-				break;
-			}
-		}
-		case CriticalError:
-		{
-			mStrg_state.status = (Status | mStrg_state.State);
-			break;
-		}
-		default:
-		{
-			mStrg_state.status = (CriticalError | mStrg_state.State);
-			uartTransmit("mStrg Kritischer Fehler Statemaschine\n!", 38);
-			break;
-		}
-	}
 }
 
 // Timer-Interrupt: Timer ist uebergelaufen
@@ -1050,8 +923,7 @@ void Error_Handler(void)
 	while (1);
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
