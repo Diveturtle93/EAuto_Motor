@@ -55,6 +55,12 @@
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F7xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Resetreason"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Basicuart"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Canbus"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_DataWatchpointTrigger"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1353261297" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -82,9 +88,9 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Application"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -138,6 +144,12 @@
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F7xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Resetreason"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Basicuart"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Canbus"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_DataWatchpointTrigger"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1115706447" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -173,15 +185,21 @@
 								<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F7xx/Include"/>
 								<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 								<listOptionValue builtIn="false" value="../Lib/STM32_Resetreason"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_Basicuart"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_Canbus"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_DataWatchpointTrigger"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
 							</option>
 							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.817296918" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 						</tool>
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Application"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -241,6 +259,12 @@
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F7xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Resetreason"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Basicuart"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Canbus"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_DataWatchpointTrigger"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1437002253" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -268,9 +292,9 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Application"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
