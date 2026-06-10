@@ -97,7 +97,7 @@ void MX_CAN3_Init(void)
 	}
 
 	// Aktiviere Interrupts fuer CAN Bus
-	if((HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
+	if ((HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING)) != HAL_OK)
 	{
 		// Fehler in der Initialisierung des CAN Interrupts
 		Error_Handler();
@@ -116,7 +116,7 @@ void MX_CAN3_Init(void)
 	sFilterConfig.FilterActivation = ENABLE;
 
 	// Filter Bank schreiben
-	if((HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
+	if ((HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig)) != HAL_OK)
 	{
 		// Fehler beim konfigurieren der Filterbank fuer den CAN-Bus
 		Error_Handler();
@@ -130,7 +130,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(canHandle->Instance==CAN1)
+  if (canHandle->Instance == CAN1)
   {
   /* USER CODE BEGIN CAN1_MspInit 0 */
 
@@ -154,7 +154,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 
   /* USER CODE END CAN1_MspInit 1 */
   }
-  else if(canHandle->Instance==CAN3)
+  else if (canHandle->Instance == CAN3)
   {
   /* USER CODE BEGIN CAN3_MspInit 0 */
 
@@ -188,7 +188,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 {
 
-  if(canHandle->Instance==CAN1)
+  if (canHandle->Instance == CAN1)
   {
   /* USER CODE BEGIN CAN1_MspDeInit 0 */
 
@@ -206,7 +206,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
   /* USER CODE END CAN1_MspDeInit 1 */
   }
-  else if(canHandle->Instance==CAN3)
+  else if (canHandle->Instance == CAN3)
   {
   /* USER CODE BEGIN CAN3_MspDeInit 0 */
 

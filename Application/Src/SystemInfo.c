@@ -13,6 +13,13 @@
 
 //----------------------------------------------------------------------
 
+// Einfuegen der STM Include-Dateien
+//----------------------------------------------------------------------
+#include "stm32f7xx_hal.h"
+//#include "cmsis_os.h"														//Sammelt Information von RTOS CMSIS LAYER
+//#include "task.h"															//Sammelt Information von RTOS
+//----------------------------------------------------------------------
+
 // Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
 #include "main.h"
@@ -21,15 +28,7 @@
 #include "BasicUart.h"
 //----------------------------------------------------------------------
 
-// Einfuegen der STM Include-Dateien
-//----------------------------------------------------------------------
-#include "stm32f7xx_hal.h"
-//#include "cmsis_os.h"														//Collect Information from RTOS CMSIS LAYER
-//#include "task.h"															//Collect Information from RTOS
-//----------------------------------------------------------------------
-
-
-// Collects hardware information from microcontroller and prints it
+// Sammelt Hardwareinformation vom Mikrocontroller und gibt sie auf dem Uart aus
 //----------------------------------------------------------------------
 void collectHardwareInfo(void)
 {
@@ -43,7 +42,7 @@ void collectHardwareInfo(void)
 
 	uartTransmit(STRING_STM_REVISION, sizeof(STRING_STM_REVISION));
 
-	switch(HAL_GetREVID())													// Mikrocontroller Revision
+	switch (HAL_GetREVID())													// Mikrocontroller Revision
 	{
 		case 0x1001:
 			uartTransmit("Z", 1);
@@ -59,14 +58,12 @@ void collectHardwareInfo(void)
 			break;
 	}
 
-
 	uartTransmit(STRING_STM_FREQ, sizeof(STRING_STM_FREQ));
-	{
-		uint32_t frequency = HAL_RCC_GetSysClockFreq();						// Systemfrequenz ausgeben
-		frequency = frequency/1000000;
 
-		uartTransmitNumber(frequency, 10);
-	}
+	uint32_t frequency = HAL_RCC_GetSysClockFreq();						// Systemfrequenz ausgeben
+	frequency = frequency/1000000;
+
+	uartTransmitNumber(frequency, 10);
 
 	uartTransmit(" MHz", 4);
 
@@ -85,7 +82,7 @@ void collectHardwareInfo(void)
 }
 //----------------------------------------------------------------------
 
-// Collects Software information and prints it
+// Sammelt Softwareinformation und gibt sie aus
 //----------------------------------------------------------------------
 void collectSoftwareInfo(void)
 {
@@ -134,7 +131,7 @@ void collectSoftwareInfo(void)
 }
 //----------------------------------------------------------------------
 
-// Collects Version information from Middleware and prints it
+// Sammelt Versionsinformationen von Middleware und gibt sie aus
 //----------------------------------------------------------------------
 void collectMiddlewareInfo(void)
 {
@@ -191,7 +188,7 @@ void collectMiddlewareInfo(void)
 }
 //----------------------------------------------------------------------
 
-// Collects Git count information and prints it
+// Sammelt Git count Informationen und gibt sie aus
 //----------------------------------------------------------------------
 void collectGitcounts(void)
 {
@@ -218,7 +215,7 @@ void collectGitcounts(void)
 }
 //----------------------------------------------------------------------
 
-// Collects Information from microcontroller and send to UART
+// Sammelt Systeminformationen vom Mikrocontroller und sendet sie ueber UART
 //----------------------------------------------------------------------
 void collectSystemInfo(void)
 {
@@ -243,7 +240,7 @@ void collectSystemInfo(void)
 }
 //----------------------------------------------------------------------
 
-// Collects Reset source Flag microcontroller
+// Sammelt Reset Source Flag Mikrocontroller
 //----------------------------------------------------------------------
 reset_reason readResetSource(void)
 {
@@ -298,7 +295,7 @@ reset_reason readResetSource(void)
 }
 //----------------------------------------------------------------------
 
-// Print reset source from microcontroller
+// Sendet Reset Source Informationen ueber UART
 //----------------------------------------------------------------------
 void printResetSource(reset_reason reset_flags)
 {
@@ -338,12 +335,12 @@ void printResetSource(reset_reason reset_flags)
 			uartTransmit("Software Reset\n", 15);
 		}
 
-		if (reset_flags & PINRST1)											//NRST pin
+		if (reset_flags & PINRST1)											// NRST pin
 		{
 			uartTransmit("PIN Reset\n", 10);
 		}
 
-		if (reset_flags & RMVF1)											//NRST pin
+		if (reset_flags & RMVF1)											// NRST pin
 		{
 			uartTransmit("RMVF\n", 5);
 		}

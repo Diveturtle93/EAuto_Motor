@@ -8,16 +8,44 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
+// Saveguard symbol
+//----------------------------------------------------------------------
+#pragma once
+//----------------------------------------------------------------------
+
 // Dateiheader definieren
 //----------------------------------------------------------------------
 #ifndef INC_OUTPUTS_H_
 #define INC_OUTPUTS_H_
 //----------------------------------------------------------------------
 
+// Einfuegen der standard Include-Dateien
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+
+// Einfuegen der STM Include-Dateien
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+
+// Einfuegen der eigenen Include Dateien
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+
 // Define Debug Symbols
 //----------------------------------------------------------------------
 #define DEBUG_OUTPUT
 #define DEBUG_SDC
+//----------------------------------------------------------------------
+
+// Version definieren
+//----------------------------------------------------------------------
+#define OUTPUTS_MAJOR					0
+#define OUTPUTS_MINOR					0
+#define OUTPUTS_PATCH					0
+#define OUTPUTS_DEV						0
 //----------------------------------------------------------------------
 
 // Strukturen definieren
@@ -104,10 +132,10 @@ typedef union
 
 // Definiere Konstanten
 //----------------------------------------------------------------------
-#define SYSTEM_OUTPUT				0b00000000								// 8 Bit, 8 Systemausgaenge
-#define HIGH_OUTPUT					0b00000000								// 8 Bit, 8 Hochstromfaehige Ausgaenge
-#define LED_OUTPUT					0b0011100011010000						// 16 Bit, 14 Leuchtdioden
-#define KOMFORT_OUTPUT				0b00000000								// 8 Bit, 5 Komfortausgaenge
+#define SYSTEM_OUTPUT					0b00000000							// 8 Bit, 8 Systemausgaenge
+#define HIGH_OUTPUT						0b00000000							// 8 Bit, 8 Hochstromfaehige Ausgaenge
+#define LED_OUTPUT						0b0011100011010000					// 16 Bit, 14 Leuchtdioden
+#define KOMFORT_OUTPUT					0b00000000							// 8 Bit, 5 Komfortausgaenge
 //----------------------------------------------------------------------
 
 // Definiere globale Variablen

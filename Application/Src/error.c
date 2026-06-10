@@ -8,6 +8,11 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
+// Einfuegen der standard Include-Dateien
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+
 // Einfuegen der STM Include-Dateien
 //----------------------------------------------------------------------
 #include "main.h"
@@ -104,7 +109,7 @@ void ITM_SendString(char *text)
 {
 #ifdef DEBUG_SWO
 	// So lange *text != '\0', also ungleich dem "String-Endezeichen(Terminator)"
-	while(*text)															// Starte Pointerschleife
+	while (*text)															// Starte Pointerschleife
 	{
 		ITM_SendChar(*text);												// Sende ITM Zeichen
 		text++;																// Pointer hochzaehlen
@@ -123,21 +128,21 @@ void ITM_SendNumber(long number)
 	unsigned int i = 0;
 
 	// Wenn Nummer 0 ist
-	if(number == 0)
+	if (number == 0)
 	{
 		ITM_SendChar('0');													// Sende 0
 		return;																// Beende Funktion
 	}
 
 	// Wenn Zahl negativ ist
-	if(number < 0)
+	if (number < 0)
 	{
 		ITM_SendChar('-');													// Vorzeichen senden
 		number = number * -1;												// Nummer invertieren
 	}
 
 	// Berechne Ziffern bis Zahl 0 ist
-	while(number > 0)
+	while (number > 0)
 	{
 		// Ziffern in Puffer schreiben
 		buf[i++] = number % 10;												// Rest berechnen
@@ -145,7 +150,7 @@ void ITM_SendNumber(long number)
 	}
 
 	// Sende Zeichen
-	for(; i > 0; i--)
+	for (; i > 0; i--)
 	{
 		ITM_SendChar('0' + buf[i-1]);
 	}
@@ -161,7 +166,7 @@ void ITM_SendFloat(double number, int digits)
 	int i = 0;
 
 	// Wenn Zahl negativ ist
-	if(number < 0.0)
+	if (number < 0.0)
 	{
 		ITM_SendChar('-');													// Vorzeichen senden
 		number = number * -1;												// Nummer invertieren
@@ -171,7 +176,7 @@ void ITM_SendFloat(double number, int digits)
 	double rounding = 0.5;
 
 	// Schleife mit anzahl Nachkommastellen
-	for(i = 0; i < digits; i++)
+	for (i = 0; i < digits; i++)
 	{
 		rounding = rounding / 10.0;
 	}
@@ -192,7 +197,7 @@ void ITM_SendFloat(double number, int digits)
 	int toprint;
 
 	// Solange Ziffern senden wie Nachkommastellen benoetigt werden
-	while(digits-- > 0)
+	while (digits-- > 0)
 	{
 		remainder = remainder * 10.0;										// Nachkommastelle in Interger umrechnen
 		toprint = (int)remainder;											// Nachkommastelle in Interger umrechnen

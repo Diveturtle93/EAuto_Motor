@@ -271,8 +271,8 @@ void Error_Handler(void);
 //----------------------------------------------------------------------
 typedef enum
 {
-	false,
-	true
+  false,
+  true
 } bool;
 //----------------------------------------------------------------------
 /* USER CODE END Private defines */

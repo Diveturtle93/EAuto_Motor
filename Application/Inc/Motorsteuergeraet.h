@@ -8,18 +8,28 @@
 // Projekt	:	Motorsteuergeraet
 //----------------------------------------------------------------------
 
+// Saveguard symbol
+//----------------------------------------------------------------------
+#pragma once
+//----------------------------------------------------------------------
+
 // Dateiheader definieren
 //----------------------------------------------------------------------
 #ifndef INC_MOTORSTEUERGERAET_H_
 #define INC_MOTORSTEUERGERAET_H_
 //----------------------------------------------------------------------
 
-// Programmversion definieren
+// Einfuegen der standard Include-Dateien
 //----------------------------------------------------------------------
-#define MAJOR 0																// Motorsteuergeraet Major version Number
-#define MINOR 1																// Motorsteuergeraet Minor version Number
 
-// Include Project Header
+//----------------------------------------------------------------------
+
+// Einfuegen der STM Include-Dateien
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+
+// Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
 #include "BasicUart.h"
 #include "adc_inputs.h"
@@ -36,6 +46,14 @@
 #include "statemaschine.h"
 #include "CAN_Bus.h"
 #include "WS2812.h"
+//----------------------------------------------------------------------
+
+// Version definieren
+//----------------------------------------------------------------------
+#define MOTORSTEUERGERAET_MAJOR					0							// Motorsteuergeraet Major version Number
+#define MOTORSTEUERGERAET_MINOR					0							// Motorsteuergeraet Minor version Number
+#define MOTORSTEUERGERAET_PATCH					0							// Motorsteuergeraet Patch version Number
+#define MOTORSTEUERGERAET_DEV					0							// Motorsteuergeraet Dev version Number
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB

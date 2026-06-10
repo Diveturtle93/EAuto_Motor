@@ -47,7 +47,7 @@ uint16_t ADC_Gaspedal(void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -93,7 +93,7 @@ uint16_t ADC_Bremsdruck(void)
 	
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -135,7 +135,7 @@ uint16_t ADC_KL15 (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -171,7 +171,7 @@ uint16_t ADC_Kuhlwassertemperatur (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -207,7 +207,7 @@ uint16_t ADC_Klimaflap (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -243,7 +243,7 @@ uint16_t ADC_PCBTemperatur (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -279,7 +279,7 @@ uint16_t ADC_Return (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -315,7 +315,7 @@ uint16_t ADC_Info (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -351,7 +351,7 @@ uint16_t ADC_Bremsdrucktemperatur (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);
@@ -387,7 +387,7 @@ uint16_t ADC_STMTemperatur (void)
 
 	// ADC Starten, Wert einlesen und ADC Stoppen
 	HAL_ADC_Start(&hadc1);													// ADC starten
-	if(HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)					// Wenn ADC funktioniert
 	{
 		// ADC Wert holen
 		ADC_Data = HAL_ADC_GetValue(&hadc1);

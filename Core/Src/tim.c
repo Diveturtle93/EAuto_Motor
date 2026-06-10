@@ -119,7 +119,7 @@ void MX_TIM6_Init(void)
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM3)
+  if (tim_baseHandle->Instance == TIM3)
   {
   /* USER CODE BEGIN TIM3_MspInit 0 */
 
@@ -153,7 +153,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 
   /* USER CODE END TIM3_MspInit 1 */
   }
-  else if(tim_baseHandle->Instance==TIM6)
+  else if (tim_baseHandle->Instance == TIM6)
   {
   /* USER CODE BEGIN TIM6_MspInit 0 */
 
@@ -173,7 +173,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(timHandle->Instance==TIM3)
+  if (timHandle->Instance == TIM3)
   {
   /* USER CODE BEGIN TIM3_MspPostInit 0 */
 
@@ -200,7 +200,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM3)
+  if (tim_baseHandle->Instance == TIM3)
   {
   /* USER CODE BEGIN TIM3_MspDeInit 0 */
 
@@ -217,7 +217,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
   /* USER CODE END TIM3_MspDeInit 1 */
   }
-  else if(tim_baseHandle->Instance==TIM6)
+  else if (tim_baseHandle->Instance == TIM6)
   {
   /* USER CODE BEGIN TIM6_MspDeInit 0 */
 

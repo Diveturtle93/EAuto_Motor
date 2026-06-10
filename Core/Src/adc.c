@@ -78,7 +78,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(adcHandle->Instance==ADC1)
+  if (adcHandle->Instance == ADC1)
   {
   /* USER CODE BEGIN ADC1_MspInit 0 */
 
@@ -125,7 +125,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 {
 
-  if(adcHandle->Instance==ADC1)
+  if (adcHandle->Instance == ADC1)
   {
   /* USER CODE BEGIN ADC1_MspDeInit 0 */
 
