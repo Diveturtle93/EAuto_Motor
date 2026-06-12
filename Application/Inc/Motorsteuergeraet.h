@@ -41,6 +41,7 @@
 #include "millis.h"
 #include "outputs.h"
 #include "pedale.h"
+#include "ResetReason.h"
 #include "rtd_sound.h"
 #include "SystemInfo.h"
 #include "statemaschine.h"
@@ -74,11 +75,11 @@
 
 // Motorsteuergeraet vorhanden
 //----------------------------------------------------------------------
-#define BMS_AVAILIBLE								1						// 0 = Nicht vorhanden, 1 = vorhanden
-#define BAMOCAR_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
-#define STROM_HV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
-#define STROM_LV_AVAILIBLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
-#define KOMBIINSTRUMENT_AVAILIBLE					1						// 0 = Nicht vorhanden, 1 = vorhanden
+#define BMS_AVAILABLE								1						// 0 = Nicht vorhanden, 1 = vorhanden
+#define BAMOCAR_AVAILABLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define STROM_HV_AVAILABLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define STROM_LV_AVAILABLE							0						// 0 = Nicht vorhanden, 1 = vorhanden
+#define KOMBIINSTRUMENT_AVAILABLE					1						// 0 = Nicht vorhanden, 1 = vorhanden
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
@@ -183,42 +184,8 @@
 // Zeit Intervalle
 //----------------------------------------------------------------------
 #define CAN_TIMEOUT									10000					// Zeit 10s bis CAN Timeout auftritt
-#define ERROR_RESET									300000					// Zeit 5min bis Error Zurueckgesetzt werden kann
-#define WARNING_RESET								30000					// Zeit 30s bis Warning Zurueckgesetzt werden kann
-//----------------------------------------------------------------------
-
-// Define Statemaschine Typedefines
-//----------------------------------------------------------------------
-typedef enum
-{
-	Start,																	// 0 Starte Motorsteuergeraet
-	Ready,																	// 1 Motorsteuergeraet gestartet
-	KL15,																	// 2 KL15 aktiv
-	Anlassen,																// 3 Anlasser betaetigt
-	Precharge,																// 4 Precharge Fahrzeug
-	ReadyToDrive,															// 5 Motorsteuergeraet bereit fuer Fahrmodus
-	Drive,																	// 6 Fahrzeug im Fahrmodus
-	Standby,																// 7 Auto wird abgeschaltet, Zeitverzoegerung bis Motorsteuergeraet ausgeht
-	Ausschalten,															// 8 Motorsteuergeraet ausschalten
-	StateNormal = 0x10,														// 16 Normalzustand
-	StateWarning = 0x20,													// 32 Warnung
-	StateError = 0x40,														// 64 Fehler
-	CriticalError = 0x80,													// 128 Critischer Fehler
-} states;
-//----------------------------------------------------------------------
-typedef union
-{
-	struct
-	{
-		uint8_t State : 4;													// State der Statemaschine
-		uint8_t Normal : 1;													// Statemaschine normal
-		uint8_t Warning : 1;												// Statemaschine warning
-		uint8_t Error : 1;													// Statemaschine error
-		uint8_t CriticalError : 1;											// Statemaschine kritscher error
-	};
-
-	uint8_t status;									// 1 Byte
-} Motor_state;
+#define MOTORTIME									300000					// Standby Zeit nach ausschalten KL15, 5min
+#define PUMPTIME									60000					// Pumpennachlauf, 1min
 //----------------------------------------------------------------------
 
 // Definiere CAN Strukturen
