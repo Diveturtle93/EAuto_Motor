@@ -31,21 +31,20 @@
 
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "BasicUart.h"
+#include "basicuart.h"
 #include "adc_inputs.h"
 #include "app_info.h"
 #include "Bamocar.h"
 #include "error.h"
 #include "inputs.h"
-#include "Bamocar.h"
 #include "millis.h"
 #include "outputs.h"
 #include "pedale.h"
-#include "ResetReason.h"
+#include "resetreason.h"
 #include "rtd_sound.h"
-#include "SystemInfo.h"
+#include "systeminfo.h"
 #include "statemaschine.h"
-#include "CAN_Bus.h"
+#include "canbus.h"
 #include "WS2812.h"
 //----------------------------------------------------------------------
 
