@@ -61,6 +61,7 @@
 									<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_WS2812"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1353261297" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -150,6 +151,7 @@
 									<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_WS2812"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1115706447" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -191,6 +193,7 @@
 								<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
 								<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
 								<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
+								<listOptionValue builtIn="false" value="../Lib/STM32_WS2812"/>
 							</option>
 							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.817296918" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 						</tool>
@@ -265,6 +268,7 @@
 									<listOptionValue builtIn="false" value="../Lib/STM32_Hardfault"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Statemaschine"/>
 									<listOptionValue builtIn="false" value="../Lib/STM32_Systeminfo"/>
+									<listOptionValue builtIn="false" value="../Lib/STM32_WS2812"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1437002253" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
