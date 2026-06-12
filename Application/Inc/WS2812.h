@@ -111,7 +111,7 @@ static const WS2812_Color WS2812_ROSE = {0xFF, 0, 0x80};					// Rosa, Rose
 
 // Funktionen definieren
 //----------------------------------------------------------------------
-void Set_LED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue);		// Setze die Farben der einzelnen LEDs
+void SetLED (uint8_t LED_Num, uint8_t red, uint8_t green, uint8_t blue);	// Setze die Farben der einzelnen LEDs
 void SetLED_color (uint8_t LED_Num, WS2812_Color color);					// Setze die Farbe mit fixem Farbwert
 void WS2812_Send_Wait (void);												// Sende Daten als PWM, mit Wartezeit
 uint8_t WS2812_Send (void);													// Sende Daten als PWM, keine Wartezeit

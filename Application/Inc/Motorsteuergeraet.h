@@ -50,10 +50,10 @@
 
 // Version definieren
 //----------------------------------------------------------------------
-#define MOTORSTEUERGERAET_MAJOR					0							// Motorsteuergeraet Major version Number
-#define MOTORSTEUERGERAET_MINOR					0							// Motorsteuergeraet Minor version Number
-#define MOTORSTEUERGERAET_PATCH					0							// Motorsteuergeraet Patch version Number
-#define MOTORSTEUERGERAET_DEV					0							// Motorsteuergeraet Dev version Number
+#define MOTORSTEUERGERAET_MAJOR						0						// Motorsteuergeraet Major version Number
+#define MOTORSTEUERGERAET_MINOR						0						// Motorsteuergeraet Minor version Number
+#define MOTORSTEUERGERAET_PATCH						0						// Motorsteuergeraet Patch version Number
+#define MOTORSTEUERGERAET_DEV						0						// Motorsteuergeraet Development version Number
 //----------------------------------------------------------------------
 
 // Define Revision of Motorsteuergeraet HW PCB
